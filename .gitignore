@@ -4,6 +4,8 @@ coverage
 coverage.json
 typechain
 
+.idea/
+
 #Hardhat files
 cache
 artifacts
