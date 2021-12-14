@@ -31,30 +31,28 @@ contract TimeCollection is ERC721URIStorage, Ownable {
     }
 
     modifier onlyExistingTokenId(uint256 tokenId) {
-        require(
-            _exists(tokenId),
-            "Token doesn't exist");
+        require(_exists(tokenId), "Token doesn't exist");
         _;
     }
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        require(
-            msg.sender == ownerOf(tokenId),
-            "Only token owner can do this");
+        require(msg.sender == ownerOf(tokenId), "Only token owner can do this");
         _;
     }
 
-    constructor(
-        string memory name,
-        string memory symbol
-    ) ERC721(name, symbol)
-    {
+    constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         COLLECTION_NAME = name;
         COLLECTION_SYMBOL = symbol;
         tokenCounter = 0;
     }
 
-    function mint(string memory name, string memory description, string memory work, string memory time, string memory date) public {
+    function mint(
+        string memory name,
+        string memory description,
+        string memory work,
+        string memory time,
+        string memory date
+    ) public {
         string memory tokenURI = formatTokenURI(name, description, work, time, date);
         _safeMint(msg.sender, tokenCounter);
         _setTokenURI(tokenCounter, tokenURI);
@@ -74,8 +72,7 @@ contract TimeCollection is ERC721URIStorage, Ownable {
         tokenCounter++;
     }
 
-
-    function buyToken(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId)  public payable {
+    function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         require(ownerOf(tokenId) != address(0), "Token is not for sale");
         require(ownerOf(tokenId) != msg.sender, "You can't buy your own token");
@@ -91,21 +88,31 @@ contract TimeCollection is ERC721URIStorage, Ownable {
         allTokens[tokenId] = token;
     }
 
-    function changeTokenPrice(uint256 tokenId, uint256 newPrice) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
+    function changeTokenPrice(uint256 tokenId, uint256 newPrice)
+        public
+        onlyExistingTokenId(tokenId)
+        onlyTokenOwner(tokenId)
+    {
         require(msg.sender != address(0), "Zero address is not allowed");
         Token memory token = allTokens[tokenId];
         token.price = newPrice;
         allTokens[tokenId] = token;
     }
 
-    function toggleForSale(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
+    function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
         allTokens[tokenId] = token;
     }
 
-    function formatTokenURI(string memory name, string memory description, string memory work, string memory time, string memory date) private pure returns (string memory) {
+    function formatTokenURI(
+        string memory name,
+        string memory description,
+        string memory work,
+        string memory time,
+        string memory date
+    ) private pure returns (string memory) {
         JsonWriter.Json memory writer;
 
         writer = writer.writeStartObject();
@@ -134,11 +141,6 @@ contract TimeCollection is ERC721URIStorage, Ownable {
 
         writer = writer.writeEndObject();
 
-        return string(
-            abi.encodePacked(
-                "data:application/json;base64,",
-                Base64.encode(bytes(writer.value))
-            )
-        );
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(writer.value))));
     }
 }
