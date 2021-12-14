@@ -82,7 +82,8 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         _tokenCounter++;
     }
 
-    function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
+
+    function buyToken(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public payable {
         require(msg.sender != address(0), "Zero address is not allowed");
         address payable owner = payable(ownerOf(tokenId));
         require(owner != msg.sender, "You can't buy your own token");
@@ -104,17 +105,16 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
-    function changeTokenPrice(uint256 tokenId, uint256 newPrice)
-        external
-        onlyExistingTokenId(tokenId)
-        onlyTokenOwner(tokenId)
-    {
-        tokens[tokenId].price = newPrice;
-        emit TokenPriceChanged(tokenId, newPrice);
+    function changeTokenPrice(uint256 tokenId, uint256 newPrice) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
+        require(msg.sender != address(0), "Zero address is not allowed");
+        Token memory token = allTokens[tokenId];
+        token.price = newPrice;
+        allTokens[tokenId] = token;
     }
 
-    function toggleForSale(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
-        Token memory token = tokens[tokenId];
+    function toggleForSale(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
+        require(msg.sender != address(0), "Zero address is not allowed");
+        Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
         emit TokenForSaleToggled(tokenId);
@@ -136,6 +136,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
     function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
         Token memory token = tokens[tokenId];
+    function formatTokenURI(string memory name, string memory description, string memory work, string memory time, string memory date) private pure returns (string memory) {
         JsonWriter.Json memory writer;
 
         writer = writer.writeStartObject();
