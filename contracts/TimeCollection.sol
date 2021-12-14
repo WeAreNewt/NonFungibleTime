@@ -82,8 +82,8 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         _tokenCounter++;
     }
 
-
     function buyToken(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public payable {
+    function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         address payable owner = payable(ownerOf(tokenId));
         require(owner != msg.sender, "You can't buy your own token");
