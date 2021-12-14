@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "base64-sol/base64.sol";
 
-contract TimeCollection is ERC721URIStorage, Ownable {
+contract TimeCollection is ERC721, Ownable {
     using JsonWriter for JsonWriter.Json;
 
     uint256 private tokenCounter;
@@ -20,8 +20,11 @@ contract TimeCollection is ERC721URIStorage, Ownable {
 
     struct Token {
         uint256 tokenId;
-        string tokenName;
-        string tokenURI;
+        string name;
+        string description;
+        string work;
+        string time;
+        string date;
         address payable mintedBy;
         address payable currentOwner;
         address payable previousOwner;
@@ -53,13 +56,14 @@ contract TimeCollection is ERC721URIStorage, Ownable {
         string memory time,
         string memory date
     ) public {
-        string memory tokenURI = formatTokenURI(name, description, work, time, date);
         _safeMint(msg.sender, tokenCounter);
-        _setTokenURI(tokenCounter, tokenURI);
         Token memory newToken = Token(
             tokenCounter,
             name,
-            tokenURI,
+            description,
+            work,
+            time,
+            date,
             payable(msg.sender),
             payable(msg.sender),
             payable(address(0)),
@@ -68,7 +72,6 @@ contract TimeCollection is ERC721URIStorage, Ownable {
             false
         );
         allTokens[tokenCounter] = newToken;
-        emit MintedNFT(tokenCounter, tokenURI);
         tokenCounter++;
     }
 
@@ -106,35 +109,30 @@ contract TimeCollection is ERC721URIStorage, Ownable {
         allTokens[tokenId] = token;
     }
 
-    function formatTokenURI(
-        string memory name,
-        string memory description,
-        string memory work,
-        string memory time,
-        string memory date
-    ) private pure returns (string memory) {
+    function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
+        Token memory token = allTokens[tokenId];
         JsonWriter.Json memory writer;
 
         writer = writer.writeStartObject();
 
-        writer = writer.writeStringProperty("name", name);
-        writer = writer.writeStringProperty("description", description);
+        writer = writer.writeStringProperty("name", token.name);
+        writer = writer.writeStringProperty("description", token.description);
 
         writer = writer.writeStartArray("attributes");
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("trait_type", "type");
-        writer = writer.writeStringProperty("value", work);
+        writer = writer.writeStringProperty("value", token.work);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("trait_type", "Number of Hours");
-        writer = writer.writeStringProperty("value", time);
+        writer = writer.writeStringProperty("value", token.time);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("trait_type", "Date");
-        writer = writer.writeStringProperty("value", date);
+        writer = writer.writeStringProperty("value", token.date);
         writer = writer.writeEndObject();
 
         writer = writer.writeEndArray();
