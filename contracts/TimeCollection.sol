@@ -83,12 +83,11 @@ contract TimeCollection is ERC721, Ownable {
         require(token.forSale, "Token is not for sale");
         require(msg.value >= token.price, "Ethereum value is not enough");
         _transfer(ownerOf(tokenId), msg.sender, tokenId);
-        address payable sendTo = token.currentOwner;
-        sendTo.transfer(msg.value);
         token.previousOwner = token.currentOwner;
         token.currentOwner = payable(msg.sender);
         token.numberOfTransfers += 1;
         allTokens[tokenId] = token;
+        token.previousOwner.transfer(msg.value);
     }
 
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
