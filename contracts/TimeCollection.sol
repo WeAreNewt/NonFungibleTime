@@ -105,15 +105,17 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
-    function changeTokenPrice(uint256 tokenId, uint256 newPrice) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
-        require(msg.sender != address(0), "Zero address is not allowed");
+    function changeTokenPrice(uint256 tokenId, uint256 newPrice)
+        public
+        onlyExistingTokenId(tokenId)
+        onlyTokenOwner(tokenId)
+    {
         Token memory token = allTokens[tokenId];
         token.price = newPrice;
         allTokens[tokenId] = token;
     }
 
-    function toggleForSale(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
-        require(msg.sender != address(0), "Zero address is not allowed");
+    function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
