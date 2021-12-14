@@ -96,14 +96,12 @@ contract TimeCollection is ERC721, Ownable {
         onlyExistingTokenId(tokenId)
         onlyTokenOwner(tokenId)
     {
-        require(msg.sender != address(0), "Zero address is not allowed");
         Token memory token = allTokens[tokenId];
         token.price = newPrice;
         allTokens[tokenId] = token;
     }
 
     function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
-        require(msg.sender != address(0), "Zero address is not allowed");
         Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
         allTokens[tokenId] = token;
