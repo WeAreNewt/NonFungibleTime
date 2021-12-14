@@ -75,7 +75,7 @@ contract TimeCollection is ERC721, Ownable {
         tokenCounter++;
     }
 
-    function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
+    function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         require(ownerOf(tokenId) != address(0), "Token is not for sale");
         require(ownerOf(tokenId) != msg.sender, "You can't buy your own token");
