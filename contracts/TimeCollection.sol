@@ -3,18 +3,16 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "base64-sol/base64.sol";
 
 contract TimeCollection is ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
     using JsonWriter for JsonWriter.Json;
 
-    Counters.Counter private _tokenIds;
+    uint256 private tokenCounter;
 
-    string public collectionName;
-    string public collectionNameSymbol;
+    string public COLLECTION_NAME;
+    string public COLLECTION_SYMBOL;
 
     mapping(uint256 => Token) public allTokens;
 
@@ -32,23 +30,36 @@ contract TimeCollection is ERC721URIStorage, Ownable {
         bool forSale;
     }
 
+    modifier onlyExistingTokenId(uint256 tokenId) {
+        require(
+            _exists(tokenId),
+            "Token doesn't exist");
+        _;
+    }
+
+    modifier onlyTokenOwner(uint256 tokenId) {
+        require(
+            msg.sender == ownerOf(tokenId),
+            "Only token owner can do this");
+        _;
+    }
+
     constructor(
         string memory name,
         string memory symbol
     ) ERC721(name, symbol)
     {
-        collectionName = name;
-        collectionNameSymbol = symbol;
+        COLLECTION_NAME = name;
+        COLLECTION_SYMBOL = symbol;
+        tokenCounter = 0;
     }
 
     function mint(string memory name, string memory description, string memory work, string memory time, string memory date) public {
-        require(msg.sender != address(0));
-        uint256 newItemId = _tokenIds.current();
         string memory tokenURI = formatTokenURI(name, description, work, time, date);
-        _safeMint(msg.sender, newItemId);
-        _setTokenURI(newItemId, tokenURI);
+        _safeMint(msg.sender, tokenCounter);
+        _setTokenURI(tokenCounter, tokenURI);
         Token memory newToken = Token(
-            newItemId,
+            tokenCounter,
             name,
             tokenURI,
             payable(msg.sender),
@@ -58,62 +69,40 @@ contract TimeCollection is ERC721URIStorage, Ownable {
             0,
             false
         );
-        allTokens[newItemId] = newToken;
-        _tokenIds.increment();
-        emit MintedNFT(newItemId, tokenURI);
+        allTokens[tokenCounter] = newToken;
+        tokenCounter++;
+        emit MintedNFT(tokenCounter, tokenURI);
     }
 
 
-    function buyToken(uint256 _tokenId) public payable {
-        require(msg.sender != address(0));
-        require(_exists(_tokenId));
-        address tokenOwner = ownerOf(_tokenId);
-        require(tokenOwner != address(0));
-        require(tokenOwner != msg.sender);
-        Token memory token = allTokens[_tokenId];
-        require(msg.value >= token.price);
-        require(token.forSale);
-        _transfer(tokenOwner, msg.sender, _tokenId);
+    function buyToken(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId)  public payable {
+        require(msg.sender != address(0), "Zero address is not allowed");
+        require(ownerOf(tokenId) != address(0), "Token is not for sale");
+        require(ownerOf(tokenId) != msg.sender, "You can't buy your own token");
+        Token memory token = allTokens[tokenId];
+        require(token.forSale, "Token is not for sale");
+        require(msg.value >= token.price, "Ethereum value is not enough");
+        _transfer(ownerOf(tokenId), msg.sender, tokenId);
         address payable sendTo = token.currentOwner;
         sendTo.transfer(msg.value);
         token.previousOwner = token.currentOwner;
         token.currentOwner = payable(msg.sender);
         token.numberOfTransfers += 1;
-        allTokens[_tokenId] = token;
+        allTokens[tokenId] = token;
     }
 
-    function changeTokenPrice(uint256 _tokenId, uint256 _newPrice) public {
-        require(msg.sender != address(0));
-        require(_exists(_tokenId));
-        address tokenOwner = ownerOf(_tokenId);
-        require(tokenOwner == msg.sender);
-        Token memory token = allTokens[_tokenId];
-        token.price = _newPrice;
-        allTokens[_tokenId] = token;
+    function changeTokenPrice(uint256 tokenId, uint256 newPrice) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
+        require(msg.sender != address(0), "Zero address is not allowed");
+        Token memory token = allTokens[tokenId];
+        token.price = newPrice;
+        allTokens[tokenId] = token;
     }
 
-    function toggleForSale(uint256 _tokenId) public {
-        require(msg.sender != address(0));
-        require(_exists(_tokenId));
-        address tokenOwner = ownerOf(_tokenId);
-        require(tokenOwner == msg.sender);
-        Token memory token = allTokens[_tokenId];
-        if(token.forSale) {
-            token.forSale = false;
-        } else {
-            token.forSale = true;
-        }
-        allTokens[_tokenId] = token;
-    }
-
-    function getTokenMetaData(uint _tokenId) public view returns(string memory) {
-        string memory tokenMetaData = tokenURI(_tokenId);
-        return tokenMetaData;
-    }
-
-    function getTokenOwner(uint256 _tokenId) public view returns(address) {
-        address _tokenOwner = ownerOf(_tokenId);
-        return _tokenOwner;
+    function toggleForSale(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public {
+        require(msg.sender != address(0), "Zero address is not allowed");
+        Token memory token = allTokens[tokenId];
+        token.forSale = !token.forSale;
+        allTokens[tokenId] = token;
     }
 
     function formatTokenURI(string memory name, string memory description, string memory work, string memory time, string memory date) private pure returns (string memory) {
