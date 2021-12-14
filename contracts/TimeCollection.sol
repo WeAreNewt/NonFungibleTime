@@ -70,8 +70,8 @@ contract TimeCollection is ERC721URIStorage, Ownable {
             false
         );
         allTokens[tokenCounter] = newToken;
-        tokenCounter++;
         emit MintedNFT(tokenCounter, tokenURI);
+        tokenCounter++;
     }
 
 
