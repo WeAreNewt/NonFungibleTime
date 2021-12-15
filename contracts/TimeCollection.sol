@@ -64,7 +64,6 @@ contract TimeCollection is ERC721, Ownable {
             time,
             date,
             payable(msg.sender),
-            payable(msg.sender),
             payable(address(0)),
             0,
             0,
