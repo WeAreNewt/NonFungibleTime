@@ -26,7 +26,6 @@ contract TimeCollection is ERC721, Ownable {
         string time;
         string date;
         address payable mintedBy;
-        address payable currentOwner;
         address payable previousOwner;
         uint256 price;
         uint256 numberOfTransfers;
@@ -77,16 +76,16 @@ contract TimeCollection is ERC721, Ownable {
 
     function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
-        require(ownerOf(tokenId) != msg.sender, "You can't buy your own token");
+        address payable owner = payable(ownerOf(tokenId));
+        require(owner != msg.sender, "You can't buy your own token");
         Token memory token = allTokens[tokenId];
         require(token.forSale, "Token is not for sale");
-        require(msg.value >= token.price, "Ethereum value is not enough");
-        _transfer(ownerOf(tokenId), msg.sender, tokenId);
-        token.previousOwner = token.currentOwner;
-        token.currentOwner = payable(msg.sender);
-        token.numberOfTransfers += 1;
+        require(msg.value >= token.price, "Ether value is not enough");
+        token.previousOwner = owner;
+        token.numberOfTransfers++;
         allTokens[tokenId] = token;
-        token.previousOwner.transfer(msg.value);
+        _transfer(owner, msg.sender, tokenId);
+        owner.transfer(msg.value);
     }
 
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
