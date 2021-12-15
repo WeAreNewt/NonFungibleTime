@@ -82,6 +82,7 @@ contract TimeCollection is ERC721, Ownable {
         require(token.forSale, "Token is not for sale");
         require(msg.value >= token.price, "Ether value is not enough");
         token.previousOwner = owner;
+        token.forSale = false;
         token.numberOfTransfers++;
         allTokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -93,9 +94,7 @@ contract TimeCollection is ERC721, Ownable {
         onlyExistingTokenId(tokenId)
         onlyTokenOwner(tokenId)
     {
-        Token memory token = allTokens[tokenId];
-        token.price = newPrice;
-        allTokens[tokenId] = token;
+        allTokens[tokenId].price = newPrice;
     }
 
     function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
