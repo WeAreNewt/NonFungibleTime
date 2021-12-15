@@ -16,7 +16,9 @@ contract TimeCollection is ERC721, Ownable {
 
     mapping(uint256 => Token) public allTokens;
 
-    event MintedNFT(uint256 indexed tokenId, string tokenURI);
+    event TokenBought(uint256 indexed tokenId, address seller, address buyer);
+    event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
+    event TokenForSaleToggled(uint256 indexed tokenId);
 
     struct Token {
         uint256 tokenId;
@@ -86,6 +88,7 @@ contract TimeCollection is ERC721, Ownable {
         allTokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
         owner.transfer(msg.value);
+        emit TokenBought(tokenId, owner, msg.sender);
     }
 
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
@@ -94,12 +97,14 @@ contract TimeCollection is ERC721, Ownable {
         onlyTokenOwner(tokenId)
     {
         allTokens[tokenId].price = newPrice;
+        emit TokenPriceChanged(tokenId, newPrice);
     }
 
     function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
         allTokens[tokenId] = token;
+        emit TokenForSaleToggled(tokenId);
     }
 
     function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
