@@ -16,10 +16,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         _;
     }
 
-    modifier onlyTokenOwner(uint256 tokenId) {
-        require(msg.sender == ownerOf(tokenId), "Only token owner can do this");
-        _;
-    }
+    mapping(uint256 => Token) public allTokens;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
@@ -32,8 +29,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         string work;
         string time;
         string date;
-        address payable mintedBy;
-        address payable previousOwner;
         uint256 price;
         uint256 royalty;
         uint256 numberOfTransfers;
@@ -42,16 +37,20 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
     uint256 internal _tokenCounter;
     uint16 internal constant BASIS_POINTS = 10000;
+    modifier onlyExistingTokenId(uint256 tokenId) {
+        require(_exists(tokenId), 'Token doesnt exist');
+        _;
+    }
 
-    string public COLLECTION_NAME;
-    string public COLLECTION_SYMBOL;
+    modifier onlyTokenOwner(uint256 tokenId) {
+        require(msg.sender == ownerOf(tokenId), 'Only token owner can do this');
+        _;
+    }
 
     mapping(uint256 => Token) public tokens;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
-        COLLECTION_NAME = name;
-        COLLECTION_SYMBOL = symbol;
-        _tokenCounter = 0;
+        tokenCounter = 0;
     }
 
     function mint(
@@ -72,6 +71,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             time,
             date,
             payable(msg.sender),
+            payable(msg.sender),
             payable(address(0)),
             0,
             royalty,
@@ -82,7 +82,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         _tokenCounter++;
     }
 
-    function buyToken(uint256 tokenId) onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) public payable {
     function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         address payable owner = payable(ownerOf(tokenId));
@@ -105,17 +104,18 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
+
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
-        public
-        onlyExistingTokenId(tokenId)
-        onlyTokenOwner(tokenId)
+    external
+    onlyExistingTokenId(tokenId)
+    onlyTokenOwner(tokenId)
     {
         Token memory token = allTokens[tokenId];
         token.price = newPrice;
         allTokens[tokenId] = token;
     }
 
-    function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
+    function toggleForSale(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
@@ -139,34 +139,36 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
         Token memory token = tokens[tokenId];
     function formatTokenURI(string memory name, string memory description, string memory work, string memory time, string memory date) private pure returns (string memory) {
+    function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
+        Token memory token = allTokens[tokenId];
         JsonWriter.Json memory writer;
 
         writer = writer.writeStartObject();
 
-        writer = writer.writeStringProperty("name", token.name);
-        writer = writer.writeStringProperty("description", token.description);
+        writer = writer.writeStringProperty('name', token.name);
+        writer = writer.writeStringProperty('description', token.description);
 
-        writer = writer.writeStartArray("attributes");
+        writer = writer.writeStartArray('attributes');
 
         writer = writer.writeStartObject();
-        writer = writer.writeStringProperty("trait_type", "type");
-        writer = writer.writeStringProperty("value", token.work);
+        writer = writer.writeStringProperty('trait_type', 'type');
+        writer = writer.writeStringProperty('value', token.work);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
-        writer = writer.writeStringProperty("trait_type", "Number of Hours");
-        writer = writer.writeStringProperty("value", token.time);
+        writer = writer.writeStringProperty('trait_type', 'Number of Hours');
+        writer = writer.writeStringProperty('value', token.time);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
-        writer = writer.writeStringProperty("trait_type", "Date");
-        writer = writer.writeStringProperty("value", token.date);
+        writer = writer.writeStringProperty('trait_type', 'Date');
+        writer = writer.writeStringProperty('value', token.date);
         writer = writer.writeEndObject();
 
         writer = writer.writeEndArray();
 
         writer = writer.writeEndObject();
 
-        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(writer.value))));
+        return string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(writer.value))));
     }
 }
