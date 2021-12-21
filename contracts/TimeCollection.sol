@@ -56,7 +56,7 @@ contract TimeCollection is ERC721, Ownable {
         string memory work,
         string memory time,
         string memory date
-    ) public {
+    ) external {
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             _tokenCounter,
@@ -75,7 +75,7 @@ contract TimeCollection is ERC721, Ownable {
         _tokenCounter++;
     }
 
-    function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
+    function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         address payable owner = payable(ownerOf(tokenId));
         require(owner != msg.sender, "You can't buy your own token");
@@ -92,7 +92,7 @@ contract TimeCollection is ERC721, Ownable {
     }
 
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
-        public
+        external
         onlyExistingTokenId(tokenId)
         onlyTokenOwner(tokenId)
     {
@@ -100,7 +100,7 @@ contract TimeCollection is ERC721, Ownable {
         emit TokenPriceChanged(tokenId, newPrice);
     }
 
-    function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
+    function toggleForSale(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = tokens[tokenId];
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
