@@ -3,18 +3,22 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "base64-sol/base64.sol";
 
-contract TimeCollection is ERC721, Ownable {
+contract TimeCollection is IERC2981, ERC721, Ownable {
     using JsonWriter for JsonWriter.Json;
 
-    uint256 private _tokenCounter;
+    modifier onlyExistingTokenId(uint256 tokenId) {
+        require(_exists(tokenId), "Token doesn't exist");
+        _;
+    }
 
-    string public COLLECTION_NAME;
-    string public COLLECTION_SYMBOL;
-
-    mapping(uint256 => Token) public tokens;
+    modifier onlyTokenOwner(uint256 tokenId) {
+        require(msg.sender == ownerOf(tokenId), "Only token owner can do this");
+        _;
+    }
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
@@ -30,19 +34,18 @@ contract TimeCollection is ERC721, Ownable {
         address payable mintedBy;
         address payable previousOwner;
         uint256 price;
+        uint256 royalty;
         uint256 numberOfTransfers;
         bool forSale;
     }
 
-    modifier onlyExistingTokenId(uint256 tokenId) {
-        require(_exists(tokenId), "Token doesn't exist");
-        _;
-    }
+    uint256 internal _tokenCounter;
+    uint16 internal constant BASIS_POINTS = 10000;
 
-    modifier onlyTokenOwner(uint256 tokenId) {
-        require(msg.sender == ownerOf(tokenId), "Only token owner can do this");
-        _;
-    }
+    string public COLLECTION_NAME;
+    string public COLLECTION_SYMBOL;
+
+    mapping(uint256 => Token) public tokens;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         COLLECTION_NAME = name;
@@ -55,8 +58,10 @@ contract TimeCollection is ERC721, Ownable {
         string memory description,
         string memory work,
         string memory time,
-        string memory date
+        string memory date,
+        uint256 royalty
     ) external {
+        require(royalty < BASIS_POINTS, "Invalid royalty");
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             _tokenCounter,
@@ -68,6 +73,7 @@ contract TimeCollection is ERC721, Ownable {
             payable(msg.sender),
             payable(address(0)),
             0,
+            royalty,
             0,
             false
         );
@@ -87,7 +93,13 @@ contract TimeCollection is ERC721, Ownable {
         token.numberOfTransfers++;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
-        owner.transfer(msg.value);
+        if (owner != token.mintedBy) {
+            uint256 royaltyAmount = (token.price * token.royalty) / BASIS_POINTS;
+            token.mintedBy.transfer(royaltyAmount);
+            owner.transfer(token.price - royaltyAmount);
+        } else {
+            owner.transfer(token.price);
+        }
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
@@ -105,6 +117,16 @@ contract TimeCollection is ERC721, Ownable {
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
         emit TokenForSaleToggled(tokenId);
+    }
+
+    function royaltyInfo(uint256 tokenId, uint256 salePrice)
+        external
+        view
+        override
+        onlyExistingTokenId(tokenId)
+        returns (address, uint256)
+    {
+        return (tokens[tokenId].mintedBy, (salePrice * tokens[tokenId].royalty) / BASIS_POINTS);
     }
 
     function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
