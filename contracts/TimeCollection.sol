@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "base64-sol/base64.sol";
 
@@ -127,6 +128,10 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         returns (address, uint256)
     {
         return (tokens[tokenId].mintedBy, (salePrice * tokens[tokenId].royalty) / BASIS_POINTS);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
+        return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
