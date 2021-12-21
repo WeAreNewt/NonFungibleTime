@@ -9,12 +9,12 @@ import "base64-sol/base64.sol";
 contract TimeCollection is ERC721, Ownable {
     using JsonWriter for JsonWriter.Json;
 
-    uint256 private tokenCounter;
+    uint256 private _tokenCounter;
 
     string public COLLECTION_NAME;
     string public COLLECTION_SYMBOL;
 
-    mapping(uint256 => Token) public allTokens;
+    mapping(uint256 => Token) public tokens;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
@@ -47,7 +47,7 @@ contract TimeCollection is ERC721, Ownable {
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         COLLECTION_NAME = name;
         COLLECTION_SYMBOL = symbol;
-        tokenCounter = 0;
+        _tokenCounter = 0;
     }
 
     function mint(
@@ -57,9 +57,9 @@ contract TimeCollection is ERC721, Ownable {
         string memory time,
         string memory date
     ) public {
-        _safeMint(msg.sender, tokenCounter);
+        _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
-            tokenCounter,
+            _tokenCounter,
             name,
             description,
             work,
@@ -71,21 +71,21 @@ contract TimeCollection is ERC721, Ownable {
             0,
             false
         );
-        allTokens[tokenCounter] = newToken;
-        tokenCounter++;
+        tokens[_tokenCounter] = newToken;
+        _tokenCounter++;
     }
 
     function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         address payable owner = payable(ownerOf(tokenId));
         require(owner != msg.sender, "You can't buy your own token");
-        Token memory token = allTokens[tokenId];
+        Token memory token = tokens[tokenId];
         require(token.forSale, "Token is not for sale");
         require(msg.value >= token.price, "Ether value is not enough");
         token.previousOwner = owner;
         token.forSale = false;
         token.numberOfTransfers++;
-        allTokens[tokenId] = token;
+        tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
         owner.transfer(msg.value);
         emit TokenBought(tokenId, owner, msg.sender);
@@ -96,19 +96,19 @@ contract TimeCollection is ERC721, Ownable {
         onlyExistingTokenId(tokenId)
         onlyTokenOwner(tokenId)
     {
-        allTokens[tokenId].price = newPrice;
+        tokens[tokenId].price = newPrice;
         emit TokenPriceChanged(tokenId, newPrice);
     }
 
     function toggleForSale(uint256 tokenId) public onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
-        Token memory token = allTokens[tokenId];
+        Token memory token = tokens[tokenId];
         token.forSale = !token.forSale;
-        allTokens[tokenId] = token;
+        tokens[tokenId] = token;
         emit TokenForSaleToggled(tokenId);
     }
 
     function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
-        Token memory token = allTokens[tokenId];
+        Token memory token = tokens[tokenId];
         JsonWriter.Json memory writer;
 
         writer = writer.writeStartObject();
