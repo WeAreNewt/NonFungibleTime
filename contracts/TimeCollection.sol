@@ -32,6 +32,7 @@ contract TimeCollection is ERC721, Ownable {
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
     error NotEnoughFunds(uint256 tokenId);
     error NullValue();
+    error AlreadyRedeemed(uint256 tokenId);
 
     struct Token {
         uint256 tokenId;
@@ -43,6 +44,7 @@ contract TimeCollection is ERC721, Ownable {
         uint256 price;
         uint256 royalty;
         uint256 numberOfTransfers;
+        bool redeemed;
         bool forSale;
     }
 
@@ -94,6 +96,7 @@ contract TimeCollection is ERC721, Ownable {
             time,
             date,
             0,
+            false,
             royalty,
             0,
             false
@@ -138,6 +141,20 @@ contract TimeCollection is ERC721, Ownable {
     {
         Token memory token = allTokens[tokenId];
         token.price = newPrice;
+        allTokens[tokenId] = token;
+    }
+
+    /// @title redeem
+    /// @dev Redeems the token with the given tokenId.
+    /// @param tokenId Token id of the NFT that you are redeeming
+    function redeem(uint256 tokenId)
+    external
+    onlyExistingTokenId(tokenId)
+    onlyTokenOwner(tokenId)
+    {
+        Token memory token = allTokens[tokenId];
+        if (token.redeemed) revert AlreadyRedeemed(tokenId);
+        token.redeemed = true;
         allTokens[tokenId] = token;
     }
 
