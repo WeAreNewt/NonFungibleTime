@@ -11,15 +11,8 @@ import "base64-sol/base64.sol";
 /// @title Tokenized time collection
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
-contract TimeCollection is ERC721, Ownable {
+contract TimeCollection is IERC2981, ERC721, Ownable {
     using JsonWriter for JsonWriter.Json;
-
-    modifier onlyExistingTokenId(uint256 tokenId) {
-        require(_exists(tokenId), "Token doesn't exist");
-        _;
-    }
-
-    mapping(uint256 => Token) public allTokens;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
@@ -36,16 +29,16 @@ contract TimeCollection is ERC721, Ownable {
 
     struct Token {
         uint256 tokenId;
+        uint256 price;
+        uint256 royalty;
         string name;
         string description;
         string work;
         string time;
         string date;
-        uint256 price;
-        uint256 royalty;
-        uint256 numberOfTransfers;
         bool redeemed;
         bool forSale;
+        address payable mintedBy;
     }
 
     uint256 internal _tokenCounter;
@@ -67,7 +60,6 @@ contract TimeCollection is ERC721, Ownable {
         _tokenCounter = 0;
     }
 
-    /// @title mint
     /// @dev Mints a new token with the given parameters.
     /// @param name Name of the NFT that you are minting
     /// @param description Description of the NFT that you are minting
@@ -82,35 +74,34 @@ contract TimeCollection is ERC721, Ownable {
         string memory date,
         uint256 royalty
     ) external {
-        if(royalty > BASIS_POINTS) revert InvalidRoyalty();
+        if (royalty > BASIS_POINTS) revert InvalidRoyalty();
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             _tokenCounter,
+            0,
+            royalty,
             name,
             description,
             work,
             time,
             date,
-            0,
-            royalty,
-            0,
             false,
-            false
+            false,
+            payable(msg.sender)
         );
         tokens[_tokenCounter] = newToken;
         _tokenCounter++;
     }
 
-    /// @title buyToken
     /// @dev Buys the token with the given tokenId.
     /// @param tokenId The token id of the NFT that you are buying
-    function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
-        if(msg.sender == address(0)) revert InvalidAddress(msg.sender);
+    function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
+        if (msg.sender == address(0)) revert InvalidAddress(msg.sender);
         address payable owner = payable(ownerOf(tokenId));
-        if(owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
+        if (owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
         Token memory token = tokens[tokenId];
-        if(!token.forSale) revert NotForSale(tokenId);
-        if(msg.value < token.price) revert NotEnoughFunds(tokenId);
+        if (!token.forSale) revert NotForSale(tokenId);
+        if (msg.value < token.price) revert NotEnoughFunds(tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -124,7 +115,6 @@ contract TimeCollection is ERC721, Ownable {
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
-    /// @title changeTokenPrice
     /// @dev Changes the price of the token with the given tokenId.
     /// @param tokenId Token id of the NFT that you are selling
     /// @param newPrice New price of the NFT that you are selling
@@ -133,12 +123,11 @@ contract TimeCollection is ERC721, Ownable {
     onlyExistingTokenId(tokenId)
     onlyTokenOwner(tokenId)
     {
-        Token memory token = allTokens[tokenId];
+        Token memory token = tokens[tokenId];
         token.price = newPrice;
-        allTokens[tokenId] = token;
+        tokens[tokenId] = token;
     }
 
-    /// @title redeem
     /// @dev Redeems the token with the given tokenId.
     /// @param tokenId Token id of the NFT that you are redeeming
     function redeem(uint256 tokenId)
@@ -146,38 +135,43 @@ contract TimeCollection is ERC721, Ownable {
     onlyExistingTokenId(tokenId)
     onlyTokenOwner(tokenId)
     {
-        Token memory token = allTokens[tokenId];
+        Token memory token = tokens[tokenId];
         if (token.redeemed) revert AlreadyRedeemed(tokenId);
         token.redeemed = true;
-        allTokens[tokenId] = token;
+        tokens[tokenId] = token;
     }
 
-    /// @title toggleForSale
     /// @dev Toggles the for sale status of the token with the given tokenId.
     /// @param tokenId The number of rings from dendrochronological sample
     function toggleForSale(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
-        Token memory token = allTokens[tokenId];
+        Token memory token = tokens[tokenId];
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
         emit TokenForSaleToggled(tokenId);
     }
 
 
+    /// @dev Gets the royalty information of the token with the given tokenId.
+    /// @param tokenId The id of the token that you are checking
+    /// @param salePrice The price of the NFT that you are querying
+    /// @return True if the interface is supported, false otherwise
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
-        external
-        view
-        override
-        onlyExistingTokenId(tokenId)
-        returns (address, uint256)
+    external
+    view
+    override
+    onlyExistingTokenId(tokenId)
+    returns (address, uint256)
     {
         return (tokens[tokenId].mintedBy, (salePrice * tokens[tokenId].royalty) / BASIS_POINTS);
     }
 
+    /// @dev Checks if the contract supports the specified interface.
+    /// @param interfaceId The interface id of the interface that you are querying
+    /// @return True if the interface is supported, false otherwise
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
         return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// @title formatTokenURI
     /// @dev Returns the URI of the token with the given tokenId.
     /// @param tokenId Token Id of the NFT that you are getting the URI
     /// @return encoded token data in json format
