@@ -31,8 +31,8 @@ contract TimeCollection is ERC721, Ownable {
     error NotForSale(uint256 tokenId);
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
     error NotEnoughFunds(uint256 tokenId);
-    error NullValue();
     error AlreadyRedeemed(uint256 tokenId);
+    error InvalidRoyalty();
 
     struct Token {
         uint256 tokenId;
@@ -50,6 +50,7 @@ contract TimeCollection is ERC721, Ownable {
 
     uint256 internal _tokenCounter;
     uint16 internal constant BASIS_POINTS = 10000;
+
     modifier onlyExistingTokenId(uint256 tokenId) {
         if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
         _;
@@ -63,8 +64,9 @@ contract TimeCollection is ERC721, Ownable {
     mapping(uint256 => Token) public tokens;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
-        tokenCounter = 0;
+        _tokenCounter = 0;
     }
+
     /// @title mint
     /// @dev Mints a new token with the given parameters.
     /// @param name Name of the NFT that you are minting
@@ -80,13 +82,7 @@ contract TimeCollection is ERC721, Ownable {
         string memory date,
         uint256 royalty
     ) external {
-        if (name.length == 0) revert NullValue();
-        if (description.length == 0) revert NullValue();
-        if (work.length == 0) revert NullValue();
-        if (time.length == 0) revert NullValue();
-        if (date.length == 0) revert NullValue();
-        _safeMint(msg.sender, tokenCounter);
-        require(royalty < BASIS_POINTS, "Invalid royalty");
+        if(royalty > BASIS_POINTS) revert InvalidRoyalty();
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             _tokenCounter,
@@ -96,9 +92,9 @@ contract TimeCollection is ERC721, Ownable {
             time,
             date,
             0,
-            false,
             royalty,
             0,
+            false,
             false
         );
         tokens[_tokenCounter] = newToken;
@@ -109,15 +105,13 @@ contract TimeCollection is ERC721, Ownable {
     /// @dev Buys the token with the given tokenId.
     /// @param tokenId The token id of the NFT that you are buying
     function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
-        require(msg.sender != address(0), "Zero address is not allowed");
+        if(msg.sender == address(0)) revert InvalidAddress(msg.sender);
         address payable owner = payable(ownerOf(tokenId));
-        require(owner != msg.sender, "You can't buy your own token");
+        if(owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
         Token memory token = tokens[tokenId];
-        require(token.forSale, "Token is not for sale");
-        require(msg.value >= token.price, "Ether value is not enough");
-        token.previousOwner = owner;
+        if(!token.forSale) revert NotForSale(tokenId);
+        if(msg.value < token.price) revert NotEnoughFunds(tokenId);
         token.forSale = false;
-        token.numberOfTransfers++;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
         if (owner != token.mintedBy) {
@@ -168,10 +162,7 @@ contract TimeCollection is ERC721, Ownable {
         emit TokenForSaleToggled(tokenId);
     }
 
-    /// @title getTokenURI
-    /// @dev Returns the URI of the token with the given tokenId.
-    /// @param tokenId Token Id of the NFT that you are getting the URI
-    /// @return encoded token data in json format
+
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
         external
         view
@@ -186,11 +177,12 @@ contract TimeCollection is ERC721, Ownable {
         return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
+    /// @title formatTokenURI
+    /// @dev Returns the URI of the token with the given tokenId.
+    /// @param tokenId Token Id of the NFT that you are getting the URI
+    /// @return encoded token data in json format
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
         Token memory token = tokens[tokenId];
-    function formatTokenURI(string memory name, string memory description, string memory work, string memory time, string memory date) private pure returns (string memory) {
-    function tokenURI(uint256 tokenId) public view override onlyExistingTokenId(tokenId) returns (string memory) {
-        Token memory token = allTokens[tokenId];
         JsonWriter.Json memory writer;
 
         writer = writer.writeStartObject();
