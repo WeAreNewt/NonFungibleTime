@@ -8,7 +8,10 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "base64-sol/base64.sol";
 
-contract TimeCollection is IERC2981, ERC721, Ownable {
+/// @title Tokenized time collection
+/// @notice Everything created can change a lot, we are still building it.
+/// @dev Everything
+contract TimeCollection is ERC721, Ownable {
     using JsonWriter for JsonWriter.Json;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
@@ -21,6 +24,14 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
     event TokenForSaleToggled(uint256 indexed tokenId);
+
+    error TokenDoesntExist(uint256 tokenId);
+    error OnlyOwner(uint256 tokenId);
+    error InvalidAddress(address addr);
+    error NotForSale(uint256 tokenId);
+    error CantBuyYourOwnToken(address buyer, uint256 tokenId);
+    error NotEnoughFunds(uint256 tokenId);
+    error NullValue();
 
     struct Token {
         uint256 tokenId;
@@ -38,12 +49,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     uint256 internal _tokenCounter;
     uint16 internal constant BASIS_POINTS = 10000;
     modifier onlyExistingTokenId(uint256 tokenId) {
-        require(_exists(tokenId), 'Token doesnt exist');
+        if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
         _;
     }
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        require(msg.sender == ownerOf(tokenId), 'Only token owner can do this');
+        if (msg.sender != ownerOf(tokenId)) revert OnlyOwner(tokenId);
         _;
     }
 
@@ -52,7 +63,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         tokenCounter = 0;
     }
-
+    /// @title mint
+    /// @dev Mints a new token with the given parameters.
+    /// @param name Name of the NFT that you are minting
+    /// @param description Description of the NFT that you are minting
+    /// @param work Type of work that will be done of the NFT that you are minting
+    /// @param time Units of time to be redeemed of the NFT that you are minting
+    /// @param date Date of when the NFT will be redeemed of the NFT that you are minting
     function mint(
         string memory name,
         string memory description,
@@ -61,6 +78,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         string memory date,
         uint256 royalty
     ) external {
+        if (name.length == 0) revert NullValue();
+        if (description.length == 0) revert NullValue();
+        if (work.length == 0) revert NullValue();
+        if (time.length == 0) revert NullValue();
+        if (date.length == 0) revert NullValue();
+        _safeMint(msg.sender, tokenCounter);
         require(royalty < BASIS_POINTS, "Invalid royalty");
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
@@ -70,9 +93,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             work,
             time,
             date,
-            payable(msg.sender),
-            payable(msg.sender),
-            payable(address(0)),
             0,
             royalty,
             0,
@@ -82,6 +102,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         _tokenCounter++;
     }
 
+    /// @title buyToken
+    /// @dev Buys the token with the given tokenId.
+    /// @param tokenId The token id of the NFT that you are buying
     function buyToken(uint256 tokenId) public payable onlyExistingTokenId(tokenId) {
         require(msg.sender != address(0), "Zero address is not allowed");
         address payable owner = payable(ownerOf(tokenId));
@@ -104,7 +127,10 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
-
+    /// @title changeTokenPrice
+    /// @dev Changes the price of the token with the given tokenId.
+    /// @param tokenId Token id of the NFT that you are selling
+    /// @param newPrice New price of the NFT that you are selling
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
     external
     onlyExistingTokenId(tokenId)
@@ -115,6 +141,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         allTokens[tokenId] = token;
     }
 
+    /// @title toggleForSale
+    /// @dev Toggles the for sale status of the token with the given tokenId.
+    /// @param tokenId The number of rings from dendrochronological sample
     function toggleForSale(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = allTokens[tokenId];
         token.forSale = !token.forSale;
@@ -122,6 +151,10 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenForSaleToggled(tokenId);
     }
 
+    /// @title getTokenURI
+    /// @dev Returns the URI of the token with the given tokenId.
+    /// @param tokenId Token Id of the NFT that you are getting the URI
+    /// @return encoded token data in json format
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
         external
         view
