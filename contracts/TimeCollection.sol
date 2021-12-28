@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Undefined
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import "solidity-json-writer/contracts/JsonWriter.sol";
-import "base64-sol/base64.sol";
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/interfaces/IERC2981.sol';
+import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
+import 'solidity-json-writer/contracts/JsonWriter.sol';
+import 'base64-sol/base64.sol';
 
 /// @title Tokenized time collection
 /// @notice Everything created can change a lot, we are still building it.
@@ -119,9 +119,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param tokenId Token id of the NFT that you are selling
     /// @param newPrice New price of the NFT that you are selling
     function changeTokenPrice(uint256 tokenId, uint256 newPrice)
-    external
-    onlyExistingTokenId(tokenId)
-    onlyTokenOwner(tokenId)
+        external
+        onlyExistingTokenId(tokenId)
+        onlyTokenOwner(tokenId)
     {
         Token memory token = tokens[tokenId];
         token.price = newPrice;
@@ -130,11 +130,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
     /// @dev Redeems the token with the given tokenId.
     /// @param tokenId Token id of the NFT that you are redeeming
-    function redeem(uint256 tokenId)
-    external
-    onlyExistingTokenId(tokenId)
-    onlyTokenOwner(tokenId)
-    {
+    function redeem(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = tokens[tokenId];
         if (token.redeemed) revert AlreadyRedeemed(tokenId);
         token.redeemed = true;
@@ -143,24 +139,27 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
     /// @dev Toggles the for sale status of the token with the given tokenId.
     /// @param tokenId The number of rings from dendrochronological sample
-    function toggleForSale(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
+    function toggleForSale(uint256 tokenId)
+        external
+        onlyExistingTokenId(tokenId)
+        onlyTokenOwner(tokenId)
+    {
         Token memory token = tokens[tokenId];
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
         emit TokenForSaleToggled(tokenId);
     }
 
-
     /// @dev Gets the royalty information of the token with the given tokenId.
     /// @param tokenId The id of the token that you are checking
-    /// @param salePrice The price of the NFT that you are querying
-    /// @return True if the interface is supported, false otherwise
+    /// @param salePrice The price of the NFT that should be used for royalty calculation
+    /// @return The address who will receive the royalties and the royalty amount for the given price
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
-    external
-    view
-    override
-    onlyExistingTokenId(tokenId)
-    returns (address, uint256)
+        external
+        view
+        override
+        onlyExistingTokenId(tokenId)
+        returns (address, uint256)
     {
         return (tokens[tokenId].mintedBy, (salePrice * tokens[tokenId].royalty) / BASIS_POINTS);
     }
@@ -168,7 +167,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @dev Checks if the contract supports the specified interface.
     /// @param interfaceId The interface id of the interface that you are querying
     /// @return True if the interface is supported, false otherwise
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, IERC165)
+        returns (bool)
+    {
         return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 
@@ -205,6 +210,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
         writer = writer.writeEndObject();
 
-        return string(abi.encodePacked('data:application/json;base64,', Base64.encode(bytes(writer.value))));
+        return
+            string(
+                abi.encodePacked(
+                    'data:application/json;base64,',
+                    Base64.encode(bytes(writer.value))
+                )
+            );
     }
 }
