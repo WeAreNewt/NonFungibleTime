@@ -17,14 +17,16 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
     event TokenForSaleToggled(uint256 indexed tokenId);
+    event CurrencyAllowanceToggled(address indexed currency);
 
     error TokenDoesntExist(uint256 tokenId);
-    error OnlyOwner(uint256 tokenId);
+    error OnlyTokenOwner(uint256 tokenId);
     error InvalidAddress(address addr);
     error NotForSale(uint256 tokenId);
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
     error NotEnoughFunds(uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
+    error UnallowedCurrency(uint256 tokenId, address currency);
     error InvalidRoyalty();
 
     struct Token {
@@ -39,6 +41,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         bool redeemed;
         bool forSale;
         address payable mintedBy;
+        address currency;
     }
 
     uint256 internal _tokenCounter;
@@ -50,11 +53,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     }
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        if (msg.sender != ownerOf(tokenId)) revert OnlyOwner(tokenId);
+        if (msg.sender != ownerOf(tokenId)) revert OnlyTokenOwner(tokenId);
         _;
     }
 
     mapping(uint256 => Token) public tokens;
+    mapping(address => bool) public isCurrencyAllowed;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         _tokenCounter = 0;
@@ -87,7 +91,8 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             date,
             false,
             false,
-            payable(msg.sender)
+            payable(msg.sender),
+            address(0)
         );
         tokens[_tokenCounter] = newToken;
         _tokenCounter++;
@@ -100,6 +105,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         address payable owner = payable(ownerOf(tokenId));
         if (owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
         Token memory token = tokens[tokenId];
+        if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
         if (msg.value < token.price) revert NotEnoughFunds(tokenId);
         token.forSale = false;
@@ -115,16 +121,19 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenBought(tokenId, owner, msg.sender);
     }
 
-    /// @dev Changes the price of the token with the given tokenId.
+    /// @dev Changes the price and currency of the token with the given tokenId.
     /// @param tokenId Token id of the NFT that you are selling
-    /// @param newPrice New price of the NFT that you are selling
-    function changeTokenPrice(uint256 tokenId, uint256 newPrice)
-        external
-        onlyExistingTokenId(tokenId)
-        onlyTokenOwner(tokenId)
-    {
+    /// @param currency The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency
+    /// @param price Price of the NFT that you are selling
+    function changeTokenBuyingConditions(
+        uint256 tokenId,
+        address currency,
+        uint256 price
+    ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
+        if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
         Token memory token = tokens[tokenId];
-        token.price = newPrice;
+        token.price = price;
+        token.currency = currency;
         tokens[tokenId] = token;
     }
 
@@ -145,6 +154,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         onlyTokenOwner(tokenId)
     {
         Token memory token = tokens[tokenId];
+        if (!token.forSale && !isCurrencyAllowed[token.currency]) {
+            revert UnallowedCurrency(tokenId, token.currency);
+        }
         token.forSale = !token.forSale;
         tokens[tokenId] = token;
         emit TokenForSaleToggled(tokenId);
@@ -217,5 +229,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
                     Base64.encode(bytes(writer.value))
                 )
             );
+    }
+
+    /// @dev Toggles the payment allowance of the given currency
+    /// @param currency The address of the ERC-20 currency to toggle allowance. Use address(0) for native currency
+    function toggleCurrencyAllowance(address currency) external onlyOwner {
+        isCurrencyAllowed[currency] = !isCurrencyAllowed[currency];
+        emit CurrencyAllowanceToggled(currency);
     }
 }
