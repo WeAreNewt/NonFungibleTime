@@ -3,6 +3,8 @@ pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
 import 'solidity-json-writer/contracts/JsonWriter.sol';
@@ -12,6 +14,7 @@ import 'base64-sol/base64.sol';
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
 contract TimeCollection is IERC2981, ERC721, Ownable {
+    using SafeERC20 for IERC20;
     using JsonWriter for JsonWriter.Json;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
@@ -27,6 +30,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     error NotEnoughFunds(uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
     error UnallowedCurrency(uint256 tokenId, address currency);
+    error TransferFailed();
     error InvalidRoyalty();
 
     struct Token {
@@ -113,10 +117,10 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         _transfer(owner, msg.sender, tokenId);
         if (owner != token.mintedBy) {
             uint256 royaltyAmount = (token.price * token.royalty) / BASIS_POINTS;
-            token.mintedBy.transfer(royaltyAmount);
-            owner.transfer(token.price - royaltyAmount);
+            _transferCurrency(msg.sender, token.mintedBy, token.currency, royaltyAmount);
+            _transferCurrency(msg.sender, owner, token.currency, token.price - royaltyAmount);
         } else {
-            owner.transfer(token.price);
+            _transferCurrency(msg.sender, owner, token.currency, token.price);
         }
         emit TokenBought(tokenId, owner, msg.sender);
     }
@@ -236,5 +240,24 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     function toggleCurrencyAllowance(address currency) external onlyOwner {
         isCurrencyAllowed[currency] = !isCurrencyAllowed[currency];
         emit CurrencyAllowanceToggled(currency);
+    }
+
+    /// @dev Transfers the given amount of the given currency from sender to receiver
+    /// @param sender The address of who will send the transfer
+    /// @param receiver The address of who will receive the transfer
+    /// @param currency The currency to use for the transfer. Use address(0) for native currency
+    /// @param amount The amount to transfer
+    function _transferCurrency(
+        address sender,
+        address payable receiver,
+        address currency,
+        uint256 amount
+    ) internal {
+        if (currency == address(0)) {
+            (bool transferSucceed, ) = receiver.call{value: amount}('');
+            if (!transferSucceed) revert TransferFailed();
+        } else {
+            IERC20(currency).safeTransferFrom(sender, receiver, amount);
+        }
     }
 }
