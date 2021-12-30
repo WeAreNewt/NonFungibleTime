@@ -1,0 +1,15 @@
+{
+  "packages": ["packages/*"],
+  "version": "independent",
+  "npmClient": "npm",
+  "useWorkspaces": true,
+  "private": true,
+  "command": {
+    "publish": {
+      "allowBranch": ["main"],
+      "commitHooks": false,
+      "conventionalCommits": true,
+      "message": "chore(release): [skip ci]"
+    }
+  }
+}
