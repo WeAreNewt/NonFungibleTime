@@ -1,0 +1,27 @@
+{
+  "name": "@wearenewt/tokenized-time-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "description": "> TODO: description",
+  "author": "Andrew Schmidt <andrew@aave.com>",
+  "homepage": "https://github.com/WeAreNewt/TokenizedTimeNFTs#readme",
+  "license": "ISC",
+  "main": "lib/subgraph.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WeAreNewt/TokenizedTimeNFTs.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/WeAreNewt/TokenizedTimeNFTs/issues"
+  }
+}
