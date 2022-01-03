@@ -9,6 +9,7 @@ describe("Tokenized time collection", () => {
   let timeContract: TimeCollection;
   let owner: SignerWithAddress;
   let address1: SignerWithAddress;
+  let address2: SignerWithAddress;
   let testToken: TestToken;
 
   beforeEach(async () => {
@@ -18,7 +19,7 @@ describe("Tokenized time collection", () => {
     const TestTokenFactory = await ethers.getContractFactory(
         "TestToken"
     );
-    [owner, address1] = await ethers.getSigners();
+    [owner, address1, address2] = await ethers.getSigners();
     timeContract = await TimeCollectionFactory.deploy(
       "Tokenized Time",
       "TTime"
@@ -285,6 +286,30 @@ describe("Tokenized time collection", () => {
         await testToken.increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
         await timeContract.buyToken(ethers.constants.Zero);
         expect(await testToken.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(99));
+        expect(await testToken.balanceOf(address1.address)).to.equal(ethers.constants.One);
+        expect(await timeContract.ownerOf(ethers.constants.Zero)).to.equal(owner.address);
+    });
+
+    it("Should buy a token and give royalties to the minter", async() => {
+        await timeContract.connect(address2).mint(
+            "One dev hour v1",
+            "One development hour to be used for any dao",
+            "Development",
+            "1",
+            "26/11/2021 19:00",
+            10
+        ); 
+        await timeContract.connect(address2).transferFrom(address2.address, address1.address, ethers.constants.Zero);
+        await timeContract.toggleCurrencyAllowance(testToken.address);
+        await timeContract.connect(address1).changeTokenBuyingConditions(ethers.constants.Zero, testToken.address, ethers.BigNumber.from(100));
+        await timeContract.connect(address1).toggleForSale(ethers.constants.Zero);
+        await testToken.mint();
+        await testToken.increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
+        await timeContract.buyToken(ethers.constants.Zero);
+        expect(await testToken.balanceOf(owner.address)).to.equal(ethers.constants.Zero);
+        //expect(await testToken.balanceOf(address2.address)).to.equal(ethers.BigNumber.from(10));
+        console.log(await testToken.balanceOf(address2.address));
+        expect(await testToken.balanceOf(address1.address)).to.equal(ethers.BigNumber.from(90));
         expect(await timeContract.ownerOf(ethers.constants.Zero)).to.equal(owner.address);
     });
 });
