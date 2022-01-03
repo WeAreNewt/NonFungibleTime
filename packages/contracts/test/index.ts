@@ -159,4 +159,33 @@ describe("Tokenized time collection", () => {
     await timeContract.toggleForSale(ethers.BigNumber.from(0));
     expect(await (await timeContract.tokens(0)).forSale).to.be.true
   });
+
+  it("Should redeem an NFT if you are the owner of it", async () => {
+    await timeContract.mint(
+        "One dev hour v1",
+        "One development hour to be used for any dao",
+        "Development",
+        "1",
+        "26/11/2021 19:00",
+        0
+      );
+      await timeContract.redeem(ethers.BigNumber.from(0));
+      expect(await (await timeContract.tokens(0)).redeemed).to.be.true
+  });
+
+  it("Should revert the NFT redeem if you are not the owner of it", async () => {
+    await timeContract.mint(
+        "One dev hour v1",
+        "One development hour to be used for any dao",
+        "Development",
+        "1",
+        "26/11/2021 19:00",
+        0
+      );
+      try {
+        await timeContract.connect(address1).redeem(ethers.BigNumber.from(0));
+      } catch (error : any) {
+          expect(error.message).to.contain('OnlyTokenOwner');
+      }
+    });
 });
