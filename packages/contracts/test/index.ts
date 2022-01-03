@@ -39,9 +39,9 @@ describe("Tokenized time collection", () => {
     );
 
     expect(await timeContract.tokens(0)).to.eql( [
-      ethers.BigNumber.from(0),
-      ethers.BigNumber.from(0),
-      ethers.BigNumber.from(0),
+      ethers.constants.Zero,
+      ethers.constants.Zero,
+      ethers.constants.Zero,
       "One dev hour v1",
       "One development hour to be used for any dao",
       "Development",
@@ -54,8 +54,8 @@ describe("Tokenized time collection", () => {
     ]);
   });
 
-  it("Should toggle for sale if you are the token owner", async () => {
 
+  it("Should revert if you try to put on sale a NFT with an unallowed currency", async () => {
     await timeContract.mint(
       "One dev hour v1",
       "One development hour to be used for any dao",
@@ -64,8 +64,69 @@ describe("Tokenized time collection", () => {
       "26/11/2021 19:00",
       0
     );
-    await timeContract.toggleForSale(ethers.BigNumber.from(0));
-    expect(await (await timeContract.tokens(0)).forSale).to.be.true
+    try {
+      await timeContract.toggleForSale(ethers.BigNumber.from(0));
+    } catch (error : any) {
+      expect(error.message).to.contain('UnallowedCurrency');
+    }
+  });
+
+  it("Should revert if you try to whitelist a currency and you are not the owner", async () => {
+    try {
+      await timeContract.connect(address1).toggleCurrencyAllowance(ethers.constants.AddressZero);
+    } catch (error : any) {
+      expect(error.message).to.contain('Ownable: caller is not the owner');
+    }
+  });
+
+  it("Should whitelist a currency to use as payment if you are the owner", async () => {
+    await timeContract.toggleCurrencyAllowance(ethers.constants.AddressZero);
+    expect(await timeContract.isCurrencyAllowed(ethers.constants.AddressZero)).to.be.true;
+  });
+
+  it("Should revert if you try to change token buying conditions and you are not the owner", async () => {
+    await timeContract.mint(
+      "One dev hour v1",
+      "One development hour to be used for any dao",
+      "Development",
+      "1",
+      "26/11/2021 19:00",
+      0
+    );
+    try {
+      await timeContract.connect(address1).changeTokenBuyingConditions(ethers.constants.Zero, ethers.constants.AddressZero, ethers.constants.One);
+    } catch (error : any) {
+      expect(error.message).to.contain('OnlyTokenOwner');
+    }
+  });
+
+  it("Should change token buying conditions", async () => {
+    await timeContract.mint(
+      "One dev hour v1",
+      "One development hour to be used for any dao",
+      "Development",
+      "1",
+      "26/11/2021 19:00",
+      0
+    );
+
+    await timeContract.toggleCurrencyAllowance(ethers.constants.AddressZero);
+    await timeContract.changeTokenBuyingConditions(ethers.constants.Zero, ethers.constants.AddressZero, ethers.constants.One);
+
+    expect(await timeContract.tokens(0)).to.eql( [
+      ethers.constants.Zero,
+      ethers.constants.One,
+      ethers.constants.Zero,
+      "One dev hour v1",
+      "One development hour to be used for any dao",
+      "Development",
+      "1",
+      "26/11/2021 19:00",
+      false,
+      false,
+      owner.address,
+      ethers.constants.AddressZero
+    ]);
   });
 
   it("Should revert if you try to toggle from sale and you are not the owner", async () => {
@@ -84,5 +145,18 @@ describe("Tokenized time collection", () => {
     }
   });
 
-  
+  it("Should toggle for sale if you are the token owner", async () => {
+
+    await timeContract.mint(
+      "One dev hour v1",
+      "One development hour to be used for any dao",
+      "Development",
+      "1",
+      "26/11/2021 19:00",
+      0
+    );
+    await timeContract.toggleCurrencyAllowance(ethers.constants.AddressZero);
+    await timeContract.toggleForSale(ethers.BigNumber.from(0));
+    expect(await (await timeContract.tokens(0)).forSale).to.be.true
+  });
 });
