@@ -67,8 +67,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @dev Constructor of the contract
     /// @param name Collection name
     /// @param symbol Collection symbol
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {
+    constructor(string memory name, string memory symbol, bool useNativeCurrency) ERC721(name, symbol) {
         _tokenCounter = 0;
+        if(useNativeCurrency) isCurrencyAllowed[address(0)] = true;
     }
 
     /// @dev Mints a new token with the given parameters.

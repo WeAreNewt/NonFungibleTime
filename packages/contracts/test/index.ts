@@ -22,7 +22,8 @@ describe("Tokenized time collection", () => {
     [owner, address1, address2] = await ethers.getSigners();
     timeContract = await TimeCollectionFactory.deploy(
       "Tokenized Time",
-      "TTime"
+      "TTime",
+      false
     );
     testToken = await TestTokenFactory.deploy();
   });
