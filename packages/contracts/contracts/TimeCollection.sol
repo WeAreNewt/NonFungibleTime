@@ -49,7 +49,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     }
 
     uint256 internal _tokenCounter;
-    uint16 internal constant BASIS_POINTS = 10000;
+    uint16 internal constant BASIS_POINTS = 100;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
         if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
@@ -77,6 +77,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param work Type of work that will be done of the NFT that you are minting
     /// @param time Units of time to be redeemed of the NFT that you are minting
     /// @param date Date of when the NFT will be redeemed of the NFT that you are minting
+    /// @param royalty The royalty that you will keep as a minter in percentage
     function mint(
         string memory name,
         string memory description,

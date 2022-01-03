@@ -169,7 +169,7 @@ function mint(string name, string description, string work, string time, string 
 | work | string | Type of work that will be done of the NFT that you are minting
 | time | string | Units of time to be redeemed of the NFT that you are minting
 | date | string | Date of when the NFT will be redeemed of the NFT that you are minting
-| royalty | uint256 | undefined
+| royalty | uint256 | The royalty that you will keep as a minter in percentage
 
 ### name
 

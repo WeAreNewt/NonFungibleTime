@@ -307,8 +307,7 @@ describe("Tokenized time collection", () => {
         await testToken.increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
         await timeContract.buyToken(ethers.constants.Zero);
         expect(await testToken.balanceOf(owner.address)).to.equal(ethers.constants.Zero);
-        //expect(await testToken.balanceOf(address2.address)).to.equal(ethers.BigNumber.from(10));
-        console.log(await testToken.balanceOf(address2.address));
+        expect(await testToken.balanceOf(address2.address)).to.equal(ethers.BigNumber.from(10));
         expect(await testToken.balanceOf(address1.address)).to.equal(ethers.BigNumber.from(90));
         expect(await timeContract.ownerOf(ethers.constants.Zero)).to.equal(owner.address);
     });
