@@ -64,8 +64,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     mapping(uint256 => Token) public tokens;
     mapping(address => bool) public isCurrencyAllowed;
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {
+    /// @dev Constructor of the contract
+    /// @param name Collection name
+    /// @param symbol Collection symbol
+    constructor(string memory name, string memory symbol, bool useNativeCurrency) ERC721(name, symbol) {
         _tokenCounter = 0;
+        if(useNativeCurrency) isCurrencyAllowed[address(0)] = true;
     }
 
     /// @dev Mints a new token with the given parameters.
@@ -74,6 +78,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param work Type of work that will be done of the NFT that you are minting
     /// @param time Units of time to be redeemed of the NFT that you are minting
     /// @param date Date of when the NFT will be redeemed of the NFT that you are minting
+    /// @param royalty The royalty that you will keep as a minter as a fraction of 10000
     function mint(
         string memory name,
         string memory description,
@@ -111,7 +116,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
-        if (msg.value < token.price) revert NotEnoughFunds(tokenId);
+        if (IERC20(token.currency).balanceOf(msg.sender) < token.price) revert NotEnoughFunds(tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
