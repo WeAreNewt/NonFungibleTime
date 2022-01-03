@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
-
 import { HardhatUserConfig, task } from 'hardhat/config';
+import '@primitivefi/hardhat-dodoc';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
@@ -33,6 +33,11 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
+  dodoc: {
+    include: [
+      'TimeCollection'
+    ]
+  }
 };
 
 export default config;
