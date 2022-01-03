@@ -297,7 +297,7 @@ describe("Tokenized time collection", () => {
             "Development",
             "1",
             "26/11/2021 19:00",
-            10
+            1000
         ); 
         await timeContract.connect(address2).transferFrom(address2.address, address1.address, ethers.constants.Zero);
         await timeContract.toggleCurrencyAllowance(testToken.address);
