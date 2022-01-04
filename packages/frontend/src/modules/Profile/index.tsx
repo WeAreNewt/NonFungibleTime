@@ -81,7 +81,7 @@ export default function Profile() {
                     <div className="w-1/4 p-5 justify-items-start">
                         <div className="flex flex-row justify-evenly">
                             {/** Avatar/Blockie */}
-                            <img src="https://lh3.googleusercontent.com/nbLoKXUB707PZ2iBQ6JBVE8Ytu6Wms5HwiM3_Ssvi0LuAKS-CYU1mcdjr6naiyiaSY_FyYZHAdJWQ3emrHcff_k6-ZKPIKyMpCZN=w600" />
+                            <img alt="ens avatar" src="https://lh3.googleusercontent.com/nbLoKXUB707PZ2iBQ6JBVE8Ytu6Wms5HwiM3_Ssvi0LuAKS-CYU1mcdjr6naiyiaSY_FyYZHAdJWQ3emrHcff_k6-ZKPIKyMpCZN=w600" />
                             {/** ENS Name/Address */}
                             <div>soliditychad.eth</div>
                         </div>

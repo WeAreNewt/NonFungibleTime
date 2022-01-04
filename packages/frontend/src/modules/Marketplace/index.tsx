@@ -1,5 +1,4 @@
 import React from 'react'
-import { FaShareAlt } from 'react-icons/fa'
 import NFTCard from '../../components/NFTCard'
 import { Category, NFTProps } from '../../types'
 
