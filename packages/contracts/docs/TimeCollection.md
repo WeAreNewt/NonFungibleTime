@@ -65,6 +65,22 @@ function buyToken(uint256 tokenId) external payable
 |---|---|---|
 | tokenId | uint256 | The token id of the NFT that you are buying.
 
+### c_0xa2c3c72d
+
+```solidity
+function c_0xa2c3c72d(bytes32 c__0xa2c3c72d) external pure
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| c__0xa2c3c72d | bytes32 | undefined
+
 ### changeTokenBuyingConditions
 
 ```solidity
@@ -411,7 +427,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 tokenId, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string work)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string work)
 ```
 
 
@@ -428,7 +444,6 @@ function tokens(uint256) external view returns (uint256 tokenId, uint256 availab
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined
 | availabilityFrom | uint256 | undefined
 | availabilityTo | uint256 | undefined
 | duration | uint256 | undefined

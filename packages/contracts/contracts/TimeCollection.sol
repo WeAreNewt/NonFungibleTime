@@ -35,7 +35,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     error InvalidTimeParams();
 
     struct Token {
-        uint256 tokenId;
         uint256 availabilityFrom;
         uint256 availabilityTo;
         uint256 duration;
@@ -106,7 +105,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         }
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
-            _tokenCounter,
             availabilityFrom,
             availabilityTo,
             duration,
