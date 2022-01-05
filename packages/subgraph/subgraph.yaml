@@ -1,0 +1,38 @@
+specVersion: 0.0.2
+description: Tokenized Time subgraph
+repository: https://github.com/wearenewt/tokenizedtimenfts
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TimeCollection
+    network: mumbai
+    source:
+      abi: TimeCollection
+      address: '0xe3Df57fA518d140224340C980A7cbb58ef73C81e'
+      startBlock: 23534137
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Proposal
+        - Vote
+        - Executor
+      abis:
+        - name: TimeCollection
+          file: ./abi/TimeCollection.json
+      eventHandlers:
+        - event: TokenBought(indexed uint256,address,address)
+          handler: handleTokenBought
+        - event: TokenPriceChanged(indexed uint256,uint256)
+          handler: handleTokenPriceChanged
+        - event: TokenForSaleToggled(indexed uint256)
+          handler: handleTokenForSaleToggled
+        - event: CurrencyAllowanceToggled(indexed address)
+          handler: handleCurrencyAllowanceToggled
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/mapping/tokenizedtime.ts

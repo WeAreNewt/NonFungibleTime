@@ -1,27 +1,35 @@
 {
   "name": "@wearenewt/tokenized-time-subgraph",
   "version": "0.1.0",
-  "private": true,
-  "description": "> TODO: description",
-  "author": "Andrew Schmidt <andrew@aave.com>",
-  "homepage": "https://github.com/WeAreNewt/TokenizedTimeNFTs#readme",
-  "license": "ISC",
-  "main": "lib/subgraph.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
+  "description": "This package contains NFT indexing for the Tokenized Time project",
+  "scripts": {
+    "dev-environment": "npm i && tail -f /dev/null",
+    "build": "graph build",
+    "prepare": "mustache ./config/${NETWORK:-mumbai}.json subgraph.template.yaml > subgraph.yaml && npm run subgraph:codegen",
+    "subgraph:codegen": "graph codegen --output-dir ./generated",
+    "subgraph:build": "graph build",
+    "subgraph:deploy:hosted": "graph deploy $SLUG --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $ACCESS_TOKEN",
+    "deploy:hosted:mumbai": "NETWORK=mumbai env-cmd npm run prepare && SLUG=wearenewt/tokenized-time-mumbai env-cmd npm run subgraph:deploy:hosted",
+    "deploy:hosted:polygon": "NETWORK=polygon env-cmd npm run prepare && SLUG=wearenewt/tokenized-time env-cmd npm run subgraph:deploy:hosted",
+    "generate-types": "typechain --target=ethers-v5 --out-dir src/contracts '../contracts/artifacts/contracts/TimeCollection.sol/TimeCollection.json'"
   },
-  "files": [
-    "lib"
-  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WeAreNewt/TokenizedTimeNFTs.git"
+    "url": "git@github.com:WeAreNewt/TokenizedTimeNFTs.git"
   },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+  "dependencies": {
+    "@apollo/client": "^3.3.16",
+    "@typechain/ethers-v5": "^7.0.1",
+    "cross-fetch": "^3.1.4",
+    "dotenv": "^9.0.2",
+    "graphql": "^14.7.0"
   },
-  "bugs": {
-    "url": "https://github.com/WeAreNewt/TokenizedTimeNFTs/issues"
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.18.0",
+    "@graphprotocol/graph-ts": "^0.18.1",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "env-cmd": "^10.1.0",
+    "mustache": "^3.1.0"
   }
 }
