@@ -65,6 +65,22 @@ function buyToken(uint256 tokenId) external payable
 |---|---|---|
 | tokenId | uint256 | The token id of the NFT that you are buying.
 
+### c_0xa2c3c72d
+
+```solidity
+function c_0xa2c3c72d(bytes32 c__0xa2c3c72d) external pure
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| c__0xa2c3c72d | bytes32 | undefined
+
 ### changeTokenBuyingConditions
 
 ```solidity
