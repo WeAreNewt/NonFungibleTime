@@ -40,7 +40,6 @@ describe('Tokenized time collection', () => {
       10000000,
       300
     );
-
     expect(await timeContract.tokens(0)).to.eql([
       BigNumber.from(1641342727),
       BigNumber.from(1651342727),
@@ -55,6 +54,162 @@ describe('Tokenized time collection', () => {
       'One development hour to be used for any dao',
       'Development',
     ]);
+  });
+
+  it('Should success when mint an NFT with duration matching availability range duration', async () => {
+    let availabilityFrom = 1641342727;
+    let availabilityTo = 1651342727;
+    let duration = availabilityTo - availabilityFrom;
+    expect(duration).to.be.equals(availabilityTo - availabilityFrom);
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      availabilityFrom,
+      availabilityTo,
+      duration,
+      300
+    );
+  });
+
+  it('Should success when mint an NFT with duration being less than availability range duration', async () => {
+    let availabilityFrom = 1641342727;
+    let availabilityTo = 1651342727;
+    let duration = 1000;
+    expect(duration).to.be.lessThan(availabilityTo - availabilityFrom);
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      availabilityFrom,
+      availabilityTo,
+      duration,
+      300
+    );
+  });
+
+  it('Should success when mint an NFT without availability range', async () => {
+    let availabilityFrom = 0;
+    let availabilityTo = 0;
+    let duration = 10000000;
+    expect(availabilityFrom).to.be.equals(0);
+    expect(availabilityTo).to.be.equals(0);
+    expect(duration).to.be.greaterThan(0);
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      availabilityFrom,
+      availabilityTo,
+      duration,
+      300
+    );
+  });
+
+  it('Should success when mint an NFT without lower availability range', async () => {
+    let availabilityFrom = 0;
+    let availabilityTo = 1651342727;
+    let duration = 100000;
+    expect(availabilityTo).to.be.greaterThan(0);
+    expect(availabilityFrom).to.be.equals(0);
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      availabilityFrom,
+      availabilityTo,
+      duration,
+      300
+    );
+  });
+
+  it('Should success when mint an NFT without upper availability range', async () => {
+    let availabilityFrom = 1641342727;
+    let availabilityTo = 0;
+    let duration = 100000;
+    expect(availabilityFrom).to.be.greaterThan(0);
+    expect(availabilityTo).to.be.equals(0);
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      availabilityFrom,
+      availabilityTo,
+      duration,
+      300
+    );
+  });
+
+  it('Should revert when mint an NFT with zero duration', async () => {
+    let availabilityFrom = 1641342727;
+    let availabilityTo = 1651342727;
+    let duration = 0;
+    expect(availabilityFrom).to.be.greaterThan(0);
+    expect(availabilityTo).to.be.greaterThan(0);
+    expect(duration).to.be.equals(0);
+    await expect(
+      timeContract.mint(
+        'One dev hour v1',
+        'One development hour to be used for any dao',
+        'Development',
+        availabilityFrom,
+        availabilityTo,
+        duration,
+        300
+      )
+    ).to.be.revertedWith('InvalidTimeParams()');
+    availabilityFrom = 0;
+    availabilityTo = 0;
+    expect(availabilityFrom).to.be.equals(0);
+    expect(availabilityTo).to.be.equals(0);
+    expect(duration).to.be.equals(0);
+    await expect(
+      timeContract.mint(
+        'One dev hour v1',
+        'One development hour to be used for any dao',
+        'Development',
+        availabilityFrom,
+        availabilityTo,
+        duration,
+        300
+      )
+    ).to.be.revertedWith('InvalidTimeParams()');
+  });
+
+  it('Should revert when mint an NFT with duration greater than availability range', async () => {
+    let availabilityFrom = 1641342727;
+    let availabilityTo = 1651342727;
+    let duration = availabilityTo - availabilityFrom + 1;
+    expect(duration).to.be.greaterThan(availabilityTo - availabilityFrom);
+    await expect(
+      timeContract.mint(
+        'One dev hour v1',
+        'One development hour to be used for any dao',
+        'Development',
+        availabilityFrom,
+        availabilityTo,
+        duration,
+        300
+      )
+    ).to.be.revertedWith('InvalidTimeParams()');
+  });
+
+  it('Should revert when mint an NFT with availability range with an upper bound less than the lower one', async () => {
+    let availabilityFrom = 1600000000;
+    let availabilityTo = 1400000000;
+    let duration = 100;
+    expect(availabilityFrom).to.be.greaterThan(availabilityTo);
+    await expect(
+      timeContract.mint(
+        'One dev hour v1',
+        'One development hour to be used for any dao',
+        'Development',
+        availabilityFrom,
+        availabilityTo,
+        duration,
+        300
+      )
+    ).to.be.revertedWith('InvalidTimeParams()');
   });
 
   it('Should revert if you try to put on sale a NFT with an unallowed currency', async () => {
