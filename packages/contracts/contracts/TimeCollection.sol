@@ -183,6 +183,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit TokenForSaleToggled(tokenId);
     }
 
+    /// @dev Toggles the payment allowance of the given currency.
+    /// @param currency The address of the ERC-20 currency to toggle allowance. Use address(0) for native currency.
+    function toggleCurrencyAllowance(address currency) external onlyOwner {
+        isCurrencyAllowed[currency] = !isCurrencyAllowed[currency];
+        emit CurrencyAllowanceToggled(currency);
+    }
+
     /// @dev Gets the royalty information of the token with the given tokenId.
     /// @param tokenId The id of the token that you are checking.
     /// @param salePrice The price of the NFT that should be used for royalty calculation.
@@ -258,13 +265,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
                     Base64.encode(bytes(writer.value))
                 )
             );
-    }
-
-    /// @dev Toggles the payment allowance of the given currency.
-    /// @param currency The address of the ERC-20 currency to toggle allowance. Use address(0) for native currency.
-    function toggleCurrencyAllowance(address currency) external onlyOwner {
-        isCurrencyAllowed[currency] = !isCurrencyAllowed[currency];
-        emit CurrencyAllowanceToggled(currency);
     }
 
     /// @dev Transfers the given amount of the given currency from sender to receiver.
