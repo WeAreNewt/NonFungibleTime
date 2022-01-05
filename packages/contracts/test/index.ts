@@ -42,7 +42,6 @@ describe('Tokenized time collection', () => {
     );
 
     expect(await timeContract.tokens(0)).to.eql([
-      ethers.constants.Zero,
       BigNumber.from(1641342727),
       BigNumber.from(1651342727),
       BigNumber.from(10000000),
@@ -120,7 +119,6 @@ describe('Tokenized time collection', () => {
     );
 
     expect(await timeContract.tokens(0)).to.eql([
-      ethers.constants.Zero,
       BigNumber.from(1641342727),
       BigNumber.from(1651342727),
       BigNumber.from(10000000),
@@ -298,7 +296,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.One
     );
     await timeContract.toggleForSale(ethers.constants.Zero);
-    await testToken.connect(buyer).mint();
+    await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
     await testToken
       .connect(buyer)
       .increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
@@ -332,7 +330,7 @@ describe('Tokenized time collection', () => {
         ethers.BigNumber.from(100)
       );
     await timeContract.connect(otherAccount).toggleForSale(ethers.constants.Zero);
-    await testToken.connect(buyer).mint();
+    await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
     await testToken
       .connect(buyer)
       .increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
