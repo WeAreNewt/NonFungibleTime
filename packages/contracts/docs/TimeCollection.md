@@ -65,22 +65,6 @@ function buyToken(uint256 tokenId) external payable
 |---|---|---|
 | tokenId | uint256 | The token id of the NFT that you are buying.
 
-### c_0xa2c3c72d
-
-```solidity
-function c_0xa2c3c72d(bytes32 c__0xa2c3c72d) external pure
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| c__0xa2c3c72d | bytes32 | undefined
-
 ### changeTokenBuyingConditions
 
 ```solidity
@@ -169,7 +153,7 @@ function isCurrencyAllowed(address) external view returns (bool)
 ### mint
 
 ```solidity
-function mint(string name, string description, string work, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable
+function mint(string name, string description, string work, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable returns (uint256)
 ```
 
 
@@ -187,6 +171,12 @@ function mint(string name, string description, string work, uint256 availability
 | availabilityTo | uint256 | Unix timestamp indicating end of availability. Zero if does not have upper bound.
 | duration | uint256 | The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
 | royaltyBasisPoints | uint256 | The royalty percentage measured in basis points. Each basis point represents 0.01%.
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | An integer representing the ID of the minted NFT.
 
 ### name
 

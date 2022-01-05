@@ -86,6 +86,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
     /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
     /// @param royaltyBasisPoints The royalty percentage measured in basis points. Each basis point represents 0.01%.
+    /// @return An integer representing the ID of the minted NFT.
     function mint(
         string memory name,
         string memory description,
@@ -94,15 +95,10 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 availabilityTo,
         uint256 duration,
         uint256 royaltyBasisPoints
-    ) external {
+    ) external returns (uint256) {
         if (royaltyBasisPoints > BASIS_POINTS) revert InvalidRoyalty();
-        if (
-            availabilityFrom != 0 &&
-            availabilityTo != 0 &&
-            (availabilityFrom > availabilityTo || duration > availabilityTo - availabilityFrom)
-        ) {
+        if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration))
             revert InvalidTimeParams();
-        }
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             availabilityFrom,
@@ -119,7 +115,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             work
         );
         tokens[_tokenCounter] = newToken;
-        _tokenCounter++;
+        return _tokenCounter++;
     }
 
     /// @dev Buys the token with the given tokenId.
@@ -288,5 +284,26 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         } else {
             IERC20(currency).safeTransferFrom(sender, receiver, amount);
         }
+    }
+
+    /// @dev Tells whether the given params conform a valid time representation or not. To be valid must follow:
+    ///     - Duration is greater than zero.
+    ///     - If the availability range is bounded on both ends then:
+    ///         * availabilityTo is greater than availabilityFrom
+    ///         * duration is less or equal than availabilityTo - availabilityFrom
+    /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
+    /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
+    /// @param duration The actual quantity of time tokenized inside availability range. Measured in seconds.
+    /// @return True if given params are a valid time representation, false otherwise.
+    function _areValidTimeParams(
+        uint256 availabilityFrom,
+        uint256 availabilityTo,
+        uint256 duration
+    ) internal pure returns (bool) {
+        return
+            duration != 0 &&
+            ((availabilityFrom == 0 || availabilityTo == 0) ||
+                (availabilityTo > availabilityFrom &&
+                    duration <= availabilityTo - availabilityFrom));
     }
 }
