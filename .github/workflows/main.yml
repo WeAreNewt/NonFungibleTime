@@ -22,7 +22,7 @@ jobs:
       - name: Install packages
         run: npm install
         working-directory: ${{env.working-directory}}
-     -  name: Compile code
+      - name: Compile code
         run: npx hardhat compile
         working-directory: ${{env.working-directory}}
       - name: Run tests
