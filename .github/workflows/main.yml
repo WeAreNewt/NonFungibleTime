@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: '14.16.1'
       - name: Install NPM packages
-        run: npm ci
+        run: npm i
         working-directory: ${{env.working-directory}}
       - name: Build frontend
         run: npm run build

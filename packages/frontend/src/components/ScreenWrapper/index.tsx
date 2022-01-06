@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import Menu from '../Menu'
+import Navbar from '../Navbar'
 
 interface ScreenWrapperProps {
     children: ReactNode;
@@ -7,8 +7,8 @@ interface ScreenWrapperProps {
 
 export default function ScreenWrapper({ children }: ScreenWrapperProps) {
     return (
-        <div>
-            <Menu />
+        <div className="relative h-screen overflow-hidden">
+            <Navbar />
             {children}
         </div>
     )
