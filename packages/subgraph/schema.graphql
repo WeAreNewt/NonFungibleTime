@@ -1,7 +1,98 @@
-type TimeNFT @entity {
+enum Category {
+  Business
+  Development
+  Advertising
+  Communication
+  Design
+  Other
+}
+
+type NFT @entity {
   id: ID!
-  owner: String!
+  tokenId: BigInt!
+  tokenURI: String!
+  contractAddress: String!
+  owner: User!
+  creator: User!
   name: String!
   description: String!
-  category: String!
+  work: Category!
+  availabilityTo: BigInt!
+  availabilityFrom: BigInt!
+  # number of hours
+  duration: BigInt!
+  history: [NFTStatusChange!] @derivedFrom(field: "nft")
+  forSale: Boolean!
+  redeemed: Boolean!
+  # out of 10000
+  royaltyBasisPoints: BigInt!
+  price: BigInt!
+  currency: PaymentToken!
+}
+
+type User @entity {
+  id: ID!
+  address: String!
+  nfts: [NFT!] @derivedFrom(field: "owner")
+  actions: [NFTStatusChange!]
+}
+
+enum EventType {
+  Sale
+  Transfer
+  Redeem
+  BuyingConditionsChanged
+}
+
+interface NFTStatusChange {
+  id: ID!
+  nft: NFT!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+}
+
+type Sale implements NFTStatusChange @entity {
+  id: ID!
+  nft: NFT!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  to: String!
+  from: String!
+  price: BigInt!
+  currency: PaymentToken!
+  royaltyAccrued: BigInt!
+}
+
+type Transfer implements NFTStatusChange @entity {
+  id: ID!
+  nft: NFT!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  to: String!
+  from: String!
+}
+
+type Redeem implements NFTStatusChange @entity {
+  id: ID!
+  nft: NFT!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  redeemedBy: String!
+}
+
+type BuyingConditionsChanged implements NFTStatusChange @entity {
+  id: ID!
+  nft: NFT!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  currency: PaymentToken!
+  price: BigInt!
+  forSale: Boolean!
+}
+
+type PaymentToken @entity {
+  id: ID!
+  address: ID!
+  decimals: Int!
+  acceptable: Boolean!
 }

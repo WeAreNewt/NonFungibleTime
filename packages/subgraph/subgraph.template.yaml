@@ -16,23 +16,27 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Proposal
-        - Vote
-        - Executor
+        - NFT
+        - User
+        - Sale
+        - Transfer
+        - Redeem
+        - BuyingConditionsChanged
+        - PaymentToken
       abis:
         - name: TimeCollection
           file: ./abi/TimeCollection.json
+        - name: ERC721
+          file: ./abi/ERC721.json
       eventHandlers:
         - event: TokenBought(indexed uint256,address,address)
           handler: handleTokenBought
-        - event: TokenPriceChanged(indexed uint256,uint256)
-          handler: handleTokenPriceChanged
-        - event: TokenForSaleToggled(indexed uint256)
-          handler: handleTokenForSaleToggled
+        - event: TokenBuyingConditionsChanged(indexed uint256,address,uint256,bool)
+          handler: handleTokenBuyingConditionsChanged
+        - event: TokenRedeemed(indexed uint256)
+          handler: handleTokenRedeemed
         - event: CurrencyAllowanceToggled(indexed address)
           handler: handleCurrencyAllowanceToggled
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
       file: ./src/mapping/tokenizedtime.ts
