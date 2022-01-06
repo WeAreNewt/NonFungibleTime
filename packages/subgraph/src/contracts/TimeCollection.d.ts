@@ -25,11 +25,11 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "buyToken(uint256)": FunctionFragment;
-    "changeTokenBuyingConditions(uint256,address,uint256)": FunctionFragment;
+    "changeTokenBuyingConditions(uint256,address,uint256,bool)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "isCurrencyAllowed(address)": FunctionFragment;
-    "mint(string,string,string,string,string,uint256)": FunctionFragment;
+    "mint(string,string,string,uint256,uint256,uint256,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -41,7 +41,6 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "toggleCurrencyAllowance(address)": FunctionFragment;
-    "toggleForSale(uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "tokens(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
@@ -59,7 +58,7 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "changeTokenBuyingConditions",
-    values: [BigNumberish, string, BigNumberish]
+    values: [BigNumberish, string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -75,7 +74,15 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
-    values: [string, string, string, string, string, BigNumberish]
+    values: [
+      string,
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -111,10 +118,6 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "toggleCurrencyAllowance",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "toggleForSale",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
@@ -182,10 +185,6 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
     functionFragment: "toggleCurrencyAllowance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "toggleForSale",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokens", data: BytesLike): Result;
   decodeFunctionResult(
@@ -203,8 +202,8 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
     "CurrencyAllowanceToggled(address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "TokenBought(uint256,address,address)": EventFragment;
-    "TokenForSaleToggled(uint256)": EventFragment;
-    "TokenPriceChanged(uint256,uint256)": EventFragment;
+    "TokenBuyingConditionsChanged(uint256,address,uint256,bool)": EventFragment;
+    "TokenRedeemed(uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
@@ -213,8 +212,10 @@ interface TimeCollectionInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CurrencyAllowanceToggled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokenBought"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TokenForSaleToggled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TokenPriceChanged"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "TokenBuyingConditionsChanged"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokenRedeemed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -279,6 +280,7 @@ export class TimeCollection extends BaseContract {
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
+      forSale: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -302,9 +304,10 @@ export class TimeCollection extends BaseContract {
       name: string,
       description: string,
       work: string,
-      time: string,
-      date: string,
-      royalty: BigNumberish,
+      availabilityFrom: BigNumberish,
+      availabilityTo: BigNumberish,
+      duration: BigNumberish,
+      royaltyBasisPoints: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -365,11 +368,6 @@ export class TimeCollection extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    toggleForSale(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -383,28 +381,28 @@ export class TimeCollection extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        string,
-        string,
-        string,
+        BigNumber,
+        BigNumber,
         string,
         string,
         boolean,
         boolean,
+        string,
         string,
         string
       ] & {
-        tokenId: BigNumber;
+        availabilityFrom: BigNumber;
+        availabilityTo: BigNumber;
+        duration: BigNumber;
         price: BigNumber;
-        royalty: BigNumber;
+        royaltyBasisPoints: BigNumber;
+        mintedBy: string;
+        currency: string;
+        redeemed: boolean;
+        forSale: boolean;
         name: string;
         description: string;
         work: string;
-        time: string;
-        date: string;
-        redeemed: boolean;
-        forSale: boolean;
-        mintedBy: string;
-        currency: string;
       }
     >;
 
@@ -438,6 +436,7 @@ export class TimeCollection extends BaseContract {
     tokenId: BigNumberish,
     currency: string,
     price: BigNumberish,
+    forSale: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -458,9 +457,10 @@ export class TimeCollection extends BaseContract {
     name: string,
     description: string,
     work: string,
-    time: string,
-    date: string,
-    royalty: BigNumberish,
+    availabilityFrom: BigNumberish,
+    availabilityTo: BigNumberish,
+    duration: BigNumberish,
+    royaltyBasisPoints: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -518,11 +518,6 @@ export class TimeCollection extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  toggleForSale(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   tokens(
@@ -533,28 +528,28 @@ export class TimeCollection extends BaseContract {
       BigNumber,
       BigNumber,
       BigNumber,
-      string,
-      string,
-      string,
+      BigNumber,
+      BigNumber,
       string,
       string,
       boolean,
       boolean,
+      string,
       string,
       string
     ] & {
-      tokenId: BigNumber;
+      availabilityFrom: BigNumber;
+      availabilityTo: BigNumber;
+      duration: BigNumber;
       price: BigNumber;
-      royalty: BigNumber;
+      royaltyBasisPoints: BigNumber;
+      mintedBy: string;
+      currency: string;
+      redeemed: boolean;
+      forSale: boolean;
       name: string;
       description: string;
       work: string;
-      time: string;
-      date: string;
-      redeemed: boolean;
-      forSale: boolean;
-      mintedBy: string;
-      currency: string;
     }
   >;
 
@@ -585,6 +580,7 @@ export class TimeCollection extends BaseContract {
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
+      forSale: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -608,11 +604,12 @@ export class TimeCollection extends BaseContract {
       name: string,
       description: string,
       work: string,
-      time: string,
-      date: string,
-      royalty: BigNumberish,
+      availabilityFrom: BigNumberish,
+      availabilityTo: BigNumberish,
+      duration: BigNumberish,
+      royaltyBasisPoints: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -663,11 +660,6 @@ export class TimeCollection extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    toggleForSale(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     tokens(
@@ -678,28 +670,28 @@ export class TimeCollection extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        string,
-        string,
-        string,
+        BigNumber,
+        BigNumber,
         string,
         string,
         boolean,
         boolean,
+        string,
         string,
         string
       ] & {
-        tokenId: BigNumber;
+        availabilityFrom: BigNumber;
+        availabilityTo: BigNumber;
+        duration: BigNumber;
         price: BigNumber;
-        royalty: BigNumber;
+        royaltyBasisPoints: BigNumber;
+        mintedBy: string;
+        currency: string;
+        redeemed: boolean;
+        forSale: boolean;
         name: string;
         description: string;
         work: string;
-        time: string;
-        date: string;
-        redeemed: boolean;
-        forSale: boolean;
-        mintedBy: string;
-        currency: string;
       }
     >;
 
@@ -756,17 +748,24 @@ export class TimeCollection extends BaseContract {
       { tokenId: BigNumber; seller: string; buyer: string }
     >;
 
-    TokenForSaleToggled(
+    TokenBuyingConditionsChanged(
+      tokenId?: BigNumberish | null,
+      currency?: null,
+      price?: null,
+      forSale?: null
+    ): TypedEventFilter<
+      [BigNumber, string, BigNumber, boolean],
+      {
+        tokenId: BigNumber;
+        currency: string;
+        price: BigNumber;
+        forSale: boolean;
+      }
+    >;
+
+    TokenRedeemed(
       tokenId?: BigNumberish | null
     ): TypedEventFilter<[BigNumber], { tokenId: BigNumber }>;
-
-    TokenPriceChanged(
-      tokenId?: BigNumberish | null,
-      newPrice?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { tokenId: BigNumber; newPrice: BigNumber }
-    >;
 
     Transfer(
       from?: string | null,
@@ -796,6 +795,7 @@ export class TimeCollection extends BaseContract {
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
+      forSale: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -819,9 +819,10 @@ export class TimeCollection extends BaseContract {
       name: string,
       description: string,
       work: string,
-      time: string,
-      date: string,
-      royalty: BigNumberish,
+      availabilityFrom: BigNumberish,
+      availabilityTo: BigNumberish,
+      duration: BigNumberish,
+      royaltyBasisPoints: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -882,11 +883,6 @@ export class TimeCollection extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    toggleForSale(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -928,6 +924,7 @@ export class TimeCollection extends BaseContract {
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
+      forSale: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -951,9 +948,10 @@ export class TimeCollection extends BaseContract {
       name: string,
       description: string,
       work: string,
-      time: string,
-      date: string,
-      royalty: BigNumberish,
+      availabilityFrom: BigNumberish,
+      availabilityTo: BigNumberish,
+      duration: BigNumberish,
+      royaltyBasisPoints: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1011,11 +1009,6 @@ export class TimeCollection extends BaseContract {
 
     toggleCurrencyAllowance(
       currency: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    toggleForSale(
-      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

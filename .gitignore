@@ -10,3 +10,9 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+#subgraph build
+build
+generated
+abis
+subgraph.yaml
