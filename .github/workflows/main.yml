@@ -15,12 +15,15 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "14.16.1"
+          node-version: '14.16.1'
       - name: Install hardhat
         run: npm install --save-dev hardhat
         working-directory: ${{env.working-directory}}
       - name: Install packages
         run: npm install
+        working-directory: ${{env.working-directory}}
+      - name: Compile code
+        run: npx hardhat compile
         working-directory: ${{env.working-directory}}
       - name: Run tests
         run: npx hardhat test
@@ -34,7 +37,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "14.16.1"
+          node-version: '14.16.1'
       - name: Install NPM packages
         run: npm i
         working-directory: ${{env.working-directory}}
