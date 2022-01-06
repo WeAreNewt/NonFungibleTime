@@ -63,7 +63,23 @@ function buyToken(uint256 tokenId) external payable
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | The token id of the NFT that you are buying
+| tokenId | uint256 | The token id of the NFT that you are buying.
+
+### c_0xa2c3c72d
+
+```solidity
+function c_0xa2c3c72d(bytes32 c__0xa2c3c72d) external pure
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| c__0xa2c3c72d | bytes32 | undefined
 
 ### changeTokenBuyingConditions
 
@@ -79,9 +95,9 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | Token id of the NFT that you are selling
-| currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency
-| price | uint256 | Price of the NFT that you are selling
+| tokenId | uint256 | Token id of the NFT that you are selling.
+| currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
+| price | uint256 | Price of the NFT that you are selling.
 
 ### getApproved
 
@@ -153,7 +169,7 @@ function isCurrencyAllowed(address) external view returns (bool)
 ### mint
 
 ```solidity
-function mint(string name, string description, string work, string time, string date, uint256 royalty) external nonpayable
+function mint(string name, string description, string work, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable returns (uint256)
 ```
 
 
@@ -164,12 +180,19 @@ function mint(string name, string description, string work, string time, string 
 
 | Name | Type | Description |
 |---|---|---|
-| name | string | Name of the NFT that you are minting
-| description | string | Description of the NFT that you are minting
-| work | string | Type of work that will be done of the NFT that you are minting
-| time | string | Units of time to be redeemed of the NFT that you are minting
-| date | string | Date of when the NFT will be redeemed of the NFT that you are minting
-| royalty | uint256 | The royalty that you will keep as a minter as a fraction of 10000
+| name | string | Name of the NFT that you are minting.
+| description | string | Description of the NFT that you are minting.
+| work | string | Type of work that will be done of the NFT that you are minting.
+| availabilityFrom | uint256 | Unix timestamp indicating start of availability. Zero if does not have lower bound.
+| availabilityTo | uint256 | Unix timestamp indicating end of availability. Zero if does not have upper bound.
+| duration | uint256 | The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
+| royaltyBasisPoints | uint256 | The royalty percentage measured in basis points. Each basis point represents 0.01%.
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | An integer representing the ID of the minted NFT.
 
 ### name
 
@@ -241,7 +264,7 @@ function redeem(uint256 tokenId) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | Token id of the NFT that you are redeeming
+| tokenId | uint256 | Token id of the NFT that you are redeeming.
 
 ### renounceOwnership
 
@@ -268,14 +291,14 @@ function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | The id of the token that you are checking
-| salePrice | uint256 | The price of the NFT that should be used for royalty calculation
+| tokenId | uint256 | The id of the token that you are checking.
+| salePrice | uint256 | The price of the NFT that should be used for royalty calculation.
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | The address who will receive the royalties and the royalty amount for the given price
+| _0 | address | The address who will receive the royalties and the royalty amount for the given price.
 | _1 | uint256 | undefined
 
 ### safeTransferFrom
@@ -328,13 +351,13 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 | Name | Type | Description |
 |---|---|---|
-| interfaceId | bytes4 | The interface id of the interface that you are querying
+| interfaceId | bytes4 | The interface id of the interface that you are querying.
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | True if the interface is supported, false otherwise
+| _0 | bool | True if the interface is supported, false otherwise.
 
 ### symbol
 
@@ -361,13 +384,13 @@ function toggleCurrencyAllowance(address currency) external nonpayable
 
 
 
-*Toggles the payment allowance of the given currency*
+*Toggles the payment allowance of the given currency.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| currency | address | The address of the ERC-20 currency to toggle allowance. Use address(0) for native currency
+| currency | address | The address of the ERC-20 currency to toggle allowance. Use address(0) for native currency.
 
 ### toggleForSale
 
@@ -383,7 +406,7 @@ function toggleForSale(uint256 tokenId) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | The number of rings from dendrochronological sample
+| tokenId | uint256 | The number of rings from dendrochronological sample.
 
 ### tokenURI
 
@@ -399,18 +422,18 @@ function tokenURI(uint256 tokenId) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | Token Id of the NFT that you are getting the URI
+| tokenId | uint256 | Token Id of the NFT that you are getting the URI.
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | encoded token data in json format
+| _0 | string | encoded token data in json format.
 
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 tokenId, uint256 price, uint256 royalty, string name, string description, string work, string time, string date, bool redeemed, bool forSale, address payable mintedBy, address currency)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string work)
 ```
 
 
@@ -427,18 +450,18 @@ function tokens(uint256) external view returns (uint256 tokenId, uint256 price, 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined
+| availabilityFrom | uint256 | undefined
+| availabilityTo | uint256 | undefined
+| duration | uint256 | undefined
 | price | uint256 | undefined
-| royalty | uint256 | undefined
+| royaltyBasisPoints | uint256 | undefined
+| mintedBy | address payable | undefined
+| currency | address | undefined
+| redeemed | bool | undefined
+| forSale | bool | undefined
 | name | string | undefined
 | description | string | undefined
 | work | string | undefined
-| time | string | undefined
-| date | string | undefined
-| redeemed | bool | undefined
-| forSale | bool | undefined
-| mintedBy | address payable | undefined
-| currency | address | undefined
 
 ### transferFrom
 
@@ -673,6 +696,17 @@ error InvalidAddress(address addr)
 
 ```solidity
 error InvalidRoyalty()
+```
+
+
+
+
+
+
+### InvalidTimeParams
+
+```solidity
+error InvalidTimeParams()
 ```
 
 
