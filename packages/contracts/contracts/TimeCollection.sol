@@ -18,8 +18,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     using JsonWriter for JsonWriter.Json;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
-    event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice);
-    event TokenForSaleToggled(uint256 indexed tokenId);
+    event TokenBuyingConditionsChanged(
+        uint256 indexed tokenId,
+        address currency,
+        uint256 price,
+        bool forSale
+    );
+    event TokenRedeemed(uint256 indexed tokenId);
     event CurrencyAllowanceToggled(address indexed currency);
 
     error TokenDoesntExist(uint256 tokenId);
@@ -128,6 +133,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
         if (IERC20(token.currency).balanceOf(msg.sender) < token.price)
+            //TODO: is this check necessary? what if its using native currency?
             revert NotEnoughFunds(tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
@@ -146,16 +152,20 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param tokenId Token id of the NFT that you are selling.
     /// @param currency The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
     /// @param price Price of the NFT that you are selling.
+    /// @param forSale A boolean indicating if the NFT is for sale or not.
     function changeTokenBuyingConditions(
         uint256 tokenId,
         address currency,
-        uint256 price
+        uint256 price,
+        bool forSale
     ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
         Token memory token = tokens[tokenId];
         token.price = price;
         token.currency = currency;
+        token.forSale = forSale;
         tokens[tokenId] = token;
+        emit TokenBuyingConditionsChanged(tokenId, currency, price, forSale);
     }
 
     /// @dev Redeems the token with the given tokenId.
@@ -165,22 +175,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         if (token.redeemed) revert AlreadyRedeemed(tokenId);
         token.redeemed = true;
         tokens[tokenId] = token;
-    }
-
-    /// @dev Toggles the for sale status of the token with the given tokenId.
-    /// @param tokenId The number of rings from dendrochronological sample.
-    function toggleForSale(uint256 tokenId)
-        external
-        onlyExistingTokenId(tokenId)
-        onlyTokenOwner(tokenId)
-    {
-        Token memory token = tokens[tokenId];
-        if (!token.forSale && !isCurrencyAllowed[token.currency]) {
-            revert UnallowedCurrency(tokenId, token.currency);
-        }
-        token.forSale = !token.forSale;
-        tokens[tokenId] = token;
-        emit TokenForSaleToggled(tokenId);
+        emit TokenRedeemed(tokenId);
     }
 
     /// @dev Toggles the payment allowance of the given currency.

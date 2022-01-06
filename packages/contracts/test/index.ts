@@ -212,7 +212,7 @@ describe('Tokenized time collection', () => {
     ).to.be.revertedWith('InvalidTimeParams()');
   });
 
-  it('Should revert if you try to put on sale a NFT with an unallowed currency', async () => {
+  it('Should revert if you set buying conditions with an unallowed currency', async () => {
     await timeContract.mint(
       'One dev hour v1',
       'One development hour to be used for any dao',
@@ -222,9 +222,14 @@ describe('Tokenized time collection', () => {
       10000000,
       300
     );
-    await expect(timeContract.toggleForSale(ethers.BigNumber.from(0))).to.be.revertedWith(
-      'UnallowedCurrency(0, "0x0000000000000000000000000000000000000000")'
-    );
+    await expect(
+      timeContract.changeTokenBuyingConditions(
+        ethers.constants.Zero,
+        ethers.constants.AddressZero,
+        ethers.constants.Zero,
+        true
+      )
+    ).to.be.revertedWith('UnallowedCurrency(0, "0x0000000000000000000000000000000000000000")');
   });
 
   it('Should revert if you try to whitelist a currency and you are not the owner', async () => {
@@ -251,7 +256,12 @@ describe('Tokenized time collection', () => {
     await expect(
       timeContract
         .connect(otherAccount)
-        .changeTokenBuyingConditions(ethers.constants.Zero, testToken.address, ethers.constants.One)
+        .changeTokenBuyingConditions(
+          ethers.constants.Zero,
+          testToken.address,
+          ethers.constants.One,
+          true
+        )
     ).to.be.revertedWith('OnlyTokenOwner');
   });
 
@@ -270,7 +280,8 @@ describe('Tokenized time collection', () => {
     await timeContract.changeTokenBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
-      ethers.constants.One
+      ethers.constants.One,
+      false
     );
 
     expect(await timeContract.tokens(0)).to.eql([
@@ -289,7 +300,7 @@ describe('Tokenized time collection', () => {
     ]);
   });
 
-  it('Should revert if you try to toggle from sale and you are not the owner', async () => {
+  it('Should revert if you try to change buying conditions and you are not the token owner', async () => {
     await timeContract.mint(
       'One dev hour v1',
       'One development hour to be used for any dao',
@@ -300,7 +311,14 @@ describe('Tokenized time collection', () => {
       300
     );
     await expect(
-      timeContract.connect(otherAccount).toggleForSale(ethers.BigNumber.from(0))
+      timeContract
+        .connect(otherAccount)
+        .changeTokenBuyingConditions(
+          ethers.constants.Zero,
+          ethers.constants.AddressZero,
+          ethers.constants.Zero,
+          true
+        )
     ).to.be.revertedWith('OnlyTokenOwner(0)');
   });
 
@@ -318,9 +336,9 @@ describe('Tokenized time collection', () => {
     await timeContract.changeTokenBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
-      ethers.constants.One
+      ethers.constants.One,
+      true
     );
-    await timeContract.toggleForSale(ethers.BigNumber.from(0));
     expect(await (await timeContract.tokens(0)).forSale).to.be.true;
   });
 
@@ -383,7 +401,8 @@ describe('Tokenized time collection', () => {
     await timeContract.changeTokenBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
-      ethers.constants.One
+      ethers.constants.One,
+      false
     );
     await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
       'NotForSale(0)'
@@ -404,9 +423,9 @@ describe('Tokenized time collection', () => {
     await timeContract.changeTokenBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
-      ethers.constants.One
+      ethers.constants.One,
+      true
     );
-    await timeContract.toggleForSale(ethers.constants.Zero);
     await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
       'NotEnoughFunds'
     );
@@ -426,9 +445,9 @@ describe('Tokenized time collection', () => {
     await timeContract.changeTokenBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
-      ethers.constants.One
+      ethers.constants.One,
+      true
     );
-    await timeContract.toggleForSale(ethers.constants.Zero);
     await expect(timeContract.buyToken(ethers.constants.Zero)).to.be.revertedWith(
       `CantBuyYourOwnToken("${minter.address}", 0)`
     );
@@ -448,9 +467,9 @@ describe('Tokenized time collection', () => {
     await timeContract.changeTokenBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
-      ethers.constants.One
+      ethers.constants.One,
+      true
     );
-    await timeContract.toggleForSale(ethers.constants.Zero);
     await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
     await testToken
       .connect(buyer)
@@ -482,9 +501,9 @@ describe('Tokenized time collection', () => {
       .changeTokenBuyingConditions(
         ethers.constants.Zero,
         testToken.address,
-        ethers.BigNumber.from(100)
+        ethers.BigNumber.from(100),
+        true
       );
-    await timeContract.connect(otherAccount).toggleForSale(ethers.constants.Zero);
     await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
     await testToken
       .connect(buyer)

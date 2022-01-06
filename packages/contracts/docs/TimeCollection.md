@@ -65,26 +65,10 @@ function buyToken(uint256 tokenId) external payable
 |---|---|---|
 | tokenId | uint256 | The token id of the NFT that you are buying.
 
-### c_0xa2c3c72d
-
-```solidity
-function c_0xa2c3c72d(bytes32 c__0xa2c3c72d) external pure
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| c__0xa2c3c72d | bytes32 | undefined
-
 ### changeTokenBuyingConditions
 
 ```solidity
-function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price) external nonpayable
+function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, bool forSale) external nonpayable
 ```
 
 
@@ -98,6 +82,7 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | tokenId | uint256 | Token id of the NFT that you are selling.
 | currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
 | price | uint256 | Price of the NFT that you are selling.
+| forSale | bool | A boolean indicating if the NFT is for sale or not.
 
 ### getApproved
 
@@ -392,22 +377,6 @@ function toggleCurrencyAllowance(address currency) external nonpayable
 |---|---|---|
 | currency | address | The address of the ERC-20 currency to toggle allowance. Use address(0) for native currency.
 
-### toggleForSale
-
-```solidity
-function toggleForSale(uint256 tokenId) external nonpayable
-```
-
-
-
-*Toggles the for sale status of the token with the given tokenId.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | The number of rings from dendrochronological sample.
-
 ### tokenURI
 
 ```solidity
@@ -588,10 +557,10 @@ event TokenBought(uint256 indexed tokenId, address seller, address buyer)
 | seller  | address | undefined |
 | buyer  | address | undefined |
 
-### TokenForSaleToggled
+### TokenBuyingConditionsChanged
 
 ```solidity
-event TokenForSaleToggled(uint256 indexed tokenId)
+event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, bool forSale)
 ```
 
 
@@ -603,11 +572,14 @@ event TokenForSaleToggled(uint256 indexed tokenId)
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| currency  | address | undefined |
+| price  | uint256 | undefined |
+| forSale  | bool | undefined |
 
-### TokenPriceChanged
+### TokenRedeemed
 
 ```solidity
-event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice)
+event TokenRedeemed(uint256 indexed tokenId)
 ```
 
 
@@ -619,7 +591,6 @@ event TokenPriceChanged(uint256 indexed tokenId, uint256 newPrice)
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
-| newPrice  | uint256 | undefined |
 
 ### Transfer
 
