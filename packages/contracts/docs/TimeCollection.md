@@ -154,7 +154,7 @@ function isCurrencyAllowed(address) external view returns (bool)
 ### mint
 
 ```solidity
-function mint(string name, string description, string work, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable returns (uint256)
+function mint(string name, string description, string category, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable returns (uint256)
 ```
 
 
@@ -167,7 +167,7 @@ function mint(string name, string description, string work, uint256 availability
 |---|---|---|
 | name | string | Name of the NFT that you are minting.
 | description | string | Description of the NFT that you are minting.
-| work | string | Type of work that will be done of the NFT that you are minting.
+| category | string | Type or category label that represents the activity for what the time is being tokenized.
 | availabilityFrom | uint256 | Unix timestamp indicating start of availability. Zero if does not have lower bound.
 | availabilityTo | uint256 | Unix timestamp indicating end of availability. Zero if does not have upper bound.
 | duration | uint256 | The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
@@ -402,7 +402,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string work)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string category)
 ```
 
 
@@ -430,7 +430,7 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | forSale | bool | undefined
 | name | string | undefined
 | description | string | undefined
-| work | string | undefined
+| category | string | undefined
 
 ### transferFrom
 

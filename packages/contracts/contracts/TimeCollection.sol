@@ -49,7 +49,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         bool forSale;
         string name;
         string description;
-        string work;
+        string category;
     }
 
     uint256 internal _tokenCounter;
@@ -84,7 +84,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @dev Mints a new token with the given parameters.
     /// @param name Name of the NFT that you are minting.
     /// @param description Description of the NFT that you are minting.
-    /// @param work Type of work that will be done of the NFT that you are minting.
+    /// @param category Type or category label that represents the activity for what the time is being tokenized.
     /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
     /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
     /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
@@ -93,7 +93,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     function mint(
         string memory name,
         string memory description,
-        string memory work,
+        string memory category,
         uint256 availabilityFrom,
         uint256 availabilityTo,
         uint256 duration,
@@ -115,7 +115,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             false,
             name,
             description,
-            work
+            category
         );
         tokens[_tokenCounter] = newToken;
         return _tokenCounter++;
@@ -226,7 +226,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty('trait_type', 'type');
-        writer = writer.writeStringProperty('value', token.work);
+        writer = writer.writeStringProperty('value', token.category);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
