@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
 import 'solidity-json-writer/contracts/JsonWriter.sol';
@@ -14,7 +13,6 @@ import 'base64-sol/base64.sol';
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
 contract TimeCollection is IERC2981, ERC721, Ownable {
-    using SafeERC20 for IERC20;
     using JsonWriter for JsonWriter.Json;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
@@ -51,7 +49,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         bool forSale;
         string name;
         string description;
-        string work;
+        string category;
     }
 
     uint256 internal _tokenCounter;
@@ -86,7 +84,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @dev Mints a new token with the given parameters.
     /// @param name Name of the NFT that you are minting.
     /// @param description Description of the NFT that you are minting.
-    /// @param work Type of work that will be done of the NFT that you are minting.
+    /// @param category Type or category label that represents the activity for what the time is being tokenized.
     /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
     /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
     /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
@@ -95,7 +93,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     function mint(
         string memory name,
         string memory description,
-        string memory work,
+        string memory category,
         uint256 availabilityFrom,
         uint256 availabilityTo,
         uint256 duration,
@@ -117,7 +115,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             false,
             name,
             description,
-            work
+            category
         );
         tokens[_tokenCounter] = newToken;
         return _tokenCounter++;
@@ -132,9 +130,6 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
-        if (IERC20(token.currency).balanceOf(msg.sender) < token.price)
-            //TODO: is this check necessary? what if its using native currency?
-            revert NotEnoughFunds(tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -231,7 +226,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty('trait_type', 'type');
-        writer = writer.writeStringProperty('value', token.work);
+        writer = writer.writeStringProperty('value', token.category);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
@@ -273,12 +268,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         address currency,
         uint256 amount
     ) internal {
+        bool transferSucceed;
         if (currency == address(0)) {
-            (bool transferSucceed, ) = receiver.call{value: amount}('');
-            if (!transferSucceed) revert TransferFailed();
+            (transferSucceed, ) = receiver.call{value: amount}('');
         } else {
-            IERC20(currency).safeTransferFrom(sender, receiver, amount);
+            transferSucceed = IERC20(currency).transferFrom(sender, receiver, amount);
         }
+        if (!transferSucceed) revert TransferFailed();
     }
 
     /// @dev Tells whether the given params conform a valid time representation or not. To be valid must follow:
