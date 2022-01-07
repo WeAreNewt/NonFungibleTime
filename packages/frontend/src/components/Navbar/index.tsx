@@ -71,7 +71,7 @@ export default function Menu() {
                                         <div
                                             key={index}
                                         >
-                                            {link.link.substring(0, 5) === 'https' ? <a href={link.link} className={activePage === link.title.toLowerCase() ? "text-indigo-600 px-3 py-2 rounded-md text-lg font-semibold" : "text-gray-500 px-3 py-2 rounded-md text-lg font-semibold"} aria-current={activePage === link.title.toLowerCase() ? "page" : undefined}
+                                            {link.link.substring(0, 5) === 'https' ? <a href={link.link} target="_blank" rel="noopener noreferrer" className="text-gray-500 px-3 py-2 rounded-md text-lg font-semibold" aria-current={undefined}
                                             >{link.title}</a> : <Link
                                                 to={link.link}
                                                 title={link.title}
@@ -100,7 +100,7 @@ export default function Menu() {
                             <div
                                 key={index}
                             >
-                                {link.link.substring(0, 5) === 'https' ? <a href={link.link} className={activePage === link.title.toLowerCase() ? "text-indigo-600 px-3 py-2 rounded-md text-base font-semibold" : "text-gray-500 px-3 py-2 rounded-md text-base font-semibold"} aria-current={activePage === link.title.toLowerCase() ? "page" : undefined}
+                                {link.link.substring(0, 5) === 'https' ? <a href={link.link} target="_blank" rel="noopener noreferrer" className="text-gray-500 px-3 py-2 rounded-md text-base font-semibold" aria-current={undefined}
                                 >{link.title}</a> : <Link
                                     to={link.link}
                                     title={link.title}
