@@ -427,7 +427,7 @@ describe('Tokenized time collection', () => {
       true
     );
     await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      'NotEnoughFunds'
+      'ERC20: transfer amount exceeds balance'
     );
   });
 
