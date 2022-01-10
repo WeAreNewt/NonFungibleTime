@@ -22,11 +22,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 price,
         bool forSale
     );
+    event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver);
     event TokenRedeemed(uint256 indexed tokenId);
     event CurrencyAllowanceToggled(address indexed currency);
 
     error TokenDoesntExist(uint256 tokenId);
     error OnlyTokenOwner(uint256 tokenId);
+    error OnlyCurrentRoyaltyReceiver(uint256 tokenId);
     error InvalidAddress(address addr);
     error NotForSale(uint256 tokenId);
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
@@ -43,7 +45,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 duration;
         uint256 price;
         uint256 royaltyBasisPoints;
-        address payable mintedBy;
+        address payable royaltyReceiver;
         address currency;
         bool redeemed;
         bool forSale;
@@ -100,8 +102,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 royaltyBasisPoints
     ) external returns (uint256) {
         if (royaltyBasisPoints > BASIS_POINTS) revert InvalidRoyalty();
-        if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration))
+        if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration)) {
             revert InvalidTimeParams();
+        }
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             availabilityFrom,
@@ -133,9 +136,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
-        if (owner != token.mintedBy) {
+        if (owner != token.royaltyReceiver) {
             uint256 royaltyAmount = (token.price * token.royaltyBasisPoints) / BASIS_POINTS;
-            _transferCurrency(msg.sender, token.mintedBy, token.currency, royaltyAmount);
+            _transferCurrency(msg.sender, token.royaltyReceiver, token.currency, royaltyAmount);
             _transferCurrency(msg.sender, owner, token.currency, token.price - royaltyAmount);
         } else {
             _transferCurrency(msg.sender, owner, token.currency, token.price);
@@ -161,6 +164,20 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         token.forSale = forSale;
         tokens[tokenId] = token;
         emit TokenBuyingConditionsChanged(tokenId, currency, price, forSale);
+    }
+
+    /// @dev Changes the token royalty receiver.
+    /// @param tokenId Token id of the NFT which royalty receiver must be updated.
+    /// @param royaltyReceiver The address of the new rotalty receiver.
+    function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver)
+        external
+        onlyExistingTokenId(tokenId)
+    {
+        if (msg.sender != tokens[tokenId].royaltyReceiver) {
+            revert OnlyCurrentRoyaltyReceiver(tokenId);
+        }
+        tokens[tokenId].royaltyReceiver = payable(royaltyReceiver);
+        emit TokenRoyaltyReceiverChanged(tokenId, royaltyReceiver);
     }
 
     /// @dev Redeems the token with the given tokenId.
@@ -192,7 +209,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         returns (address, uint256)
     {
         return (
-            tokens[tokenId].mintedBy,
+            tokens[tokenId].royaltyReceiver,
             (salePrice * tokens[tokenId].royaltyBasisPoints) / BASIS_POINTS
         );
     }

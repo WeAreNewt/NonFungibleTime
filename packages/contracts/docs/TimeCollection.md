@@ -84,6 +84,23 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | price | uint256 | Price of the NFT that you are selling.
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
 
+### changeTokenRoyaltyReceiver
+
+```solidity
+function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver) external nonpayable
+```
+
+
+
+*Changes the token royalty receiver.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | Token id of the NFT which royalty receiver must be updated.
+| royaltyReceiver | address | The address of the new rotalty receiver.
+
 ### getApproved
 
 ```solidity
@@ -402,7 +419,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string category)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable royaltyReceiver, address currency, bool redeemed, bool forSale, string name, string description, string category)
 ```
 
 
@@ -424,7 +441,7 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | duration | uint256 | undefined
 | price | uint256 | undefined
 | royaltyBasisPoints | uint256 | undefined
-| mintedBy | address payable | undefined
+| royaltyReceiver | address payable | undefined
 | currency | address | undefined
 | redeemed | bool | undefined
 | forSale | bool | undefined
@@ -592,6 +609,23 @@ event TokenRedeemed(uint256 indexed tokenId)
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
 
+### TokenRoyaltyReceiverChanged
+
+```solidity
+event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| royaltyReceiver  | address | undefined |
+
 ### Transfer
 
 ```solidity
@@ -705,6 +739,22 @@ error NotEnoughFunds(uint256 tokenId)
 
 ```solidity
 error NotForSale(uint256 tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+### OnlyCurrentRoyaltyReceiver
+
+```solidity
+error OnlyCurrentRoyaltyReceiver(uint256 tokenId)
 ```
 
 
