@@ -155,6 +155,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param tokenId Token id of the NFT that you are selling.
     /// @param currency The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
     /// @param price Price of the NFT that you are selling.
+    /// @param buyerAddress address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
     /// @param forSale A boolean indicating if the NFT is for sale or not.
     function changeTokenBuyingConditions(
         uint256 tokenId,
