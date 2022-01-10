@@ -20,7 +20,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 indexed tokenId,
         address currency,
         uint256 price,
-        address buyerAddress,
+        address allowedBuyer,
         bool forSale
     );
     event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver);
@@ -49,7 +49,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 royaltyBasisPoints;
         address payable royaltyReceiver;
         address currency;
-        address buyerAddress;
+        address allowedBuyer;
         bool redeemed;
         bool forSale;
         string name;
@@ -137,7 +137,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
-        if (token.buyerAddress != address(0) && msg.sender != token.buyerAddress) revert NotAuthorizedBuyer(msg.sender, tokenId);
+        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer) revert NotAuthorizedBuyer(msg.sender, tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -155,13 +155,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param tokenId Token id of the NFT that you are selling.
     /// @param currency The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
     /// @param price Price of the NFT that you are selling.
-    /// @param buyerAddress address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
+    /// @param allowedBuyer address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
     /// @param forSale A boolean indicating if the NFT is for sale or not.
     function changeTokenBuyingConditions(
         uint256 tokenId,
         address currency,
         uint256 price,
-        address buyerAddress,
+        address allowedBuyer,
         bool forSale
     ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
@@ -169,9 +169,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         token.price = price;
         token.currency = currency;
         token.forSale = forSale;
-        token.buyerAddress = buyerAddress;
+        token.allowedBuyer = allowedBuyer;
         tokens[tokenId] = token;
-        emit TokenBuyingConditionsChanged(tokenId, currency, price, buyerAddress, forSale);
+        emit TokenBuyingConditionsChanged(tokenId, currency, price, allowedBuyer, forSale);
     }
 
     /// @dev Changes the token royalty receiver.
