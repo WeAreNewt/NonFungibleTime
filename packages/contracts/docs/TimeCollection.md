@@ -68,7 +68,7 @@ function buyToken(uint256 tokenId) external payable
 ### changeTokenBuyingConditions
 
 ```solidity
-function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, bool forSale) external nonpayable
+function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address buyerAddress, bool forSale) external nonpayable
 ```
 
 
@@ -82,6 +82,7 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | tokenId | uint256 | Token id of the NFT that you are selling.
 | currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
 | price | uint256 | Price of the NFT that you are selling.
+| buyerAddress | address | undefined
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
 
 ### changeTokenRoyaltyReceiver
@@ -443,6 +444,7 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | royaltyBasisPoints | uint256 | undefined
 | royaltyReceiver | address payable | undefined
 | currency | address | undefined
+| buyerAddress | address | undefined
 | redeemed | bool | undefined
 | forSale | bool | undefined
 | name | string | undefined
@@ -577,7 +579,7 @@ event TokenBought(uint256 indexed tokenId, address seller, address buyer)
 ### TokenBuyingConditionsChanged
 
 ```solidity
-event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, bool forSale)
+event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, address buyerAddress, bool forSale)
 ```
 
 
@@ -591,6 +593,7 @@ event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, ui
 | tokenId `indexed` | uint256 | undefined |
 | currency  | address | undefined |
 | price  | uint256 | undefined |
+| buyerAddress  | address | undefined |
 | forSale  | bool | undefined |
 
 ### TokenRedeemed
@@ -718,6 +721,23 @@ error InvalidTimeParams()
 
 
 
+
+### NotAuthorizedBuyer
+
+```solidity
+error NotAuthorizedBuyer(address buyer, uint256 tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| buyer | address | undefined |
+| tokenId | uint256 | undefined |
 
 ### NotEnoughFunds
 

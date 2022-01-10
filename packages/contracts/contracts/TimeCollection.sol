@@ -20,6 +20,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 indexed tokenId,
         address currency,
         uint256 price,
+        address buyerAddress,
         bool forSale
     );
     event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver);
@@ -31,6 +32,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     error OnlyCurrentRoyaltyReceiver(uint256 tokenId);
     error InvalidAddress(address addr);
     error NotForSale(uint256 tokenId);
+    error NotAuthorizedBuyer(address buyer, uint256 tokenId);
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
     error NotEnoughFunds(uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
@@ -47,6 +49,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 royaltyBasisPoints;
         address payable royaltyReceiver;
         address currency;
+        address buyerAddress;
         bool redeemed;
         bool forSale;
         string name;
@@ -114,6 +117,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             royaltyBasisPoints,
             payable(msg.sender),
             address(0),
+            address(0),
             false,
             false,
             name,
@@ -133,6 +137,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
+        if (token.buyerAddress != address(0) && msg.sender != token.buyerAddress) revert NotAuthorizedBuyer(msg.sender, tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -155,6 +160,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 tokenId,
         address currency,
         uint256 price,
+        address buyerAddress,
         bool forSale
     ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
@@ -162,8 +168,9 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         token.price = price;
         token.currency = currency;
         token.forSale = forSale;
+        token.buyerAddress = buyerAddress;
         tokens[tokenId] = token;
-        emit TokenBuyingConditionsChanged(tokenId, currency, price, forSale);
+        emit TokenBuyingConditionsChanged(tokenId, currency, price, buyerAddress, forSale);
     }
 
     /// @dev Changes the token royalty receiver.
