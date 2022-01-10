@@ -48,6 +48,7 @@ describe('Tokenized time collection', () => {
       BigNumber.from(300),
       minter.address,
       ethers.constants.AddressZero,
+      ethers.constants.AddressZero,
       false,
       false,
       'One dev hour v1',
@@ -227,6 +228,7 @@ describe('Tokenized time collection', () => {
         ethers.constants.Zero,
         ethers.constants.AddressZero,
         ethers.constants.Zero,
+        ethers.constants.AddressZero,
         true
       )
     ).to.be.revertedWith('UnallowedCurrency(0, "0x0000000000000000000000000000000000000000")');
@@ -260,6 +262,7 @@ describe('Tokenized time collection', () => {
           ethers.constants.Zero,
           testToken.address,
           ethers.constants.One,
+          ethers.constants.AddressZero,
           true
         )
     ).to.be.revertedWith('OnlyTokenOwner');
@@ -281,6 +284,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
+      ethers.constants.AddressZero,
       false
     );
 
@@ -292,6 +296,7 @@ describe('Tokenized time collection', () => {
       BigNumber.from(300),
       minter.address,
       testToken.address,
+      ethers.constants.AddressZero,
       false,
       false,
       'One dev hour v1',
@@ -317,6 +322,7 @@ describe('Tokenized time collection', () => {
           ethers.constants.Zero,
           ethers.constants.AddressZero,
           ethers.constants.Zero,
+          ethers.constants.AddressZero,
           true
         )
     ).to.be.revertedWith('OnlyTokenOwner(0)');
@@ -337,6 +343,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
+      ethers.constants.AddressZero,
       true
     );
     expect(await (await timeContract.tokens(0)).forSale).to.be.true;
@@ -402,6 +409,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
+      ethers.constants.AddressZero,
       false
     );
     await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
@@ -424,6 +432,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
+      ethers.constants.AddressZero,
       true
     );
     await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
@@ -446,6 +455,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
+      ethers.constants.AddressZero,
       true
     );
     await expect(timeContract.buyToken(ethers.constants.Zero)).to.be.revertedWith(
@@ -468,6 +478,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
+      ethers.constants.AddressZero,
       true
     );
     await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
@@ -478,6 +489,63 @@ describe('Tokenized time collection', () => {
     expect(await testToken.balanceOf(buyer.address)).to.equal(ethers.BigNumber.from(99));
     expect(await testToken.balanceOf(minter.address)).to.equal(ethers.constants.One);
     expect(await timeContract.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
+  });
+
+  it('Should buy a token from someone if you are the whitelisted buyer', async () => {
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await timeContract.toggleCurrencyAllowance(testToken.address);
+    await timeContract.changeTokenBuyingConditions(
+      ethers.constants.Zero,
+      testToken.address,
+      ethers.constants.One,
+      buyer.address,
+      true
+    );
+    await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
+    await testToken
+      .connect(buyer)
+      .increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
+    await timeContract.connect(buyer).buyToken(ethers.constants.Zero);
+    expect(await testToken.balanceOf(buyer.address)).to.equal(ethers.BigNumber.from(99));
+    expect(await testToken.balanceOf(minter.address)).to.equal(ethers.constants.One);
+    expect(await timeContract.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
+  });
+
+  it('Should revert the token buy if you are not the whitelisted buyer', async () => {
+    await timeContract.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await timeContract.toggleCurrencyAllowance(testToken.address);
+    await timeContract.changeTokenBuyingConditions(
+      ethers.constants.Zero,
+      testToken.address,
+      ethers.constants.One,
+      minter.address,
+      true
+    );
+    await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
+    await testToken
+      .connect(buyer)
+      .increaseAllowance(timeContract.address, ethers.BigNumber.from(100));
+
+    await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
+      `NotAuthorizedBuyer("${buyer.address}", 0)`
+    );
+
   });
 
   it('Should buy a token and give royalties to the minter', async () => {
@@ -502,6 +570,7 @@ describe('Tokenized time collection', () => {
         ethers.constants.Zero,
         testToken.address,
         ethers.BigNumber.from(100),
+        ethers.constants.AddressZero,
         true
       );
     await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
