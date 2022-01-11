@@ -18,12 +18,12 @@ describe('Tokenized time collection', () => {
     const TestTokenFactory = await ethers.getContractFactory('TestToken');
     [owner, otherAccount, buyer] = await ethers.getSigners();
     minter = owner;
-    timeContract = await TimeCollectionFactory.deploy('Tokenized Time', 'TTime', false);
+    timeContract = await TimeCollectionFactory.deploy('Non Fungible Time', 'NFTIME', false);
     testToken = await TestTokenFactory.deploy();
   });
 
   it('Should initialize the Tokenized Time contract', async () => {
-    expect(await timeContract.name()).to.equal('Tokenized Time');
+    expect(await timeContract.name()).to.equal('Non Fungible Time');
   });
 
   it('Should set the right owner', async () => {
@@ -545,7 +545,6 @@ describe('Tokenized time collection', () => {
     await expect(timeContract.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
       `NotAuthorizedBuyer("${buyer.address}", 0)`
     );
-
   });
 
   it('Should buy a token and give royalties to the minter', async () => {
