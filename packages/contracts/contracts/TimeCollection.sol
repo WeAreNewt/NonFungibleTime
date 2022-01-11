@@ -137,7 +137,8 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
-        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer) revert NotAuthorizedBuyer(msg.sender, tokenId);
+        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer)
+            revert NotAuthorizedBuyer(msg.sender, tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
