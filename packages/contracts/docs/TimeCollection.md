@@ -68,7 +68,7 @@ function buyToken(uint256 tokenId) external payable
 ### changeTokenBuyingConditions
 
 ```solidity
-function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address buyerAddress, bool forSale) external nonpayable
+function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale) external nonpayable
 ```
 
 
@@ -82,7 +82,7 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | tokenId | uint256 | Token id of the NFT that you are selling.
 | currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
 | price | uint256 | Price of the NFT that you are selling.
-| buyerAddress | address | undefined
+| allowedBuyer | address | address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
 
 ### changeTokenRoyaltyReceiver
@@ -420,7 +420,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable royaltyReceiver, address currency, bool redeemed, bool forSale, string name, string description, string category)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable royaltyReceiver, address currency, address allowedBuyer, bool redeemed, bool forSale, string name, string description, string category)
 ```
 
 
@@ -444,7 +444,7 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | royaltyBasisPoints | uint256 | undefined
 | royaltyReceiver | address payable | undefined
 | currency | address | undefined
-| buyerAddress | address | undefined
+| allowedBuyer | address | undefined
 | redeemed | bool | undefined
 | forSale | bool | undefined
 | name | string | undefined
@@ -579,7 +579,7 @@ event TokenBought(uint256 indexed tokenId, address seller, address buyer)
 ### TokenBuyingConditionsChanged
 
 ```solidity
-event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, address buyerAddress, bool forSale)
+event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, address allowedBuyer, bool forSale)
 ```
 
 
@@ -593,7 +593,7 @@ event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, ui
 | tokenId `indexed` | uint256 | undefined |
 | currency  | address | undefined |
 | price  | uint256 | undefined |
-| buyerAddress  | address | undefined |
+| allowedBuyer  | address | undefined |
 | forSale  | bool | undefined |
 
 ### TokenRedeemed
