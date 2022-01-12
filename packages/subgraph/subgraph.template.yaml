@@ -33,7 +33,7 @@ dataSources:
       eventHandlers:
         - event: TokenBought(indexed uint256,address,address)
           handler: handleTokenBought
-        - event: TokenBuyingConditionsChanged(indexed uint256,address,uint256,bool)
+        - event: TokenBuyingConditionsChanged(indexed uint256,address,uint256,address,bool)
           handler: handleTokenBuyingConditionsChanged
         - event: TokenRedeemed(indexed uint256)
           handler: handleTokenRedeemed

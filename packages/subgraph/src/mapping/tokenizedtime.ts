@@ -72,9 +72,21 @@ export function handleTokenBuyingConditions(event: TokenBuyingConditionsChanged)
   buyingConditionChange.nft = event.params.tokenId.toString();
   buyingConditionChange.timestamp = event.block.timestamp;
   buyingConditionChange.blockNumber = event.block.number;
+  const nft = Nft.load(event.params.tokenId.toString());
+  if (nft) {
+    nft.price = event.params.price;
+    nft.currency = event.params.currency.toHexString();
+    nft.forSale = event.params.forSale;
+    nft.allowedBuyer = event.params.allowedBuyer.toHexString();
+  } else {
+    log.warning(`Buying condition update for non-existant tokenId {}`, [
+      event.params.tokenId.toString(),
+    ]);
+  }
   buyingConditionChange.currency = event.params.currency.toHexString();
   buyingConditionChange.price = event.params.price;
   buyingConditionChange.forSale = event.params.forSale;
+  buyingConditionChange.allowedBuyer = event.params.allowedBuyer.toHexString();
   const from = event.transaction.from ? event.transaction.from.toHexString() : '';
   buyingConditionChange.owner = from;
   buyingConditionChange.save();
@@ -153,13 +165,14 @@ export function handleTransfer(event: Transfer): void {
       nft.duration = values.value2;
       nft.price = values.value3;
       nft.royaltyBasisPoints = values.value4;
-      nft.creator = to;
+      nft.creator = values.value5.toHexString();
       nft.currency = values.value6.toHexString();
-      nft.redeemed = values.value7;
-      nft.forSale = values.value8;
-      nft.name = values.value9;
-      nft.description = values.value10;
-      nft.work = values.value11;
+      nft.allowedBuyer = values.value7.toHexString();
+      nft.redeemed = values.value8;
+      nft.forSale = values.value9;
+      nft.name = values.value10;
+      nft.description = values.value11;
+      nft.work = values.value12;
       nft.tokenId = event.params.tokenId;
       const uri = getTokenURI(event);
       nft.tokenURI = uri;
