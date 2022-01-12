@@ -23,12 +23,14 @@ type Nft @entity {
   work: Category!
   availabilityTo: BigInt!
   availabilityFrom: BigInt!
-  # number of hours
+  "nft creator can restrict buyer to a single address"
+  allowedBuyer: String!
+  "number of hours"
   duration: BigInt!
   history: [NftStatusChange!] @derivedFrom(field: "nft")
   forSale: Boolean!
   redeemed: Boolean!
-  # out of 10000
+  "out of 10000"
   royaltyBasisPoints: BigInt!
   price: BigInt!
   currency: PaymentToken!
@@ -38,11 +40,11 @@ type User @entity {
   id: ID!
   ownedNfts: [Nft!] @derivedFrom(field: "owner")
   createdNfts: [Nft!] @derivedFrom(field: "creator")
-  # Nfts which this user has redeemed
+  "Nfts which this user has redeemed"
   redemptions: [Redeem!] @derivedFrom(field: "redeemedBy")
-  # Nfts which this user has created that have been redeemed
+  "Nfts which this user has created that have been redeemed"
   creatorRedemptions: [Redeem!] @derivedFrom(field: "creator")
-  # Sale option toggles for NFTs this user owns
+  "Sale option toggles for NFTs this user owns"
   buyingConditionUpdates: [BuyingConditionsChanged!] @derivedFrom(field: "owner")
   sales: [Sale!] @derivedFrom(field: "from")
   royaltiesAccrued: [Sale!] @derivedFrom(field: "creator")
@@ -105,6 +107,7 @@ type BuyingConditionsChanged implements NftStatusChange @entity {
   price: BigInt!
   forSale: Boolean!
   owner: User!
+  allowedBuyer: String!
 }
 
 type PaymentToken @entity {
