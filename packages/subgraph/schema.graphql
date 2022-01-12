@@ -5,9 +5,13 @@ enum Category {
   Communication
   Design
   Other
+  Content
+  Consulting
+  Legal
+  Finance
 }
 
-type NFT @entity {
+type Nft @entity {
   id: ID!
   tokenId: BigInt!
   tokenURI: String!
@@ -21,7 +25,7 @@ type NFT @entity {
   availabilityFrom: BigInt!
   # number of hours
   duration: BigInt!
-  history: [NFTStatusChange!] @derivedFrom(field: "nft")
+  history: [NftStatusChange!] @derivedFrom(field: "nft")
   forSale: Boolean!
   redeemed: Boolean!
   # out of 10000
@@ -32,9 +36,19 @@ type NFT @entity {
 
 type User @entity {
   id: ID!
-  address: String!
-  nfts: [NFT!] @derivedFrom(field: "owner")
-  actions: [NFTStatusChange!]
+  ownedNfts: [Nft!] @derivedFrom(field: "owner")
+  createdNfts: [Nft!] @derivedFrom(field: "creator")
+  # Nfts which this user has redeemed
+  redemptions: [Redeem!] @derivedFrom(field: "redeemedBy")
+  # Nfts which this user has created that have been redeemed
+  creatorRedemptions: [Redeem!] @derivedFrom(field: "creator")
+  # Sale option toggles for NFTs this user owns
+  buyingConditionUpdates: [BuyingConditionsChanged!] @derivedFrom(field: "owner")
+  sales: [Sale!] @derivedFrom(field: "from")
+  royaltiesAccrued: [Sale!] @derivedFrom(field: "creator")
+  purchases: [Sale!] @derivedFrom(field: "to")
+  incomingTransfers: [Transfer!] @derivedFrom(field: "to")
+  outgoingTransfers: [Transfer!] @derivedFrom(field: "from")
 }
 
 enum EventType {
@@ -44,55 +58,57 @@ enum EventType {
   BuyingConditionsChanged
 }
 
-interface NFTStatusChange {
+interface NftStatusChange {
   id: ID!
-  nft: NFT!
+  nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
 }
 
-type Sale implements NFTStatusChange @entity {
+type Sale implements NftStatusChange @entity {
   id: ID!
-  nft: NFT!
+  nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
-  to: String!
-  from: String!
+  to: User!
+  from: User!
+  creator: User!
   price: BigInt!
   currency: PaymentToken!
   royaltyAccrued: BigInt!
 }
 
-type Transfer implements NFTStatusChange @entity {
+type Transfer implements NftStatusChange @entity {
   id: ID!
-  nft: NFT!
+  nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
-  to: String!
-  from: String!
+  to: User!
+  from: User!
 }
 
-type Redeem implements NFTStatusChange @entity {
+type Redeem implements NftStatusChange @entity {
   id: ID!
-  nft: NFT!
+  nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
-  redeemedBy: String!
+  redeemedBy: User!
+  creator: User!
 }
 
-type BuyingConditionsChanged implements NFTStatusChange @entity {
+type BuyingConditionsChanged implements NftStatusChange @entity {
   id: ID!
-  nft: NFT!
+  nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
   currency: PaymentToken!
   price: BigInt!
   forSale: Boolean!
+  owner: User!
 }
 
 type PaymentToken @entity {
   id: ID!
-  address: ID!
   decimals: Int!
   acceptable: Boolean!
 }
