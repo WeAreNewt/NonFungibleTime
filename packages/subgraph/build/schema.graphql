@@ -1,7 +1,0 @@
-type TimeNFT @entity {
-  id: ID!
-  owner: String!
-  name: String!
-  description: String!
-  category: String!
-}

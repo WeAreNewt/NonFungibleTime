@@ -12,7 +12,6 @@ cache
 artifacts
 
 #subgraph build
-build
-generated
-abis
-subgraph.yaml
+packages/*/build/
+packages/*generated/
+packages/*/subgraph.yaml
