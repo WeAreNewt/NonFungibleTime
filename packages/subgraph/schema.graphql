@@ -1,16 +1,3 @@
-enum Category {
-  Business
-  Development
-  Advertising
-  Communication
-  Design
-  Other
-  Content
-  Consulting
-  Legal
-  Finance
-}
-
 type Nft @entity {
   id: ID!
   tokenId: BigInt!
@@ -20,7 +7,7 @@ type Nft @entity {
   creator: User!
   name: String!
   description: String!
-  work: Category!
+  work: String!
   availabilityTo: BigInt!
   availabilityFrom: BigInt!
   "nft creator can restrict buyer to a single address"
