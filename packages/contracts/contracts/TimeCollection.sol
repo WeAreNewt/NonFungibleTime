@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
 import 'solidity-json-writer/contracts/JsonWriter.sol';
@@ -14,7 +13,6 @@ import 'base64-sol/base64.sol';
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
 contract TimeCollection is IERC2981, ERC721, Ownable {
-    using SafeERC20 for IERC20;
     using JsonWriter for JsonWriter.Json;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
@@ -22,15 +20,19 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 indexed tokenId,
         address currency,
         uint256 price,
+        address allowedBuyer,
         bool forSale
     );
+    event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver);
     event TokenRedeemed(uint256 indexed tokenId);
     event CurrencyAllowanceToggled(address indexed currency);
 
     error TokenDoesntExist(uint256 tokenId);
     error OnlyTokenOwner(uint256 tokenId);
+    error OnlyCurrentRoyaltyReceiver(uint256 tokenId);
     error InvalidAddress(address addr);
     error NotForSale(uint256 tokenId);
+    error NotAuthorizedBuyer(address buyer, uint256 tokenId);
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
     error NotEnoughFunds(uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
@@ -45,13 +47,14 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         uint256 duration;
         uint256 price;
         uint256 royaltyBasisPoints;
-        address payable mintedBy;
+        address payable royaltyReceiver;
         address currency;
+        address allowedBuyer;
         bool redeemed;
         bool forSale;
         string name;
         string description;
-        string work;
+        string category;
     }
 
     uint256 internal _tokenCounter;
@@ -86,7 +89,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @dev Mints a new token with the given parameters.
     /// @param name Name of the NFT that you are minting.
     /// @param description Description of the NFT that you are minting.
-    /// @param work Type of work that will be done of the NFT that you are minting.
+    /// @param category Type or category label that represents the activity for what the time is being tokenized.
     /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
     /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
     /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
@@ -95,15 +98,16 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     function mint(
         string memory name,
         string memory description,
-        string memory work,
+        string memory category,
         uint256 availabilityFrom,
         uint256 availabilityTo,
         uint256 duration,
         uint256 royaltyBasisPoints
     ) external returns (uint256) {
         if (royaltyBasisPoints > BASIS_POINTS) revert InvalidRoyalty();
-        if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration))
+        if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration)) {
             revert InvalidTimeParams();
+        }
         _safeMint(msg.sender, _tokenCounter);
         Token memory newToken = Token(
             availabilityFrom,
@@ -113,11 +117,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
             royaltyBasisPoints,
             payable(msg.sender),
             address(0),
+            address(0),
             false,
             false,
             name,
             description,
-            work
+            category
         );
         tokens[_tokenCounter] = newToken;
         return _tokenCounter++;
@@ -132,15 +137,14 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
         if (!token.forSale) revert NotForSale(tokenId);
-        if (IERC20(token.currency).balanceOf(msg.sender) < token.price)
-            //TODO: is this check necessary? what if its using native currency?
-            revert NotEnoughFunds(tokenId);
+        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer)
+            revert NotAuthorizedBuyer(msg.sender, tokenId);
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
-        if (owner != token.mintedBy) {
+        if (owner != token.royaltyReceiver) {
             uint256 royaltyAmount = (token.price * token.royaltyBasisPoints) / BASIS_POINTS;
-            _transferCurrency(msg.sender, token.mintedBy, token.currency, royaltyAmount);
+            _transferCurrency(msg.sender, token.royaltyReceiver, token.currency, royaltyAmount);
             _transferCurrency(msg.sender, owner, token.currency, token.price - royaltyAmount);
         } else {
             _transferCurrency(msg.sender, owner, token.currency, token.price);
@@ -152,11 +156,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param tokenId Token id of the NFT that you are selling.
     /// @param currency The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
     /// @param price Price of the NFT that you are selling.
+    /// @param allowedBuyer address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
     /// @param forSale A boolean indicating if the NFT is for sale or not.
     function changeTokenBuyingConditions(
         uint256 tokenId,
         address currency,
         uint256 price,
+        address allowedBuyer,
         bool forSale
     ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
@@ -164,8 +170,23 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         token.price = price;
         token.currency = currency;
         token.forSale = forSale;
+        token.allowedBuyer = allowedBuyer;
         tokens[tokenId] = token;
-        emit TokenBuyingConditionsChanged(tokenId, currency, price, forSale);
+        emit TokenBuyingConditionsChanged(tokenId, currency, price, allowedBuyer, forSale);
+    }
+
+    /// @dev Changes the token royalty receiver.
+    /// @param tokenId Token id of the NFT which royalty receiver must be updated.
+    /// @param royaltyReceiver The address of the new rotalty receiver.
+    function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver)
+        external
+        onlyExistingTokenId(tokenId)
+    {
+        if (msg.sender != tokens[tokenId].royaltyReceiver) {
+            revert OnlyCurrentRoyaltyReceiver(tokenId);
+        }
+        tokens[tokenId].royaltyReceiver = payable(royaltyReceiver);
+        emit TokenRoyaltyReceiverChanged(tokenId, royaltyReceiver);
     }
 
     /// @dev Redeems the token with the given tokenId.
@@ -197,7 +218,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         returns (address, uint256)
     {
         return (
-            tokens[tokenId].mintedBy,
+            tokens[tokenId].royaltyReceiver,
             (salePrice * tokens[tokenId].royaltyBasisPoints) / BASIS_POINTS
         );
     }
@@ -231,7 +252,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty('trait_type', 'type');
-        writer = writer.writeStringProperty('value', token.work);
+        writer = writer.writeStringProperty('value', token.category);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
@@ -273,12 +294,13 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         address currency,
         uint256 amount
     ) internal {
+        bool transferSucceed;
         if (currency == address(0)) {
-            (bool transferSucceed, ) = receiver.call{value: amount}('');
-            if (!transferSucceed) revert TransferFailed();
+            (transferSucceed, ) = receiver.call{value: amount}('');
         } else {
-            IERC20(currency).safeTransferFrom(sender, receiver, amount);
+            transferSucceed = IERC20(currency).transferFrom(sender, receiver, amount);
         }
+        if (!transferSucceed) revert TransferFailed();
     }
 
     /// @dev Tells whether the given params conform a valid time representation or not. To be valid must follow:

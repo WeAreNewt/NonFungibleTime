@@ -68,7 +68,7 @@ function buyToken(uint256 tokenId) external payable
 ### changeTokenBuyingConditions
 
 ```solidity
-function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, bool forSale) external nonpayable
+function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale) external nonpayable
 ```
 
 
@@ -82,7 +82,25 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | tokenId | uint256 | Token id of the NFT that you are selling.
 | currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
 | price | uint256 | Price of the NFT that you are selling.
+| allowedBuyer | address | address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
+
+### changeTokenRoyaltyReceiver
+
+```solidity
+function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver) external nonpayable
+```
+
+
+
+*Changes the token royalty receiver.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | Token id of the NFT which royalty receiver must be updated.
+| royaltyReceiver | address | The address of the new rotalty receiver.
 
 ### getApproved
 
@@ -154,7 +172,7 @@ function isCurrencyAllowed(address) external view returns (bool)
 ### mint
 
 ```solidity
-function mint(string name, string description, string work, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable returns (uint256)
+function mint(string name, string description, string category, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints) external nonpayable returns (uint256)
 ```
 
 
@@ -167,7 +185,7 @@ function mint(string name, string description, string work, uint256 availability
 |---|---|---|
 | name | string | Name of the NFT that you are minting.
 | description | string | Description of the NFT that you are minting.
-| work | string | Type of work that will be done of the NFT that you are minting.
+| category | string | Type or category label that represents the activity for what the time is being tokenized.
 | availabilityFrom | uint256 | Unix timestamp indicating start of availability. Zero if does not have lower bound.
 | availabilityTo | uint256 | Unix timestamp indicating end of availability. Zero if does not have upper bound.
 | duration | uint256 | The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
@@ -402,7 +420,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable mintedBy, address currency, bool redeemed, bool forSale, string name, string description, string work)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable royaltyReceiver, address currency, address allowedBuyer, bool redeemed, bool forSale, string name, string description, string category)
 ```
 
 
@@ -424,13 +442,14 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | duration | uint256 | undefined
 | price | uint256 | undefined
 | royaltyBasisPoints | uint256 | undefined
-| mintedBy | address payable | undefined
+| royaltyReceiver | address payable | undefined
 | currency | address | undefined
+| allowedBuyer | address | undefined
 | redeemed | bool | undefined
 | forSale | bool | undefined
 | name | string | undefined
 | description | string | undefined
-| work | string | undefined
+| category | string | undefined
 
 ### transferFrom
 
@@ -560,7 +579,7 @@ event TokenBought(uint256 indexed tokenId, address seller, address buyer)
 ### TokenBuyingConditionsChanged
 
 ```solidity
-event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, bool forSale)
+event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, uint256 price, address allowedBuyer, bool forSale)
 ```
 
 
@@ -574,6 +593,7 @@ event TokenBuyingConditionsChanged(uint256 indexed tokenId, address currency, ui
 | tokenId `indexed` | uint256 | undefined |
 | currency  | address | undefined |
 | price  | uint256 | undefined |
+| allowedBuyer  | address | undefined |
 | forSale  | bool | undefined |
 
 ### TokenRedeemed
@@ -591,6 +611,23 @@ event TokenRedeemed(uint256 indexed tokenId)
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+
+### TokenRoyaltyReceiverChanged
+
+```solidity
+event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| royaltyReceiver  | address | undefined |
 
 ### Transfer
 
@@ -685,6 +722,23 @@ error InvalidTimeParams()
 
 
 
+### NotAuthorizedBuyer
+
+```solidity
+error NotAuthorizedBuyer(address buyer, uint256 tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| buyer | address | undefined |
+| tokenId | uint256 | undefined |
+
 ### NotEnoughFunds
 
 ```solidity
@@ -705,6 +759,22 @@ error NotEnoughFunds(uint256 tokenId)
 
 ```solidity
 error NotForSale(uint256 tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+### OnlyCurrentRoyaltyReceiver
+
+```solidity
+error OnlyCurrentRoyaltyReceiver(uint256 tokenId)
 ```
 
 
