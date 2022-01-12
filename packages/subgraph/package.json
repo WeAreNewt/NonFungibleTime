@@ -5,13 +5,12 @@
   "scripts": {
     "dev-environment": "npm i && tail -f /dev/null",
     "build": "graph build",
-    "prepare": "mustache ./config/${NETWORK:-mumbai}.json subgraph.template.yaml > subgraph.yaml && npm run subgraph:codegen",
+    "prepare:mumbai": "mustache ./config/mumbai.json subgraph.template.yaml > subgraph.yaml && npm run subgraph:codegen",
+    "prepare:polygon": "mustache ./config/polygon.json subgraph.template.yaml > subgraph.yaml && npm run subgraph:codegen",
     "subgraph:codegen": "graph codegen --output-dir ./generated",
-    "subgraph:build": "graph build",
     "subgraph:deploy:hosted": "graph deploy $SLUG --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $ACCESS_TOKEN",
-    "deploy:hosted:mumbai": "NETWORK=mumbai env-cmd npm run prepare && SLUG=wearenewt/tokenized-time-mumbai env-cmd npm run subgraph:deploy:hosted",
-    "deploy:hosted:polygon": "NETWORK=polygon env-cmd npm run prepare && SLUG=wearenewt/tokenized-time env-cmd npm run subgraph:deploy:hosted",
-    "generate-types": "typechain --target=ethers-v5 --out-dir src/contracts '../contracts/artifacts/contracts/TimeCollection.sol/TimeCollection.json'"
+    "deploy:hosted:mumbai": "NETWORK=mumbai env-cmd npm run prepare:mumbai && SLUG=wearenewt/tokenized-time-mumbai env-cmd npm run subgraph:deploy:hosted",
+    "deploy:hosted:polygon": "NETWORK=polygon env-cmd npm run prepare:polygon && SLUG=wearenewt/tokenized-time env-cmd npm run subgraph:deploy:hosted"
   },
   "repository": {
     "type": "git",
@@ -25,8 +24,8 @@
     "graphql": "^14.7.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.18.0",
-    "@graphprotocol/graph-ts": "^0.18.1",
+    "@graphprotocol/graph-cli": "^0.23.2",
+    "@graphprotocol/graph-ts": "^0.23.1",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "env-cmd": "^10.1.0",
