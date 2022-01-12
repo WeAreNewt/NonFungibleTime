@@ -13,5 +13,5 @@ artifacts
 
 #subgraph build
 packages/*/build/
-packages/*generated/
+packages/*/generated/
 packages/*/subgraph.yaml
