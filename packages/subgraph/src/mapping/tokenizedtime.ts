@@ -47,9 +47,8 @@ export function handleTokenBought(event: TokenBought): void {
     purchase.nft = event.params.tokenId.toString();
     purchase.timestamp = event.block.timestamp;
     purchase.blockNumber = event.block.number;
-    const toEvent = event.transaction.to;
-    const to: string = toEvent ? toEvent.toHex() : Address.zero().toHex();
-    const from = event.transaction.from.toHex();
+    const to = event.params.buyer.toHex();
+    const from = event.params.seller.toHex();
     const toUser = User.load(to);
     if (!toUser) {
       const user = new User(to);
@@ -60,6 +59,7 @@ export function handleTokenBought(event: TokenBought): void {
     purchase.price = nftParams.value3;
     purchase.currency = nftParams.value6.toHexString();
     purchase.royaltyAccrued = nftParams.value4.times(nftParams.value3);
+    purchase.creator = nftParams.value5.toHex();
     purchase.save();
   } else {
     log.warning(`Token purchase event for non-existant tokenId {}`, [
