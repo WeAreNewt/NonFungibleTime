@@ -143,9 +143,8 @@ export function handleTransfer(event: Transfer): void {
   transfer.nft = tokenId;
   transfer.timestamp = event.block.timestamp;
   transfer.blockNumber = event.block.number;
-  const toEvent = event.transaction.to;
-  const to: string = toEvent ? toEvent.toHex() : Address.zero().toHex();
-  const from = event.transaction.from.toHex();
+  const from = event.params.from.toHex();
+  const to = event.params.to.toHex();
   const toUser = User.load(to);
   if (!toUser) {
     const user = new User(to);
