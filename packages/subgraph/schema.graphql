@@ -32,7 +32,7 @@ type User @entity {
   "Nfts which this user has created that have been redeemed"
   creatorRedemptions: [Redeem!] @derivedFrom(field: "creator")
   "Sale option toggles for NFTs this user owns"
-  buyingConditionUpdates: [BuyingConditionsChanged!] @derivedFrom(field: "owner")
+  buyingConditionChanges: [BuyingConditionChange!] @derivedFrom(field: "owner")
   sales: [Sale!] @derivedFrom(field: "from")
   royaltiesAccrued: [Sale!] @derivedFrom(field: "creator")
   purchases: [Sale!] @derivedFrom(field: "to")
@@ -44,12 +44,13 @@ enum EventType {
   Sale
   Transfer
   Redeem
-  BuyingConditionsChanged
+  BuyingConditionChange
 }
 
 interface NftStatusChange {
   id: ID!
   nft: Nft!
+  txHash: String!
   timestamp: BigInt!
   blockNumber: BigInt!
 }
@@ -59,6 +60,7 @@ type Sale implements NftStatusChange @entity {
   nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
+  txHash: String!
   to: User!
   from: User!
   creator: User!
@@ -72,6 +74,7 @@ type Transfer implements NftStatusChange @entity {
   nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
+  txHash: String!
   to: User!
   from: User!
 }
@@ -81,15 +84,17 @@ type Redeem implements NftStatusChange @entity {
   nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
+  txHash: String!
   redeemedBy: User!
   creator: User!
 }
 
-type BuyingConditionsChanged implements NftStatusChange @entity {
+type BuyingConditionChange implements NftStatusChange @entity {
   id: ID!
   nft: Nft!
   timestamp: BigInt!
   blockNumber: BigInt!
+  txHash: String!
   currency: PaymentToken!
   price: BigInt!
   forSale: Boolean!

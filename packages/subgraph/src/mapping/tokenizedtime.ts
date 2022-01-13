@@ -7,7 +7,7 @@ import {
   Transfer,
 } from '../../generated/TimeCollection/TimeCollection';
 import {
-  BuyingConditionsChanged,
+  BuyingConditionChange,
   Nft,
   PaymentToken,
   Redeem,
@@ -15,7 +15,7 @@ import {
   Transfer as TransferEvent,
   User,
 } from '../../generated/schema';
-import { Address, ByteArray, log } from '@graphprotocol/graph-ts';
+import { Address, log } from '@graphprotocol/graph-ts';
 import { ERC721 } from '../../generated/TimeCollection/ERC721';
 import { ERC20 } from '../../generated/TimeCollection/ERC20';
 
@@ -42,7 +42,8 @@ export function handleTokenBought(event: TokenBought): void {
   const token = contract.try_tokens(event.params.tokenId);
   const nftParams = token.value;
   if (!token.reverted) {
-    const purchase = new Sale(event.transaction.hash.toHexString());
+    const purchase = new Sale(event.transaction.hash.toHexString() + '-sale');
+    purchase.txHash = event.transaction.hash.toHexString();
     purchase.nft = event.params.tokenId.toString();
     purchase.timestamp = event.block.timestamp;
     purchase.blockNumber = event.block.number;
@@ -67,9 +68,12 @@ export function handleTokenBought(event: TokenBought): void {
   }
 }
 
-export function handleTokenBuyingConditions(event: TokenBuyingConditionsChanged): void {
-  const buyingConditionChange = new BuyingConditionsChanged(event.transaction.hash.toHexString());
+export function handleTokenBuyingConditionsChanged(event: TokenBuyingConditionsChanged): void {
+  const buyingConditionChange = new BuyingConditionChange(
+    event.transaction.hash.toHexString() + '-conditionChange'
+  );
   buyingConditionChange.nft = event.params.tokenId.toString();
+  buyingConditionChange.txHash = event.transaction.hash.toHexString();
   buyingConditionChange.timestamp = event.block.timestamp;
   buyingConditionChange.blockNumber = event.block.number;
   const nft = Nft.load(event.params.tokenId.toString());
@@ -97,7 +101,8 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
   const token = contract.try_tokens(event.params.tokenId);
   const nftParams = token.value;
   if (!token.reverted) {
-    const redeemed = new Redeem(event.transaction.hash.toHexString());
+    const redeemed = new Redeem(event.transaction.hash.toHexString() + '-redeem');
+    redeemed.txHash = event.transaction.hash.toHexString();
     redeemed.nft = event.params.tokenId.toString();
     redeemed.timestamp = event.block.timestamp;
     redeemed.blockNumber = event.block.number;
@@ -133,7 +138,8 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
 
 export function handleTransfer(event: Transfer): void {
   const tokenId = event.params.tokenId.toString();
-  const transfer = new TransferEvent(event.transaction.hash.toHexString());
+  const transfer = new TransferEvent(event.transaction.hash.toHexString() + '-transfer');
+  transfer.txHash = event.transaction.hash.toHexString();
   transfer.nft = tokenId;
   transfer.timestamp = event.block.timestamp;
   transfer.blockNumber = event.block.number;
