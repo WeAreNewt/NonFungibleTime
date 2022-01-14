@@ -1,11 +1,16 @@
 import { ethers } from 'hardhat';
 
 async function main() {
-  const TimeCollection = await ethers.getContractFactory('TimeCollection');
-  const timeCollection = await TimeCollection.deploy('Non Fungible Time', 'NFTIME', true);
+  const TimeCollection = await ethers.getContractFactory('NonFungibleTimeCollection');
+  const timeCollection = await TimeCollection.deploy(
+    'Non Fungible Time',
+    'NFTIME',
+    true,
+    '<SvgGeneratorAddress>'
+  );
 
   await timeCollection.deployed();
-  console.log('NFT Collection deployed to:', timeCollection.address);
+  console.log('NonFungibleTimeCollection deployed to:', timeCollection.address);
 }
 
 main().catch((error) => {
