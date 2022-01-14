@@ -2,10 +2,9 @@ import { ethers } from 'hardhat';
 
 async function main() {
   const SvgGeneratorFactory = await ethers.getContractFactory('SvgGenerator');
-  const svgGenerator = await SvgGeneratorFactory.deploy();
+  const svgGenerator = await SvgGeneratorFactory.attach('<SvgGeneratorAddress>');
 
-  await svgGenerator.deployed();
-  console.log('SvgGenerator deployed to:', svgGenerator.address);
+  console.log(await svgGenerator.generateSvg(false, 'Design'));
 }
 
 main().catch((error) => {
