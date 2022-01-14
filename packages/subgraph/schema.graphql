@@ -1,0 +1,109 @@
+type Nft @entity {
+  id: ID!
+  tokenId: BigInt!
+  tokenURI: String!
+  contractAddress: String!
+  owner: User!
+  creator: User!
+  name: String!
+  description: String!
+  work: String!
+  availabilityTo: BigInt!
+  availabilityFrom: BigInt!
+  "nft creator can restrict buyer to a single address"
+  allowedBuyer: String!
+  "number of hours"
+  duration: BigInt!
+  history: [NftStatusChange!] @derivedFrom(field: "nft")
+  forSale: Boolean!
+  redeemed: Boolean!
+  "out of 10000"
+  royaltyBasisPoints: BigInt!
+  price: BigInt!
+  currency: PaymentToken!
+}
+
+type User @entity {
+  id: ID!
+  ownedNfts: [Nft!] @derivedFrom(field: "owner")
+  createdNfts: [Nft!] @derivedFrom(field: "creator")
+  "Nfts which this user has redeemed"
+  redemptions: [Redeem!] @derivedFrom(field: "redeemedBy")
+  "Nfts which this user has created that have been redeemed"
+  creatorRedemptions: [Redeem!] @derivedFrom(field: "creator")
+  "Sale option toggles for NFTs this user owns"
+  buyingConditionChanges: [BuyingConditionChange!] @derivedFrom(field: "owner")
+  sales: [Sale!] @derivedFrom(field: "from")
+  royaltiesAccrued: [Sale!] @derivedFrom(field: "creator")
+  purchases: [Sale!] @derivedFrom(field: "to")
+  incomingTransfers: [Transfer!] @derivedFrom(field: "to")
+  outgoingTransfers: [Transfer!] @derivedFrom(field: "from")
+}
+
+enum EventType {
+  Sale
+  Transfer
+  Redeem
+  BuyingConditionChange
+}
+
+interface NftStatusChange {
+  id: ID!
+  nft: Nft!
+  txHash: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+}
+
+type Sale implements NftStatusChange @entity {
+  id: ID!
+  nft: Nft!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: String!
+  to: User!
+  from: User!
+  creator: User!
+  price: BigInt!
+  currency: PaymentToken!
+  royaltyAccrued: BigInt!
+}
+
+type Transfer implements NftStatusChange @entity {
+  id: ID!
+  nft: Nft!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: String!
+  to: User!
+  from: User!
+}
+
+type Redeem implements NftStatusChange @entity {
+  id: ID!
+  nft: Nft!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: String!
+  redeemedBy: User!
+  creator: User!
+}
+
+type BuyingConditionChange implements NftStatusChange @entity {
+  id: ID!
+  nft: Nft!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: String!
+  currency: PaymentToken!
+  price: BigInt!
+  forSale: Boolean!
+  owner: User!
+  allowedBuyer: String!
+}
+
+type PaymentToken @entity {
+  id: ID!
+  decimals: Int!
+  acceptable: Boolean!
+}

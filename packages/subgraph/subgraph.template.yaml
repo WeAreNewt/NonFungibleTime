@@ -1,0 +1,44 @@
+specVersion: 0.0.1
+description: Tokenized Time subgraph
+repository: https://github.com/wearenewt/tokenizedtimenfts
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TimeCollection
+    network: {{network}}
+    source:
+      abi: TimeCollection
+      address: '{{timeCollectionAddress}}'
+      startBlock: {{timeCollectionStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NFT
+        - User
+        - Sale
+        - Transfer
+        - Redeem
+        - BuyingConditionsChanged
+        - PaymentToken
+      abis:
+        - name: TimeCollection
+          file: ../contracts/artifacts/contracts/TimeCollection.sol/TimeCollection.json
+        - name: ERC721
+          file: ../contracts/artifacts/@openzeppelin/contracts/token/ERC721/ERC721.sol/ERC721.json
+        - name: ERC20
+          file: ../contracts/artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json
+      eventHandlers:
+        - event: TokenBought(indexed uint256,address,address)
+          handler: handleTokenBought
+        - event: TokenBuyingConditionsChanged(indexed uint256,address,uint256,address,bool)
+          handler: handleTokenBuyingConditionsChanged
+        - event: TokenRedeemed(indexed uint256)
+          handler: handleTokenRedeemed
+        - event: CurrencyAllowanceToggled(indexed address)
+          handler: handleCurrencyAllowanceToggled
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping/tokenizedtime.ts

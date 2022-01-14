@@ -10,3 +10,8 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+#subgraph build
+packages/*/build/
+packages/*/generated/
+packages/*/subgraph.yaml
