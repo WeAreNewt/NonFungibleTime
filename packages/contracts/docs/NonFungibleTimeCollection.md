@@ -1,8 +1,8 @@
-# TimeCollection
+# NonFungibleTimeCollection
 
 
 
-> Tokenized time collection
+> Non Fungible Time collection
 
 Everything created can change a lot, we are still building it.
 
@@ -82,7 +82,7 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | tokenId | uint256 | Token id of the NFT that you are selling.
 | currency | address | The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
 | price | uint256 | Price of the NFT that you are selling.
-| allowedBuyer | address | address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
+| allowedBuyer | address | address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT.
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
 
 ### changeTokenRoyaltyReceiver
@@ -340,6 +340,22 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 | operator | address | undefined
 | approved | bool | undefined
 
+### setSvgGenerator
+
+```solidity
+function setSvgGenerator(address svgGenerator) external nonpayable
+```
+
+
+
+*Sets the SVG generator for the NFT image.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| svgGenerator | address | The address of a contract following the ISvgGenerator signature.
+
 ### supportsInterface
 
 ```solidity
@@ -415,7 +431,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | encoded token data in json format.
+| _0 | string | Base64-encoded token metadata.
 
 ### tokens
 

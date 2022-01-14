@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import { HardhatUserConfig, task } from 'hardhat/config';
 import '@primitivefi/hardhat-dodoc';
 import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-etherscan';
 import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
@@ -26,7 +27,9 @@ const config: HardhatUserConfig = {
       },
     },
   },
-
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY || '',
+  },
   networks: {
     mumbai: {
       url: process.env.MUMBAI_URL || '',
@@ -34,10 +37,8 @@ const config: HardhatUserConfig = {
     },
   },
   dodoc: {
-    include: [
-      'TimeCollection'
-    ]
-  }
+    include: ['NonFungibleTimeCollection', 'ISvgGenerator', 'SvgGenerator'],
+  },
 };
 
 export default config;

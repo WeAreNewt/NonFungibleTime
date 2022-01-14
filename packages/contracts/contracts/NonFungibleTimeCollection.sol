@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.4;
 
+import './interfaces/ISvgGenerator.sol';
+import 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
-import 'solidity-json-writer/contracts/JsonWriter.sol';
-import 'base64-sol/base64.sol';
+import '@openzeppelin/contracts/utils/Strings.sol';
 
-/// @title Tokenized time collection
+/// @title Non Fungible Time collection
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
-contract TimeCollection is IERC2981, ERC721, Ownable {
-    using JsonWriter for JsonWriter.Json;
-
+contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenBuyingConditionsChanged(
         uint256 indexed tokenId,
@@ -59,6 +58,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
     uint256 internal _tokenCounter;
     uint16 internal constant BASIS_POINTS = 10000;
+    address internal _svgGenerator;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
         if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
@@ -80,10 +80,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     constructor(
         string memory name,
         string memory symbol,
-        bool useNativeCurrency
+        bool useNativeCurrency,
+        address svgGenerator
     ) ERC721(name, symbol) {
         _tokenCounter = 0;
         if (useNativeCurrency) isCurrencyAllowed[address(0)] = true;
+        _svgGenerator = svgGenerator;
     }
 
     /// @dev Mints a new token with the given parameters.
@@ -156,7 +158,7 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
     /// @param tokenId Token id of the NFT that you are selling.
     /// @param currency The address of the ERC-20 currency to use for the payment. Use address(0) to set native currency.
     /// @param price Price of the NFT that you are selling.
-    /// @param allowedBuyer address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT
+    /// @param allowedBuyer address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT.
     /// @param forSale A boolean indicating if the NFT is for sale or not.
     function changeTokenBuyingConditions(
         uint256 tokenId,
@@ -206,6 +208,12 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
         emit CurrencyAllowanceToggled(currency);
     }
 
+    /// @dev Sets the SVG generator for the NFT image.
+    /// @param svgGenerator The address of a contract following the ISvgGenerator signature.
+    function setSvgGenerator(address svgGenerator) external onlyOwner {
+        _svgGenerator = svgGenerator;
+    }
+
     /// @dev Gets the royalty information of the token with the given tokenId.
     /// @param tokenId The id of the token that you are checking.
     /// @param salePrice The price of the NFT that should be used for royalty calculation.
@@ -238,49 +246,92 @@ contract TimeCollection is IERC2981, ERC721, Ownable {
 
     /// @dev Returns the URI of the token with the given tokenId.
     /// @param tokenId Token Id of the NFT that you are getting the URI.
-    /// @return encoded token data in json format.
+    /// @return Base64-encoded token metadata.
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         Token memory token = tokens[tokenId];
-        JsonWriter.Json memory writer;
-
-        writer = writer.writeStartObject();
-
-        writer = writer.writeStringProperty('name', token.name);
-        writer = writer.writeStringProperty('description', token.description);
-
-        writer = writer.writeStartArray('attributes');
-
-        writer = writer.writeStartObject();
-        writer = writer.writeStringProperty('trait_type', 'type');
-        writer = writer.writeStringProperty('value', token.category);
-        writer = writer.writeEndObject();
-
-        writer = writer.writeStartObject();
-        writer = writer.writeStringProperty('trait_type', 'availability from');
-        writer = writer.writeUintProperty('value', token.availabilityFrom);
-        writer = writer.writeEndObject();
-
-        writer = writer.writeStartObject();
-        writer = writer.writeStringProperty('trait_type', 'availability to');
-        writer = writer.writeUintProperty('value', token.availabilityTo);
-        writer = writer.writeEndObject();
-
-        writer = writer.writeStartObject();
-        writer = writer.writeStringProperty('trait_type', 'duration');
-        writer = writer.writeUintProperty('value', token.duration);
-        writer = writer.writeEndObject();
-
-        writer = writer.writeEndArray();
-
-        writer = writer.writeEndObject();
-
         return
             string(
                 abi.encodePacked(
                     'data:application/json;base64,',
-                    Base64.encode(bytes(writer.value))
+                    Base64.encode(
+                        abi.encodePacked(
+                            _getTokenURIBeforeImage(token.name, token.description),
+                            Base64.encode(
+                                bytes(
+                                    ISvgGenerator(_svgGenerator).generateSvg(
+                                        token.redeemed,
+                                        token.category
+                                    )
+                                )
+                            ),
+                            _getTokenURIAfterImage(
+                                token.category,
+                                token.availabilityFrom,
+                                token.availabilityTo,
+                                token.duration,
+                                token.redeemed
+                            )
+                        )
+                    )
                 )
             );
+    }
+
+    /// @dev Generates the string with the initial part of the token URI that goes before the image.
+    /// @param name Name of the NFT that you are minting.
+    /// @param description Description of the NFT that you are minting.
+    /// @return Bytes representing the initial part of the token URI.
+    function _getTokenURIBeforeImage(string memory name, string memory description)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        return
+            abi.encodePacked(
+                '{"name":"',
+                name,
+                '","description":"',
+                description,
+                '","image":"',
+                'data:image/svg+xml;base64,'
+            );
+    }
+
+    /// @dev Generates the string with the final part of the token URI that goes after the image.
+    /// @param category Type or category label that represents the activity for what the time is being tokenized.
+    /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
+    /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
+    /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
+    /// @param redeemed A boolean representing if the token is redeemed or not.
+    /// @return Bytes representing with the final part of the token URI.
+    function _getTokenURIAfterImage(
+        string memory category,
+        uint256 availabilityFrom,
+        uint256 availabilityTo,
+        uint256 duration,
+        bool redeemed
+    ) internal pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '","attributes":[{"trait_type":"Type","value":"',
+                category,
+                '"},{"display_type":"date","trait_type":"Availability from","value":"',
+                Strings.toString(availabilityFrom),
+                '"},{"display_type":"date","trait_type":"Availability To","value":"',
+                Strings.toString(availabilityTo),
+                '"},{"trait_type":"Duration","value":"',
+                Strings.toString(duration),
+                '"},{"trait_type":"Redeemed","value":"',
+                _boolToString(redeemed),
+                '"}]}'
+            );
+    }
+
+    /// @dev Converts the given boolean value to its human-friendly string representation.
+    /// @param boolean The boolean value to convert.
+    /// @return The corresponding string representation of the given boolean value.
+    function _boolToString(bool boolean) internal pure returns (string memory) {
+        return boolean ? 'True' : 'False';
     }
 
     /// @dev Transfers the given amount of the given currency from sender to receiver.
