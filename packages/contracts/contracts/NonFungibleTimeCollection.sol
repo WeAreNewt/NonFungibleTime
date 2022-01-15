@@ -3,17 +3,16 @@ pragma solidity ^0.8.4;
 
 import './interfaces/ISvgGenerator.sol';
 import 'base64-sol/base64.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
-import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 
 /// @title Non Fungible Time collection
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
-contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
+contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenBuyingConditionsChanged(
         uint256 indexed tokenId,
@@ -58,7 +57,6 @@ contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
 
     uint256 internal _tokenCounter;
     uint16 internal constant BASIS_POINTS = 10000;
-    address internal _svgGenerator;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
         if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
@@ -70,22 +68,27 @@ contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
         _;
     }
 
+    address public svgGenerator;
     mapping(uint256 => Token) public tokens;
     mapping(address => bool) public isCurrencyAllowed;
 
-    /// @dev Constructor of the contract.
+    /// @dev Initializer of the contract.
     /// @param name Collection name.
     /// @param symbol Collection symbol.
     /// @param useNativeCurrency Flag to enable native currency from the beginning.
-    constructor(
+    /// @param svgGeneratorContract The address of a contract following the ISvgGenerator interface.
+    /// @param owner The owner of the contract, who will be able to execute onlyOwner functions.
+    function initialize(
         string memory name,
         string memory symbol,
         bool useNativeCurrency,
-        address svgGenerator
-    ) ERC721(name, symbol) {
-        _tokenCounter = 0;
+        address svgGeneratorContract,
+        address owner
+    ) public initializer {
+        __ERC721_init(name, symbol);
+        _transferOwnership(owner);
         if (useNativeCurrency) isCurrencyAllowed[address(0)] = true;
-        _svgGenerator = svgGenerator;
+        svgGenerator = svgGeneratorContract;
     }
 
     /// @dev Mints a new token with the given parameters.
@@ -209,9 +212,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
     }
 
     /// @dev Sets the SVG generator for the NFT image.
-    /// @param svgGenerator The address of a contract following the ISvgGenerator signature.
-    function setSvgGenerator(address svgGenerator) external onlyOwner {
-        _svgGenerator = svgGenerator;
+    /// @param newSvgGenerator The address of a contract following the ISvgGenerator signature.
+    function setSvgGenerator(address newSvgGenerator) external onlyOwner {
+        svgGenerator = newSvgGenerator;
     }
 
     /// @dev Gets the royalty information of the token with the given tokenId.
@@ -238,7 +241,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
         public
         view
         virtual
-        override(ERC721, IERC165)
+        override(ERC721Upgradeable, IERC165)
         returns (bool)
     {
         return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
@@ -258,7 +261,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721, Ownable {
                             _getTokenURIBeforeImage(token.name, token.description),
                             Base64.encode(
                                 bytes(
-                                    ISvgGenerator(_svgGenerator).generateSvg(
+                                    ISvgGenerator(svgGenerator).generateSvg(
                                         token.redeemed,
                                         token.category
                                     )

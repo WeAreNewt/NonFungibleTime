@@ -124,6 +124,26 @@ function getApproved(uint256 tokenId) external view returns (address)
 |---|---|---|
 | _0 | address | undefined
 
+### initialize
+
+```solidity
+function initialize(string name, string symbol, bool useNativeCurrency, address svgGeneratorContract, address owner) external nonpayable
+```
+
+
+
+*Initializer of the contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name | string | Collection name.
+| symbol | string | Collection symbol.
+| useNativeCurrency | bool | Flag to enable native currency from the beginning.
+| svgGeneratorContract | address | The address of a contract following the ISvgGenerator interface.
+| owner | address | The owner of the contract, who will be able to execute onlyOwner functions.
+
 ### isApprovedForAll
 
 ```solidity
@@ -343,7 +363,7 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 ### setSvgGenerator
 
 ```solidity
-function setSvgGenerator(address svgGenerator) external nonpayable
+function setSvgGenerator(address newSvgGenerator) external nonpayable
 ```
 
 
@@ -354,7 +374,7 @@ function setSvgGenerator(address svgGenerator) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| svgGenerator | address | The address of a contract following the ISvgGenerator signature.
+| newSvgGenerator | address | The address of a contract following the ISvgGenerator signature.
 
 ### supportsInterface
 
@@ -377,6 +397,23 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | True if the interface is supported, false otherwise.
+
+### svgGenerator
+
+```solidity
+function svgGenerator() external view returns (address)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined
 
 ### symbol
 
