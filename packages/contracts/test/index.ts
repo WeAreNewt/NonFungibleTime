@@ -21,11 +21,13 @@ describe('Tokenized time collection', () => {
     [owner, otherAccount, buyer] = await ethers.getSigners();
     minter = owner;
     svgGenerator = await SvgGeneratorFactory.deploy();
-    nftCollection = await NftCollectionFactory.deploy(
+    nftCollection = await NftCollectionFactory.deploy();
+    nftCollection.initialize(
       'Non Fungible Time',
       'NFTIME',
       false,
-      svgGenerator.address
+      svgGenerator.address,
+      owner.address
     );
     testToken = await TestTokenFactory.deploy();
   });
