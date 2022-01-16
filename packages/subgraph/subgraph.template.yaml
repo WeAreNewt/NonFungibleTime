@@ -25,9 +25,9 @@ dataSources:
         - PaymentToken
       abis:
         - name: TimeCollection
-          file: ../contracts/artifacts/contracts/TimeCollection.sol/TimeCollection.json
+          file: ../contracts/artifacts/contracts/NonFungibleTimeCollection.sol/NonFungibleTimeCollection.json
         - name: ERC721
-          file: ../contracts/artifacts/@openzeppelin/contracts/token/ERC721/ERC721.sol/ERC721.json
+          file: ../contracts/artifacts/@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol/ERC721Upgradeable.json
         - name: ERC20
           file: ../contracts/artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json
       eventHandlers:
