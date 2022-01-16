@@ -26,7 +26,7 @@ export default function Menu() {
             title: 'Discord',
         },
         {
-            link: 'https://github.com/wearenewt/TokenizedTimeNFTs',
+            link: 'https://github.com/wearenewt/NonFungibleTime',
             title: 'Code'
         }
     ];

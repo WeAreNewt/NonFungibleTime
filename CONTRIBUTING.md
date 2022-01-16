@@ -16,7 +16,7 @@ Newt welcomes contributions in all areas: code, ideas, documentation, marketing,
 
 A list of tasks can be found on the [Newt homepage](https://wearenewt.xyz/) under the Task List section.
 
-Contributions will mainly be coordinated through the project Discord channel `#tokenized-time-nfts`. Technical contributions also be coordinated through the GitHub [issues](https://github.com/WeAreNewt/TokenizedTimeNFTs/issues) tab
+Contributions will mainly be coordinated through the project Discord channel `#tokenized-time-nfts`. Technical contributions also be coordinated through the GitHub [issues](https://github.com/WeAreNewt/NonFungibleTime/issues) tab
 
 To report a bug, create a new issue with `bug` label. When submitting a bug, please check that issue does not already exist, and provide all relevant details to for reproducing the bug
 

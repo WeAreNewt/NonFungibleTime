@@ -11,9 +11,9 @@ way for organizations to recruit talent for specialized needs
 
 The smart contracts store the NFT collection on the blockchain. This package uses the hardhat framework.
 
-The [NonFungibleTimeCollection.sol](https://github.com/WeAreNewt/TokenizedTimeNFTs/blob/main/packages/contracts/contracts/NonFungibleTimeCollection.sol) contract defines the Time NFT collection
+The [NonFungibleTimeCollection.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/NonFungibleTimeCollection.sol) contract defines the Time NFT collection
 
-The [SvgGenerator.sol](https://github.com/WeAreNewt/TokenizedTimeNFTs/blob/main/packages/contracts/contracts/SvgGenerator.sol) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
+The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/SvgGenerator.sol) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
 
 To generate contract abis and typechain artifacts:
 
@@ -22,7 +22,7 @@ npm install
 npx hardhat compile
 ```
 
-[More Info](https://github.com/WeAreNewt/TokenizedTimeNFTs/blob/main/packages/contracts/README.md)
+[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/README.md)
 
 <br />
 
@@ -35,7 +35,7 @@ Frontend is build with React + TailwindCSS
 TO-DO: Contract query framework
 TO-DO: GraphQL Client
 
-[More Info](https://github.com/WeAreNewt/TokenizedTimeNFTs/blob/main/packages/frontend/README.md)
+[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/frontend/README.md)
 
 <br />
 
@@ -49,4 +49,4 @@ The playground links below allow you to view and query the subgraph schema direc
 
 - [Mumbai Subgraph](https://thegraph.com/hosted-service/subgraph/wearenewt/non-fungible-time-mumbai)
 
-[More Info](https://github.com/WeAreNewt/TokenizedTimeNFTs/blob/main/packages/subgraph/README.md)
+[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/subgraph/README.md)

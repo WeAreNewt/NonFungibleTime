@@ -25,7 +25,7 @@ npm run build
 # Step 5: copy .env.test to .env and add your subgraph access token from TheGraph dashboard
 cp .env.test .env
 
-# Step 6: Deploy to production, subgraph deployment slug set in package.json (wearenewt/tokenized-time-mumbai)
+# Step 6: Deploy to production, subgraph deployment slug set in package.json (wearenewt/non-fungible-mumbai)
 npm run deploy:hosted:mumbai
 npm run deploy:hosted:polygon
 ```
