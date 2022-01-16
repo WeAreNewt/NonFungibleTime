@@ -19,7 +19,7 @@ import { Address, log } from '@graphprotocol/graph-ts';
 import { ERC721 } from '../../generated/TimeCollection/ERC721';
 import { ERC20 } from '../../generated/TimeCollection/ERC20';
 
-export function getTokenURI(event: Transfer): string {
+export function getTokenURI(event: Transfer | TokenRedeemed): string {
   const erc721 = ERC721.bind(event.address);
   const tokenURICallResult = erc721.try_tokenURI(event.params.tokenId);
 
@@ -109,6 +109,16 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
     const from = event.transaction.from ? event.transaction.from.toHexString() : '';
     redeemed.redeemedBy = from;
     redeemed.creator = nftParams.value5.toHexString();
+    const nft = Nft.load(event.params.tokenId.toString());
+    if (nft) {
+      const uri = getTokenURI(event);
+      nft.tokenURI = uri;
+      nft.save();
+    } else {
+      log.warning('Token redeem for nft unregistered to subgraph {}', [
+        event.params.tokenId.toString(),
+      ]);
+    }
     redeemed.save();
   } else {
     log.warning(`Token redeem event for non-existant tokenId {}`, [
