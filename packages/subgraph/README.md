@@ -1,4 +1,4 @@
-# Subgraph for Tokenized Time
+# Subgraph for Non Fungible Time
 
 ## Development
 
