@@ -4,8 +4,6 @@
 
 # Newt Contributions
 
-<br />
-
 This project is maintained by Newt, checkout out our [website](https://wearenewt.xyz/) for details about the Newt Community with instructions for joining and getting involed
 
 [Join Discord](discord.gg/newt)
@@ -13,11 +11,8 @@ This project is maintained by Newt, checkout out our [website](https://wearenewt
 Newt welcomes contributions in all areas: code, ideas, documentation, marketing, and anything else to help the community grow and thrive
 
 <br />
-<br />
 
 # Non Fungible Time Contributions
-
-<br />
 
 A list of tasks can be found on the [Newt homepage](https://wearenewt.xyz/) under the Task List section.
 
