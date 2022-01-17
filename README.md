@@ -2,14 +2,15 @@
     <img src="newt_mayan.svg" width="300" height="300" >
 <p>
 
-# Non Fungible Time
+# Non-Fungible Time
 
-Mint and purchase NFTs representing time for performing gig work. Time NFTs represent an on-chain attestation of work for contributors, and a
-way for organizations to recruit talent for specialized needs
+Mint and purchase NFTs representing time for performing gig work and other use cases. Time NFTs can represent an on-chain attestation of work for contributors, and a way for organizations to recruit talent for specialized needs.
+    
+While work is the initial use case for Non-Fungible Time, we envision this primitive to be extended to other use cases, such as restaurant reservations, subleases, etc.
 
 ## Contracts
 
-The smart contracts store the NFT collection on the blockchain. This package uses the hardhat framework.
+The smart contracts store the NFT collection (ERC-721) on the blockchain - with the reference implementation on Polygon. This package uses the hardhat framework.
 
 The [NonFungibleTimeCollection.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/NonFungibleTimeCollection.sol) contract defines the Time NFT collection
 
