@@ -1,5 +1,5 @@
 {
-  "name": "@wearenewt/tokenized-time-subgraph",
+  "name": "@wearenewt/non-fungible-time-subgraph",
   "version": "0.1.0",
   "description": "This package contains NFT indexing for the Tokenized Time project",
   "scripts": {
@@ -9,12 +9,12 @@
     "prepare:polygon": "mustache ./config/polygon.json subgraph.template.yaml > subgraph.yaml && npm run subgraph:codegen",
     "subgraph:codegen": "graph codegen --output-dir ./generated",
     "subgraph:deploy:hosted": "graph deploy $SLUG --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $ACCESS_TOKEN",
-    "deploy:hosted:mumbai": "NETWORK=mumbai env-cmd npm run prepare:mumbai && SLUG=wearenewt/tokenized-time-mumbai env-cmd npm run subgraph:deploy:hosted",
-    "deploy:hosted:polygon": "NETWORK=polygon env-cmd npm run prepare:polygon && SLUG=wearenewt/tokenized-time env-cmd npm run subgraph:deploy:hosted"
+    "deploy:hosted:mumbai": "NETWORK=mumbai env-cmd npm run prepare:mumbai && SLUG=wearenewt/non-fungible-time-mumbai env-cmd npm run subgraph:deploy:hosted",
+    "deploy:hosted:polygon": "NETWORK=polygon env-cmd npm run prepare:polygon && SLUG=wearenewt/non-fungible-time env-cmd npm run subgraph:deploy:hosted"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:WeAreNewt/TokenizedTimeNFTs.git"
+    "url": "git@github.com:WeAreNewt/NonFungibleTime.git"
   },
   "dependencies": {
     "@apollo/client": "^3.3.16",

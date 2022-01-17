@@ -1,6 +1,6 @@
 specVersion: 0.0.1
-description: Tokenized Time subgraph
-repository: https://github.com/wearenewt/tokenizedtimenfts
+description: Non Fungible Time subgraph
+repository: https://github.com/wearenewt/nonfungibletime
 schema:
   file: ./schema.graphql
 dataSources:
@@ -41,4 +41,4 @@ dataSources:
           handler: handleCurrencyAllowanceToggled
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-      file: ./src/mapping/tokenizedtime.ts
+      file: ./src/mapping/nonfungibletime.ts

@@ -1,8 +1,8 @@
 {
-  "name": "@wearenewt/tokenizedtimenfts",
+  "name": "@wearenewt/non-fungible-time",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wearenewt/tokenizedtimenfts"
+    "url": "https://github.com/wearenewt/non-fungible-time"
   },
   "private": true,
   "license": "BSD-3-Clause",

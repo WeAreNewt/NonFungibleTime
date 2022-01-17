@@ -15,19 +15,19 @@ import {
   Transfer as TransferEvent,
   User,
 } from '../../generated/schema';
-import { Address, log } from '@graphprotocol/graph-ts';
+import { Address, ethereum, log, BigInt } from '@graphprotocol/graph-ts';
 import { ERC721 } from '../../generated/TimeCollection/ERC721';
 import { ERC20 } from '../../generated/TimeCollection/ERC20';
 
-export function getTokenURI(event: Transfer | TokenRedeemed): string {
+export function getTokenURI(event: ethereum.Event, tokenId: BigInt): string {
   const erc721 = ERC721.bind(event.address);
-  const tokenURICallResult = erc721.try_tokenURI(event.params.tokenId);
+  const tokenURICallResult = erc721.try_tokenURI(tokenId);
 
   let tokenURI = '';
 
   if (tokenURICallResult.reverted) {
     log.warning('tokenURI reverted for tokenID: {} contract: {}', [
-      event.params.tokenId.toString(),
+      tokenId.toString(),
       event.address.toHexString(),
     ]);
   } else {
@@ -111,7 +111,7 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
     redeemed.creator = nftParams.value5.toHexString();
     const nft = Nft.load(event.params.tokenId.toString());
     if (nft) {
-      const uri = getTokenURI(event);
+      const uri = getTokenURI(event, event.params.tokenId);
       nft.tokenURI = uri;
       nft.save();
     } else {
@@ -189,7 +189,7 @@ export function handleTransfer(event: Transfer): void {
       nft.description = values.value11;
       nft.work = values.value12;
       nft.tokenId = event.params.tokenId;
-      const uri = getTokenURI(event);
+      const uri = getTokenURI(event, event.params.tokenId);
       nft.tokenURI = uri;
       nft.contractAddress = event.address.toHexString();
       nft.owner = to;

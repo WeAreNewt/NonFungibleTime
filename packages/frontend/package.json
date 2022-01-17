@@ -1,5 +1,5 @@
 {
-  "name": "@wearenewt/tokenized-time-ui",
+  "name": "@wearenewt/non-fungible-time-ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
