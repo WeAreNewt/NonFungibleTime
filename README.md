@@ -5,7 +5,7 @@
 # Non-Fungible Time
 
 Mint and purchase NFTs representing time for performing gig work and other use cases. Time NFTs can represent an on-chain attestation of work for contributors, and a way for organizations to recruit talent for specialized needs.
-    
+
 While work is the initial use case for Non-Fungible Time, we envision this primitive to be extended to other use cases, such as restaurant reservations, subleases, etc.
 
 ## Contracts
@@ -33,8 +33,15 @@ Main features of the frontend are creating, discovering, purchasing, and redeemi
 
 Frontend is build with React + TailwindCSS
 
-TO-DO: Contract query framework
-TO-DO: GraphQL Client
+### TODOS:
+
+- [ ] Contract query framework
+- [ ] GraphQL Client
+- [ ] Connect Metamask Wallet
+- [ ] Mint NFT Modal
+- [ ] Mint Contract Call
+- [ ] Single marketplace item page
+- [ ] Buy from marketplace
 
 [More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/frontend/README.md)
 
