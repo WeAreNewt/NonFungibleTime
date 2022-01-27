@@ -22,7 +22,8 @@
     "release:check": "lerna changed",
     "release:latest": "lerna publish --yes --conventional-commits --create-release github --message 'chore(release): publish [ci skip]'",
     "release:canary": "lerna publish --canary",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "dev:frontend": "npm run start --workspace=@wearenewt/non-fungible-time-ui"
   },
   "workspaces": [
     "packages/*"
