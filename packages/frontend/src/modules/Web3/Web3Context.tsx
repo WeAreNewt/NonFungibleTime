@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
-
-import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
-
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import React, { useCallback, useEffect } from 'react';
 import * as z from 'zod';
+import { addChainParameters, Networks } from './chains';
 
 const WALLET_TYPE_STORAGE_KEY = 'WALLET_TYPE';
 
@@ -13,7 +12,7 @@ export const WalletType = z.enum(['injected']);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type WalletType = z.infer<typeof WalletType>;
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42] });
+export const injected = new InjectedConnector({});
 
 export const connectors: Record<WalletType, AbstractConnector> = {
   injected,
@@ -26,14 +25,19 @@ function getLibrary(provider: any): Web3Provider {
   return library;
 }
 
+const PROTOCOL_CHAIN = Networks.POLYGON_MAINNET;
+
 export const useWeb3 = () => {
-  const { chainId, account, activate } = useWeb3React<Web3Provider>();
+  const { chainId, account, activate, active, connector } = useWeb3React<Web3Provider>();
+  const isCorrectChain = chainId === PROTOCOL_CHAIN;
 
   const connect = useCallback(
     async (walletType: WalletType) => {
       switch (walletType) {
         case WalletType.Values.injected:
-          await activate(injected);
+          await activate(injected, (error) => {
+            console.log('Error: ', error);
+          });
           localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
           break;
         default:
@@ -41,6 +45,24 @@ export const useWeb3 = () => {
       }
     },
     [activate]
+  );
+
+  const requestToSwitchChain = useCallback(
+    async function () {
+      const provider: ExternalProvider = await connector?.getProvider();
+
+      if (provider?.isMetaMask) {
+        await provider.request?.({
+          method: 'wallet_addEthereumChain',
+          params: [addChainParameters[PROTOCOL_CHAIN]],
+        });
+        await provider.request?.({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: PROTOCOL_CHAIN }],
+        });
+      }
+    },
+    [connector]
   );
 
   useEffect(() => {
@@ -59,6 +81,9 @@ export const useWeb3 = () => {
   return {
     connect,
     account,
+    isCorrectChain,
+    active,
+    requestToSwitchChain,
   };
 };
 
