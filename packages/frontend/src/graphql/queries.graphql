@@ -1,0 +1,45 @@
+fragment NftFields on Nft {
+  id
+  tokenId
+  tokenURI
+  contractAddress
+  availabilityFrom
+  availabilityTo
+}
+
+query Nfts {
+  nfts(first: 100) {
+    ...NftFields
+  }
+}
+
+query Sales(
+  $first: Int
+  $skip: Int
+  $orderBy: Sale_orderBy
+  $orderDirection: OrderDirection
+  $where: Sale_filter
+) {
+  sales(
+    first: $first
+    skip: $skip
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+    where: $where
+  ) {
+    id
+    timestamp
+    price
+    creator {
+      id
+    }
+    currency {
+      id
+      decimals
+      acceptable
+    }
+    nft {
+      ...NftFields
+    }
+  }
+}

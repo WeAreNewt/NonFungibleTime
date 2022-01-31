@@ -19,6 +19,7 @@
     "@web3-react/metamask": "^8.0.0-beta.0",
     "constate": "^3.3.0",
     "ethers": "^5.5.3",
+    "graphql": "^16.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
@@ -32,7 +33,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "codegen:graphql": "graphql-codegen"
   },
   "husky": {
     "hooks": {
@@ -67,6 +69,12 @@
     ]
   },
   "devDependencies": {
+    "@apollo/client": "^3.5.8",
+    "@graphql-codegen/cli": "^2.4.0",
+    "@graphql-codegen/typed-document-node": "^2.2.2",
+    "@graphql-codegen/typescript": "^2.4.2",
+    "@graphql-codegen/typescript-operations": "^2.2.3",
+    "@graphql-codegen/typescript-react-query": "^3.5.0",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "autoprefixer": "^10.4.0",
