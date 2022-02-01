@@ -1,7 +1,7 @@
 schema: https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai
 documents: './src/**/*.graphql'
 generates:
-  ./src/graphql/generated.ts:
+  ./src/lib/graphql/index.ts:
     plugins:
       - typescript
       - typescript-operations
