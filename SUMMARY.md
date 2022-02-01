@@ -5,6 +5,7 @@
 * [Non Fungible Time](README.md)
   * [Tokens](primitive/non-fungible-time/tokens.md)
 * [Use Case Examples](primitive/use-case-examples.md)
+* [Methods](primitive/methods.md)
 
 ## Minting
 
