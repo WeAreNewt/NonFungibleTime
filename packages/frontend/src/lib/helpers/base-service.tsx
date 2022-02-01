@@ -184,7 +184,7 @@ export type transactionType = {
 
 export enum eEthereumTxType {
     ERC20_APPROVAL = 'ERC20_APPROVAL',
-    COLLECTION_ACTION = 'DLP_ACTION',
+    COLLECTION_ACTION = 'COLLECTION_ACTION',
 }
 
 export type EthereumTransactionTypeExtended = {

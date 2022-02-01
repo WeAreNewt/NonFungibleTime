@@ -23,7 +23,7 @@ function App() {
             <ScreenWrapper>
               <Routes>
                 <Route path="/" element={<Home />} key="home" />
-                <Route path="/profile" element={<Profile />} key="profile" />
+                <Route path="/profile/*" element={<Profile />} key="profile" />
                 <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
               </Routes>
             </ScreenWrapper>
