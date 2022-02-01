@@ -35,7 +35,6 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     error NotForSale(uint256 tokenId);
     error NotAuthorizedBuyer(address buyer, uint256 tokenId);
     error CantBuyYourOwnToken(address buyer, uint256 tokenId);
-    error NotEnoughFunds(uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
     error UnallowedCurrency(uint256 tokenId, address currency);
     error TransferFailed();
