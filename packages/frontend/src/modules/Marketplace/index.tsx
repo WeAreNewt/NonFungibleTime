@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import React from 'react';
 import NFTCard from '../../components/NFTCard';
-import { SalesDocument } from '../../graphql/generated';
+import { SalesDocument } from '../../lib/graphql/generated';
 import { Category, NFTProps } from '../../types';
 
 const sampleNFTs: NFTProps[] = [

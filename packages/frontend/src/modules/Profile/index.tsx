@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FaShareAlt } from 'react-icons/fa'
 import NFTCard from '../../components/NFTCard'
 import { Category, NFTProps } from '../../types'
+import { useAppDataProvider } from '../../lib/providers/app-data-provider'
+import { NftCollectionService } from '../../lib/helpers/NftCollection'
+import { BigNumber, providers } from 'ethers'
+import { useWeb3React } from '@web3-react/core'
 
 const sampleNFTs: NFTProps[] = [
     {
@@ -72,7 +76,33 @@ const sampleNFTs: NFTProps[] = [
     },
 ]
 
+interface FetchTokenDataParams {
+    collectionService: NftCollectionService;
+    userAddress: string;
+    provider: providers.Web3Provider;
+}
+async function mint({ collectionService, userAddress, provider }: FetchTokenDataParams) {
+
+    const txs = await collectionService.mint({ userAddress, name: 'Frontend Test', description: 'Test Description', category: 'Test', availabilityFrom: 1, availabilityTo: 2, duration: 1, royaltyBasisPoints: 100 })
+    const tx = txs[0]
+    const extendedTxData = await tx.tx();
+    const { from, ...txData } = extendedTxData;
+    const signer = provider.getSigner(from);
+    const txResponse = await signer.sendTransaction({
+        ...txData,
+        value: txData.value ? BigNumber.from(txData.value) : undefined,
+    });
+}
+
 export default function Profile() {
+    const { nftCollectionService, currentAccount } = useAppDataProvider();
+    const { library: provider } = useWeb3React();
+    console.log("CURRENT ACCOUNT");
+    console.log(currentAccount)
+
+    useEffect(() => {
+        mint({ collectionService: nftCollectionService, userAddress: currentAccount ? currentAccount : '', provider });
+    })
     return (
         <div className="flex h-full flex-col overflow-hidden">
             <div className="basis-1/4">
