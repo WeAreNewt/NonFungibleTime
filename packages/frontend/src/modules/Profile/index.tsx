@@ -132,6 +132,7 @@ export default function Profile() {
                             ...txData,
                             value: txData.value ? BigNumber.from(txData.value) : undefined,
                         });
+                        console.log(txResponse)
                         // TO-DO: Handle Submitted and Executed response
                     } else {
                         setFormError('Royalty must be between 1 and 100')

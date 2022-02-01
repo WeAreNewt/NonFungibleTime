@@ -81,6 +81,8 @@ export default function Marketplace() {
   });
   // TODO: Populate nft cards with sales
   console.log('data', data);
+  console.log('loading', loading)
+  console.log('error', error)
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
