@@ -5,6 +5,7 @@ import './interfaces/ISvgGenerator.sol';
 import 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
@@ -13,6 +14,8 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 /// @notice Everything created can change a lot, we are still building it.
 /// @dev Everything
 contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
+    using SafeERC20 for IERC20;
+
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenBuyingConditionsChanged(
         uint256 indexed tokenId,
@@ -348,13 +351,12 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         address currency,
         uint256 amount
     ) internal {
-        bool transferSucceed;
         if (currency == address(0)) {
-            (transferSucceed, ) = receiver.call{value: amount}('');
+            (bool transferSucceeded, ) = receiver.call{value: amount}('');
+            if (!transferSucceeded) revert TransferFailed();
         } else {
-            transferSucceed = IERC20(currency).transferFrom(sender, receiver, amount);
+            IERC20(currency).safeTransferFrom(sender, receiver, amount);
         }
-        if (!transferSucceed) revert TransferFailed();
     }
 
     /// @dev Tells whether the given params conform a valid time representation or not. To be valid must follow:
