@@ -1,6 +1,6 @@
 import React from 'react';
-import { formatEthAddress } from '../../lib/format';
-import { useWeb3, WalletType } from '../../modules/Web3';
+import { formatEthAddress } from '../../lib/helpers/format';
+import { useWeb3, WalletType } from '../../lib/providers/web3-provider';
 
 export default function AddressInfo() {
   const { connect, account, isCorrectChain, active, requestToSwitchChain } = useWeb3();

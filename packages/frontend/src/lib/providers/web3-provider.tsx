@@ -1,10 +1,10 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { AbstractConnector } from '@web3-react/abstract-connector';
-import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import * as z from 'zod';
-import { addChainParameters, Networks } from './chains';
+import { addChainParameters, ChainId } from '../config';
 
 const WALLET_TYPE_STORAGE_KEY = 'WALLET_TYPE';
 
@@ -19,15 +19,21 @@ export const connectors: Record<WalletType, AbstractConnector> = {
   // Add more supported connectors
 };
 
-function getLibrary(provider: any): Web3Provider {
-  const library = new Web3Provider(provider);
-  library.pollingInterval = 12000;
-  return library;
+// No network toggle for now
+const PROTOCOL_CHAIN = ChainId.mumbai;
+
+export interface Web3DataContextType {
+  chainId: number;
+  connect: (walletType: WalletType) => Promise<void>,
+  account: string | undefined,
+  isCorrectChain: boolean,
+  active: boolean,
+  requestToSwitchChain: () => Promise<void>,
 }
 
-const PROTOCOL_CHAIN = Networks.POLYGON_MAINNET;
+const Web3DataContext = React.createContext<Web3DataContextType>({} as Web3DataContextType);
 
-export const useWeb3 = () => {
+export const Web3DataProvider: React.FC = ({ children }) => {
   const { chainId, account, activate, active, connector } = useWeb3React<Web3Provider>();
   const isCorrectChain = chainId === PROTOCOL_CHAIN;
 
@@ -78,15 +84,20 @@ export const useWeb3 = () => {
     }
   }, [connect]);
 
-  return {
-    connect,
-    account,
-    isCorrectChain,
-    active,
-    requestToSwitchChain,
-  };
+  return (
+    <Web3DataContext.Provider
+      value={{
+        connect,
+        account: account ? account : undefined,
+        isCorrectChain,
+        active,
+        requestToSwitchChain,
+        chainId: PROTOCOL_CHAIN,
+      }}>
+      {children}
+    </Web3DataContext.Provider>
+  )
 };
 
-export const Provider: React.FC = ({ children }) => {
-  return <Web3ReactProvider getLibrary={getLibrary}>{children}</Web3ReactProvider>;
-};
+
+export const useWeb3 = () => useContext(Web3DataContext);
