@@ -3,6 +3,7 @@ node_modules
 coverage
 coverage.json
 packages/contracts/typechain
+build
 
 .idea/
 .vscode

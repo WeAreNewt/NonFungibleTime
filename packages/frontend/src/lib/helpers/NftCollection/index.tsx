@@ -9,7 +9,7 @@ import {
     DEFAULT_NULL_VALUE_ON_TX,
     isEthAddress,
 } from '../base-service';
-import { ERC20Service, IERC20ServiceInterface } from '../ERC20';
+import { ERC20Service, IERC20ServiceInterface } from '../IERC20';
 
 export type MintParamsType = {
     userAddress: string;

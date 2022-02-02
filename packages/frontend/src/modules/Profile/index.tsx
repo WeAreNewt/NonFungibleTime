@@ -107,6 +107,7 @@ export default function Profile() {
     const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false)
     const location = useLocation();
     const path = location.pathname.split('/');
+    const baseUrl = "https://elated-kalam-a67780.netlify.app/"; // Preview Deploy
 
     useEffect(() => {
         if (path[2] === currentAccount) {
@@ -296,7 +297,7 @@ export default function Profile() {
                                                         <div>
                                                             <label htmlFor="profile-link" className="block text-sm font-medium text-gray-700">Profile Link</label>
                                                             <div className="mt-1 relative rounded-md shadow-sm">
-                                                                <input disabled={true} type="text" name="profile-link" id="price" className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder={location.pathname} />
+                                                                <input disabled={true} type="text" name="profile-link" id="price" className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder={baseUrl + location.pathname} />
                                                             </div>
                                                         </div>
                                                     </div>
