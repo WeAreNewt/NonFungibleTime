@@ -61,12 +61,16 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     uint16 internal constant BASIS_POINTS = 10000;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
-        if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
+        if (!_exists(tokenId)) {
+            revert TokenDoesntExist(tokenId);
+        }
         _;
     }
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        if (msg.sender != ownerOf(tokenId)) revert OnlyTokenOwner(tokenId);
+        if (msg.sender != ownerOf(tokenId)) {
+            revert OnlyTokenOwner(tokenId);
+        }
         _;
     }
 
@@ -89,7 +93,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     ) public initializer {
         __ERC721_init(name, symbol);
         _transferOwnership(owner);
-        if (useNativeCurrency) isCurrencyAllowed[address(0)] = true;
+        if (useNativeCurrency) {
+            isCurrencyAllowed[address(0)] = true;
+        }
         svgGenerator = svgGeneratorContract;
     }
 
@@ -111,7 +117,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         uint256 duration,
         uint256 royaltyBasisPoints
     ) external returns (uint256) {
-        if (royaltyBasisPoints > BASIS_POINTS) revert InvalidRoyalty();
+        if (royaltyBasisPoints > BASIS_POINTS) {
+            revert InvalidRoyalty();
+        }
         if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration)) {
             revert InvalidTimeParams();
         }
@@ -139,12 +147,19 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param tokenId The token id of the NFT that you are buying.
     function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
         address payable owner = payable(ownerOf(tokenId));
-        if (owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
+        if (owner == msg.sender) {
+            revert CantBuyYourOwnToken(msg.sender, tokenId);
+        }
         Token memory token = tokens[tokenId];
-        if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
-        if (!token.forSale) revert NotForSale(tokenId);
-        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer)
+        if (!isCurrencyAllowed[token.currency]) {
+            revert UnallowedCurrency(tokenId, token.currency);
+        }
+        if (!token.forSale) {
+            revert NotForSale(tokenId);
+        }
+        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer) {
             revert NotAuthorizedBuyer(msg.sender, tokenId);
+        }
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -171,7 +186,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         address allowedBuyer,
         bool forSale
     ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
-        if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
+        if (!isCurrencyAllowed[currency]) {
+            revert UnallowedCurrency(tokenId, currency);
+        }
         Token memory token = tokens[tokenId];
         token.price = price;
         token.currency = currency;
@@ -199,7 +216,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param tokenId Token id of the NFT that you are redeeming.
     function redeem(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = tokens[tokenId];
-        if (token.redeemed) revert AlreadyRedeemed(tokenId);
+        if (token.redeemed) {
+            revert AlreadyRedeemed(tokenId);
+        }
         token.redeemed = true;
         tokens[tokenId] = token;
         emit TokenRedeemed(tokenId);
@@ -351,7 +370,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     ) internal {
         if (currency == address(0)) {
             (bool transferSucceeded, ) = receiver.call{value: amount}('');
-            if (!transferSucceeded) revert TransferFailed();
+            if (!transferSucceeded) {
+                revert TransferFailed();
+            }
         } else {
             IERC20(currency).safeTransferFrom(sender, receiver, amount);
         }
