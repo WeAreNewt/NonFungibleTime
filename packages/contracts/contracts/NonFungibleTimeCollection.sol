@@ -28,13 +28,13 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     event TokenRedeemed(uint256 indexed tokenId);
     event CurrencyAllowanceToggled(address indexed currency);
 
-    error TokenDoesntExist(uint256 tokenId);
+    error TokenDoesNotExist(uint256 tokenId);
     error OnlyTokenOwner(uint256 tokenId);
     error OnlyCurrentRoyaltyReceiver(uint256 tokenId);
     error InvalidAddress(address addr);
     error NotForSale(uint256 tokenId);
     error NotAuthorizedBuyer(address buyer, uint256 tokenId);
-    error CantBuyYourOwnToken(address buyer, uint256 tokenId);
+    error CanNotBuyYourOwnToken(address buyer, uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
     error UnallowedCurrency(uint256 tokenId, address currency);
     error TransferFailed();
@@ -62,7 +62,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
 
     modifier onlyExistingTokenId(uint256 tokenId) {
         if (!_exists(tokenId)) {
-            revert TokenDoesntExist(tokenId);
+            revert TokenDoesNotExist(tokenId);
         }
         _;
     }
@@ -148,7 +148,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
         address payable owner = payable(ownerOf(tokenId));
         if (owner == msg.sender) {
-            revert CantBuyYourOwnToken(msg.sender, tokenId);
+            revert CanNotBuyYourOwnToken(msg.sender, tokenId);
         }
         Token memory token = tokens[tokenId];
         if (!isCurrencyAllowed[token.currency]) {
