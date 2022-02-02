@@ -7,7 +7,7 @@ interface ScreenWrapperProps {
 
 export default function ScreenWrapper({ children }: ScreenWrapperProps) {
     return (
-        <div className="relative h-screen overflow-hidden">
+        <div className="relative h-screen overflow-hidden bg-white dark:bg-black">
             <Navbar />
             {children}
         </div>

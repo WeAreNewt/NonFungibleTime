@@ -7,14 +7,14 @@ export default function NFTCard({ address, name, avatar, date, category, title, 
     return (
         <div className="border p-3">
             {/** Seller name/address + avatar */}
-            <div>{name}</div>
+            <div className="text-black dark:text-white">{name}</div>
             {/** Tag */}
-            <div>{category}</div>
+            <div className="text-black dark:text-white">{category}</div>
             {/** NFT Description */}
-            <div>{title}</div>
-            <div>{description}</div>
+            <div className="text-black dark:text-white">{title}</div>
+            <div className="text-black dark:text-white">{description}</div>
             {/** Pricing */}
-            <div>{cost.toString() + ' ' + currencySymbol}</div>
+            <div className="text-black dark:text-white">{cost.toString() + ' ' + currencySymbol}</div>
         </div>
     );
 }

@@ -161,7 +161,7 @@ export default function Profile() {
                             {/** Avatar/Blockie */}
                             <img alt="ens avatar" src="https://lh3.googleusercontent.com/nbLoKXUB707PZ2iBQ6JBVE8Ytu6Wms5HwiM3_Ssvi0LuAKS-CYU1mcdjr6naiyiaSY_FyYZHAdJWQ3emrHcff_k6-ZKPIKyMpCZN=w600" />
                             {/** ENS Name/Address */}
-                            <div>soliditychad.eth</div>
+                            <div className="text-black dark:text-white">{path[2]}</div>
                         </div>
                     </div>
 
@@ -315,8 +315,6 @@ export default function Profile() {
                                     </div>
                                 </div>
                             </Dialog>
-
-
                         </div>
                     </div>
                 </div >
