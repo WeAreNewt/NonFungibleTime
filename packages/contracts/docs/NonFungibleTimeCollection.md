@@ -792,22 +792,6 @@ error NotAuthorizedBuyer(address buyer, uint256 tokenId)
 | buyer | address | undefined |
 | tokenId | uint256 | undefined |
 
-### NotEnoughFunds
-
-```solidity
-error NotEnoughFunds(uint256 tokenId)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-
 ### NotForSale
 
 ```solidity
