@@ -27,6 +27,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver);
     event TokenRedeemed(uint256 indexed tokenId);
     event CurrencyAllowanceToggled(address indexed currency);
+    event SvgGeneratorSet(address indexed svgGenerator);
 
     error TokenDoesntExist(uint256 tokenId);
     error OnlyTokenOwner(uint256 tokenId);
@@ -216,6 +217,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param newSvgGenerator The address of a contract following the ISvgGenerator signature.
     function setSvgGenerator(address newSvgGenerator) external onlyOwner {
         svgGenerator = newSvgGenerator;
+        emit SvgGeneratorSet(newSvgGenerator);
     }
 
     /// @dev Gets the royalty information of the token with the given tokenId.
