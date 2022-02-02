@@ -138,7 +138,6 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @dev Buys the token with the given tokenId.
     /// @param tokenId The token id of the NFT that you are buying.
     function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
-        if (msg.sender == address(0)) revert InvalidAddress(msg.sender);
         address payable owner = payable(ownerOf(tokenId));
         if (owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
         Token memory token = tokens[tokenId];
