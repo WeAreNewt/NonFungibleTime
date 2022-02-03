@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FaShareAlt, FaChevronCircleLeft } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDataProvider } from '../../lib/providers/app-data-provider'
-import { Category, NFTProps } from '../../types'
 import { Dialog } from '@headlessui/react'
-import { useWeb3React } from '@web3-react/core'
 
 interface NFT {
     name: string;
@@ -22,8 +20,7 @@ interface NFTDetailsParams {
 }
 
 export default function NFTDetails({ activeNft }: NFTDetailsParams) {
-    const { currentAccount, nftCollectionService } = useAppDataProvider();
-    const { library: provider } = useWeb3React();
+    const { currentAccount } = useAppDataProvider();
     const [owner, setOwner] = useState<Boolean>(true);
     const [nft, setNft] = useState<NFT>();
     const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false)
@@ -31,12 +28,14 @@ export default function NFTDetails({ activeNft }: NFTDetailsParams) {
     const navigate = useNavigate();
     const path = location.pathname.split('/');
     const baseUrl = "https://elated-kalam-a67780.netlify.app"; // Preview Deploy
-
+    console.log(activeNft);
+    console.log(owner);
     useEffect(() => {
         if (nft) {
             nft.owner === currentAccount ? setOwner(true) : setOwner(false);
         } else {
             // If no NFT is passed (not accessing from profile or marketplace link), fetch from GQl
+            setNft(undefined);
         }
     }, [path, currentAccount, nft])
 
