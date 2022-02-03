@@ -48,6 +48,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         uint256 duration;
         uint256 price;
         uint256 royaltyBasisPoints;
+        address minter;
         address payable royaltyReceiver;
         address currency;
         address allowedBuyer;
@@ -132,6 +133,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
             duration,
             0,
             royaltyBasisPoints,
+            msg.sender,
             payable(msg.sender),
             address(0),
             address(0),
@@ -299,6 +301,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
                                 )
                             ),
                             _getTokenURIAfterImage(
+                                token.minter,
                                 token.category,
                                 token.availabilityFrom,
                                 token.availabilityTo,
@@ -339,6 +342,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param redeemed A boolean representing if the token is redeemed or not.
     /// @return Bytes representing with the final part of the token URI.
     function _getTokenURIAfterImage(
+        address minter,
         string memory category,
         uint256 availabilityFrom,
         uint256 availabilityTo,
@@ -349,6 +353,8 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
             abi.encodePacked(
                 '","attributes":[{"trait_type":"Type","value":"',
                 category,
+                '"},{"trait_type":"Minter","value":"',
+                Strings.toHexString(uint256(uint160(minter))),
                 '"},{"display_type":"date","trait_type":"Availability from","value":"',
                 Strings.toString(availabilityFrom),
                 '"},{"display_type":"date","trait_type":"Availability To","value":"',
