@@ -720,10 +720,10 @@ error AlreadyRedeemed(uint256 tokenId)
 |---|---|---|
 | tokenId | uint256 | undefined |
 
-### CantBuyYourOwnToken
+### CanNotBuyYourOwnToken
 
 ```solidity
-error CantBuyYourOwnToken(address buyer, uint256 tokenId)
+error CanNotBuyYourOwnToken(address buyer, uint256 tokenId)
 ```
 
 
@@ -736,22 +736,6 @@ error CantBuyYourOwnToken(address buyer, uint256 tokenId)
 |---|---|---|
 | buyer | address | undefined |
 | tokenId | uint256 | undefined |
-
-### InvalidAddress
-
-```solidity
-error InvalidAddress(address addr)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| addr | address | undefined |
 
 ### InvalidRoyalty
 
@@ -774,23 +758,6 @@ error InvalidTimeParams()
 
 
 
-
-### NotAuthorizedBuyer
-
-```solidity
-error NotAuthorizedBuyer(address buyer, uint256 tokenId)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| buyer | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### NotForSale
 
@@ -840,10 +807,10 @@ error OnlyTokenOwner(uint256 tokenId)
 |---|---|---|
 | tokenId | uint256 | undefined |
 
-### TokenDoesntExist
+### TokenDoesNotExist
 
 ```solidity
-error TokenDoesntExist(uint256 tokenId)
+error TokenDoesNotExist(uint256 tokenId)
 ```
 
 
@@ -883,5 +850,22 @@ error UnallowedCurrency(uint256 tokenId, address currency)
 |---|---|---|
 | tokenId | uint256 | undefined |
 | currency | address | undefined |
+
+### UnauthorizedBuyer
+
+```solidity
+error UnauthorizedBuyer(address buyer, uint256 tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| buyer | address | undefined |
+| tokenId | uint256 | undefined |
 
 
