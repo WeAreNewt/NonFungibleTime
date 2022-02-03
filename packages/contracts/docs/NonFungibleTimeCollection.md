@@ -49,6 +49,22 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined
 
+### burn
+
+```solidity
+function burn(uint256 tokenId) external nonpayable
+```
+
+
+
+*Burns the token with the given tokenId sending it to the address(0).*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | Token id of the NFT that you are burning.
+
 ### buy
 
 ```solidity
@@ -503,6 +519,40 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | name | string | undefined
 | description | string | undefined
 | category | string | undefined
+
+### totalMinted
+
+```solidity
+function totalMinted() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined
+
+### totalSupply
+
+```solidity
+function totalSupply() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined
 
 ### transferFrom
 
