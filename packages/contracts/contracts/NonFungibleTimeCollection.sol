@@ -146,7 +146,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
 
     /// @dev Buys the token with the given tokenId.
     /// @param tokenId The token id of the NFT that you are buying.
-    function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
+    function buy(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
         address payable owner = payable(ownerOf(tokenId));
         if (owner == msg.sender) {
             revert CanNotBuyYourOwnToken(msg.sender, tokenId);
@@ -180,7 +180,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param price Price of the NFT that you are selling.
     /// @param allowedBuyer address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT.
     /// @param forSale A boolean indicating if the NFT is for sale or not.
-    function changeTokenBuyingConditions(
+    function changeBuyingConditions(
         uint256 tokenId,
         address currency,
         uint256 price,
@@ -202,7 +202,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @dev Changes the token royalty receiver.
     /// @param tokenId Token id of the NFT which royalty receiver must be updated.
     /// @param royaltyReceiver The address of the new rotalty receiver.
-    function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver)
+    function changeRoyaltyReceiver(uint256 tokenId, address royaltyReceiver)
         external
         onlyExistingTokenId(tokenId)
     {

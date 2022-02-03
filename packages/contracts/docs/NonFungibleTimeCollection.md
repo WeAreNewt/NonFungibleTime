@@ -49,10 +49,10 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined
 
-### buyToken
+### buy
 
 ```solidity
-function buyToken(uint256 tokenId) external payable
+function buy(uint256 tokenId) external payable
 ```
 
 
@@ -65,10 +65,10 @@ function buyToken(uint256 tokenId) external payable
 |---|---|---|
 | tokenId | uint256 | The token id of the NFT that you are buying.
 
-### changeTokenBuyingConditions
+### changeBuyingConditions
 
 ```solidity
-function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale) external nonpayable
+function changeBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale) external nonpayable
 ```
 
 
@@ -85,10 +85,10 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | allowedBuyer | address | address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT.
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
 
-### changeTokenRoyaltyReceiver
+### changeRoyaltyReceiver
 
 ```solidity
-function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver) external nonpayable
+function changeRoyaltyReceiver(uint256 tokenId, address royaltyReceiver) external nonpayable
 ```
 
 
