@@ -137,7 +137,7 @@ export class NftCollectionService
 
         const collectionContract = this.getContractInstance(this.collectionAddress);
         const token = await collectionContract.tokens(tokenId);
-        const currency = token[6];
+        const currency = token[7];
         const price = token[3];
         // No approval required and amount passed through value for purchases with base tokens (ETH, MATIC, etc.)
         if (currency === API_ETH_MOCK_ADDRESS) {
