@@ -13,7 +13,7 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 /// @title Non-Fungible Time collection
 /// @author The Newt team
 /// @notice A primitive to mint time, our most valuable asset, on-chain
-/// @dev An ERC721 contract with mint, buy, and transfer functions
+/// @dev An ERC-721 contract with mint, buy, and transfer functions
 contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
@@ -30,13 +30,12 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     event CurrencyAllowanceToggled(address indexed currency);
     event SvgGeneratorSet(address indexed svgGenerator);
 
-    error TokenDoesntExist(uint256 tokenId);
+    error TokenDoesNotExist(uint256 tokenId);
     error OnlyTokenOwner(uint256 tokenId);
     error OnlyCurrentRoyaltyReceiver(uint256 tokenId);
-    error InvalidAddress(address addr);
     error NotForSale(uint256 tokenId);
-    error NotAuthorizedBuyer(address buyer, uint256 tokenId);
-    error CantBuyYourOwnToken(address buyer, uint256 tokenId);
+    error UnauthorizedBuyer(address buyer, uint256 tokenId);
+    error CanNotBuyYourOwnToken(address buyer, uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
     error UnallowedCurrency(uint256 tokenId, address currency);
     error TransferFailed();
@@ -63,12 +62,16 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     uint16 internal constant BASIS_POINTS = 10000;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
-        if (!_exists(tokenId)) revert TokenDoesntExist(tokenId);
+        if (!_exists(tokenId)) {
+            revert TokenDoesNotExist(tokenId);
+        }
         _;
     }
 
     modifier onlyTokenOwner(uint256 tokenId) {
-        if (msg.sender != ownerOf(tokenId)) revert OnlyTokenOwner(tokenId);
+        if (msg.sender != ownerOf(tokenId)) {
+            revert OnlyTokenOwner(tokenId);
+        }
         _;
     }
 
@@ -91,7 +94,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     ) public initializer {
         __ERC721_init(name, symbol);
         _transferOwnership(owner);
-        if (useNativeCurrency) isCurrencyAllowed[address(0)] = true;
+        if (useNativeCurrency) {
+            isCurrencyAllowed[address(0)] = true;
+        }
         svgGenerator = svgGeneratorContract;
     }
 
@@ -113,7 +118,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         uint256 duration,
         uint256 royaltyBasisPoints
     ) external returns (uint256) {
-        if (royaltyBasisPoints > BASIS_POINTS) revert InvalidRoyalty();
+        if (royaltyBasisPoints > BASIS_POINTS) {
+            revert InvalidRoyalty();
+        }
         if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration)) {
             revert InvalidTimeParams();
         }
@@ -141,12 +148,19 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param tokenId The token id of the NFT that you are buying.
     function buyToken(uint256 tokenId) external payable onlyExistingTokenId(tokenId) {
         address payable owner = payable(ownerOf(tokenId));
-        if (owner == msg.sender) revert CantBuyYourOwnToken(msg.sender, tokenId);
+        if (owner == msg.sender) {
+            revert CanNotBuyYourOwnToken(msg.sender, tokenId);
+        }
         Token memory token = tokens[tokenId];
-        if (!isCurrencyAllowed[token.currency]) revert UnallowedCurrency(tokenId, token.currency);
-        if (!token.forSale) revert NotForSale(tokenId);
-        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer)
-            revert NotAuthorizedBuyer(msg.sender, tokenId);
+        if (!isCurrencyAllowed[token.currency]) {
+            revert UnallowedCurrency(tokenId, token.currency);
+        }
+        if (!token.forSale) {
+            revert NotForSale(tokenId);
+        }
+        if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer) {
+            revert UnauthorizedBuyer(msg.sender, tokenId);
+        }
         token.forSale = false;
         tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
@@ -173,7 +187,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         address allowedBuyer,
         bool forSale
     ) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
-        if (!isCurrencyAllowed[currency]) revert UnallowedCurrency(tokenId, currency);
+        if (!isCurrencyAllowed[currency]) {
+            revert UnallowedCurrency(tokenId, currency);
+        }
         Token memory token = tokens[tokenId];
         token.price = price;
         token.currency = currency;
@@ -201,7 +217,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param tokenId Token id of the NFT that you are redeeming.
     function redeem(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
         Token memory token = tokens[tokenId];
-        if (token.redeemed) revert AlreadyRedeemed(tokenId);
+        if (token.redeemed) {
+            revert AlreadyRedeemed(tokenId);
+        }
         token.redeemed = true;
         tokens[tokenId] = token;
         emit TokenRedeemed(tokenId);
@@ -354,7 +372,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     ) internal {
         if (currency == address(0)) {
             (bool transferSucceeded, ) = receiver.call{value: amount}('');
-            if (!transferSucceeded) revert TransferFailed();
+            if (!transferSucceeded) {
+                revert TransferFailed();
+            }
         } else {
             IERC20(currency).safeTransferFrom(sender, receiver, amount);
         }

@@ -469,7 +469,7 @@ describe('Tokenized time collection', () => {
       true
     );
     await expect(nftCollection.buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      `CantBuyYourOwnToken("${minter.address}", 0)`
+      `CanNotBuyYourOwnToken("${minter.address}", 0)`
     );
   });
 
@@ -553,7 +553,7 @@ describe('Tokenized time collection', () => {
       .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
 
     await expect(nftCollection.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      `NotAuthorizedBuyer("${buyer.address}", 0)`
+      `UnauthorizedBuyer("${buyer.address}", 0)`
     );
   });
 
