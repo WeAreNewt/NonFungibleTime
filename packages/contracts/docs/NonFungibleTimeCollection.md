@@ -611,6 +611,22 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
 
+### SvgGeneratorSet
+
+```solidity
+event SvgGeneratorSet(address indexed svgGenerator)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| svgGenerator `indexed` | address | undefined |
+
 ### TokenBought
 
 ```solidity
