@@ -1,12 +1,12 @@
 # NonFungibleTimeCollection
 
+*The Newt team*
 
+> Non-Fungible Time collection
 
-> Non Fungible Time collection
+A primitive to mint time, our most valuable asset, on-chain
 
-Everything created can change a lot, we are still building it.
-
-*Everything*
+*An ERC-721 contract with mint, buy, and transfer functions*
 
 ## Methods
 
@@ -49,10 +49,26 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined
 
-### buyToken
+### burn
 
 ```solidity
-function buyToken(uint256 tokenId) external payable
+function burn(uint256 tokenId) external nonpayable
+```
+
+
+
+*Burns the token with the given tokenId sending it to the address(0).*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | Token id of the NFT that you are burning.
+
+### buy
+
+```solidity
+function buy(uint256 tokenId) external payable
 ```
 
 
@@ -65,10 +81,10 @@ function buyToken(uint256 tokenId) external payable
 |---|---|---|
 | tokenId | uint256 | The token id of the NFT that you are buying.
 
-### changeTokenBuyingConditions
+### changeBuyingConditions
 
 ```solidity
-function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale) external nonpayable
+function changeBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale) external nonpayable
 ```
 
 
@@ -85,10 +101,10 @@ function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 
 | allowedBuyer | address | address of the buyer to avoid frontruns. Use address(0) to enable everyone to buy the NFT.
 | forSale | bool | A boolean indicating if the NFT is for sale or not.
 
-### changeTokenRoyaltyReceiver
+### changeRoyaltyReceiver
 
 ```solidity
-function changeTokenRoyaltyReceiver(uint256 tokenId, address royaltyReceiver) external nonpayable
+function changeRoyaltyReceiver(uint256 tokenId, address royaltyReceiver) external nonpayable
 ```
 
 
@@ -473,7 +489,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable royaltyReceiver, address currency, address allowedBuyer, bool redeemed, bool forSale, string name, string description, string category)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address minter, address payable royaltyReceiver, address currency, address allowedBuyer, bool redeemed, bool forSale, string name, string description, string category)
 ```
 
 
@@ -495,6 +511,7 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | duration | uint256 | undefined
 | price | uint256 | undefined
 | royaltyBasisPoints | uint256 | undefined
+| minter | address | undefined
 | royaltyReceiver | address payable | undefined
 | currency | address | undefined
 | allowedBuyer | address | undefined
@@ -503,6 +520,40 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | name | string | undefined
 | description | string | undefined
 | category | string | undefined
+
+### totalMinted
+
+```solidity
+function totalMinted() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined
+
+### totalSupply
+
+```solidity
+function totalSupply() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined
 
 ### transferFrom
 
@@ -736,10 +787,10 @@ error AlreadyRedeemed(uint256 tokenId)
 |---|---|---|
 | tokenId | uint256 | undefined |
 
-### CantBuyYourOwnToken
+### CanNotBuyYourOwnToken
 
 ```solidity
-error CantBuyYourOwnToken(address buyer, uint256 tokenId)
+error CanNotBuyYourOwnToken(address buyer, uint256 tokenId)
 ```
 
 
@@ -752,22 +803,6 @@ error CantBuyYourOwnToken(address buyer, uint256 tokenId)
 |---|---|---|
 | buyer | address | undefined |
 | tokenId | uint256 | undefined |
-
-### InvalidAddress
-
-```solidity
-error InvalidAddress(address addr)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| addr | address | undefined |
 
 ### InvalidRoyalty
 
@@ -790,23 +825,6 @@ error InvalidTimeParams()
 
 
 
-
-### NotAuthorizedBuyer
-
-```solidity
-error NotAuthorizedBuyer(address buyer, uint256 tokenId)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| buyer | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### NotForSale
 
@@ -856,10 +874,10 @@ error OnlyTokenOwner(uint256 tokenId)
 |---|---|---|
 | tokenId | uint256 | undefined |
 
-### TokenDoesntExist
+### TokenDoesNotExist
 
 ```solidity
-error TokenDoesntExist(uint256 tokenId)
+error TokenDoesNotExist(uint256 tokenId)
 ```
 
 
@@ -899,5 +917,22 @@ error UnallowedCurrency(uint256 tokenId, address currency)
 |---|---|---|
 | tokenId | uint256 | undefined |
 | currency | address | undefined |
+
+### UnauthorizedBuyer
+
+```solidity
+error UnauthorizedBuyer(address buyer, uint256 tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| buyer | address | undefined |
+| tokenId | uint256 | undefined |
 
 
