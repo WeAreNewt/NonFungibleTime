@@ -5,7 +5,8 @@ import {
   TokenBuyingConditionsChanged,
   TokenRedeemed,
   Transfer,
-  SetSvgGeneratorCall,
+  TokenRoyaltyReceiverChanged,
+  SvgGeneratorSet,
 } from '../../generated/TimeCollection/TimeCollection';
 import {
   BuyingConditionChange,
@@ -16,7 +17,7 @@ import {
   Transfer as TransferEvent,
   User,
 } from '../../generated/schema';
-import { Address, ethereum, log, BigInt } from '@graphprotocol/graph-ts';
+import { ethereum, log, BigInt } from '@graphprotocol/graph-ts';
 import { ERC721 } from '../../generated/TimeCollection/ERC721';
 import { ERC20 } from '../../generated/TimeCollection/ERC20';
 
@@ -48,8 +49,8 @@ export function handleTokenBought(event: TokenBought): void {
     purchase.nft = event.params.tokenId.toString();
     purchase.timestamp = event.block.timestamp;
     purchase.blockNumber = event.block.number;
-    const to = event.params.buyer.toHex();
-    const from = event.params.seller.toHex();
+    const to = event.params.buyer.toHexString();
+    const from = event.params.seller.toHexString();
     const toUser = User.load(to);
     if (!toUser) {
       const user = new User(to);
@@ -58,9 +59,9 @@ export function handleTokenBought(event: TokenBought): void {
     purchase.to = to;
     purchase.from = from;
     purchase.price = nftParams.value3;
-    purchase.currency = nftParams.value6.toHexString();
+    purchase.currency = nftParams.value7.toHexString();
     purchase.royaltyAccrued = nftParams.value4.times(nftParams.value3);
-    purchase.creator = nftParams.value5.toHex();
+    purchase.royaltyReceiver = nftParams.value6.toHexString();
     purchase.save();
   } else {
     log.warning(`Token purchase event for non-existant tokenId {}`, [
@@ -154,8 +155,8 @@ export function handleTransfer(event: Transfer): void {
   transfer.nft = tokenId;
   transfer.timestamp = event.block.timestamp;
   transfer.blockNumber = event.block.number;
-  const from = event.params.from.toHex();
-  const to = event.params.to.toHex();
+  const from = event.params.from.toHexString();
+  const to = event.params.to.toHexString();
   const toUser = User.load(to);
   if (!toUser) {
     const user = new User(to);
@@ -182,13 +183,14 @@ export function handleTransfer(event: Transfer): void {
       nft.price = values.value3;
       nft.royaltyBasisPoints = values.value4;
       nft.creator = values.value5.toHexString();
-      nft.currency = values.value6.toHexString();
-      nft.allowedBuyer = values.value7.toHexString();
-      nft.redeemed = values.value8;
-      nft.forSale = values.value9;
-      nft.name = values.value10;
-      nft.description = values.value11;
-      nft.work = values.value12;
+      nft.royaltyReceiver = values.value6.toHexString();
+      nft.currency = values.value7.toHexString();
+      nft.allowedBuyer = values.value8.toHexString();
+      nft.redeemed = values.value9;
+      nft.forSale = values.value10;
+      nft.name = values.value11;
+      nft.description = values.value12;
+      nft.work = values.value13;
       nft.tokenId = event.params.tokenId;
       const uri = getTokenURI(event, event.params.tokenId);
       nft.tokenURI = uri;
@@ -206,7 +208,30 @@ export function handleTransfer(event: Transfer): void {
   }
 }
 
-export function handleSvgGeneratorSet(event: SetSvgGeneratorCall): void {
-  // Loop through all NFTs
-  // Requires totalSupply
+export function handleSvgGeneratorSet(event: SvgGeneratorSet): void {
+  const contract = TimeCollection.bind(event.address);
+  const totalMintedCall = contract.try_totalMinted();
+  if (!totalMintedCall.reverted) {
+    const totalMinted = totalMintedCall.value.toI32();
+    for (let i = 0; i < totalMinted; i++) {
+      const nft = Nft.load(i.toString());
+      if (nft && nft.owner !== '0x0000000000000000000000000000000000000000') {
+        const uri = getTokenURI(event, BigInt.fromI32(i));
+        nft.tokenURI = uri;
+        nft.save();
+      }
+    }
+  }
+}
+
+export function handleTokenRoyaltyReceiverChanged(event: TokenRoyaltyReceiverChanged): void {
+  const tokenId = event.params.tokenId.toString();
+  const nft = Nft.load(tokenId);
+  if (nft) {
+    nft.royaltyReceiver = event.params.royaltyReceiver.toHexString();
+  } else {
+    log.warning(`Token royalty receiver changed event for non-existant tokenId {}`, [
+      event.params.tokenId.toString(),
+    ]);
+  }
 }

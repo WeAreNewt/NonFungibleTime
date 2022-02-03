@@ -43,4 +43,6 @@ dataSources:
           handler: handleTransfer
         - event: SvgGeneratorSet(indexed address)
           handler: handleSvgGeneratorSet
+        - event: TokenRoyaltyReceiverChanged(indexed uint256,address)
+          handler: handleTokenRoyaltyReceiverChanged
       file: ./src/mapping/nonfungibletime.ts

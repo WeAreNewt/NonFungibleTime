@@ -5,6 +5,7 @@ type Nft @entity {
   contractAddress: String!
   owner: User!
   creator: User!
+  royaltyReceiver: User!
   name: String!
   description: String!
   work: String!
@@ -34,7 +35,7 @@ type User @entity {
   "Sale option toggles for NFTs this user owns"
   buyingConditionChanges: [BuyingConditionChange!] @derivedFrom(field: "owner")
   sales: [Sale!] @derivedFrom(field: "from")
-  royaltiesAccrued: [Sale!] @derivedFrom(field: "creator")
+  royaltiesAccrued: [Sale!] @derivedFrom(field: "royaltyReceiver")
   purchases: [Sale!] @derivedFrom(field: "to")
   incomingTransfers: [Transfer!] @derivedFrom(field: "to")
   outgoingTransfers: [Transfer!] @derivedFrom(field: "from")
@@ -63,7 +64,7 @@ type Sale implements NftStatusChange @entity {
   txHash: String!
   to: User!
   from: User!
-  creator: User!
+  royaltyReceiver: User!
   price: BigInt!
   currency: PaymentToken!
   royaltyAccrued: BigInt!
