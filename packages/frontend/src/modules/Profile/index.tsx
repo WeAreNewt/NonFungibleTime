@@ -20,6 +20,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 1,
         currencySymbol: 'ETH',
         currencyAddress: '0x0',
+        tokenId: 0,
+        owner: '0x0',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -31,6 +33,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 5,
         currencySymbol: 'DAI',
         currencyAddress: '0x0',
+        tokenId: 1,
+        owner: '0x1',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -42,6 +46,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 1,
         currencySymbol: 'ETH',
         currencyAddress: '0x0',
+        tokenId: 2,
+        owner: '0x2',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -53,6 +59,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 5,
         currencySymbol: 'DAI',
         currencyAddress: '0x0',
+        tokenId: 3,
+        owner: '0x3',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -64,6 +72,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 1,
         currencySymbol: 'ETH',
         currencyAddress: '0x0',
+        tokenId: 4,
+        owner: '0x4',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -75,6 +85,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 5,
         currencySymbol: 'DAI',
         currencyAddress: '0x0',
+        tokenId: 5,
+        owner: '0x5',
     },
 ]
 
@@ -107,7 +119,7 @@ export default function Profile() {
     const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false)
     const location = useLocation();
     const path = location.pathname.split('/');
-    const baseUrl = "https://elated-kalam-a67780.netlify.app/"; // Preview Deploy
+    const baseUrl = "https://elated-kalam-a67780.netlify.app"; // Preview Deploy
 
     useEffect(() => {
         if (path[2] === currentAccount) {
@@ -152,7 +164,7 @@ export default function Profile() {
 
 
     return (
-        <div className="flex h-full flex-col overflow-hidden">
+        <div className="flex h-full flex-col">
             <div className="basis-1/4">
                 <div className="p-10 flex flex-row justify-between">
                     {/** Profile Header */}

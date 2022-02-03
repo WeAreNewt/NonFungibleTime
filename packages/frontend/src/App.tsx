@@ -5,6 +5,7 @@ import ScreenWrapper from './components/ScreenWrapper';
 import { Home } from './modules/Home';
 import Profile from './modules/Profile';
 import Marketplace from './modules/Marketplace';
+import Details from './modules/NFTDetails';
 import { Web3DataProvider } from './lib/providers/web3-provider';
 import { AppDataProvider } from './lib/providers/app-data-provider';
 import { Web3ReactProvider } from '@web3-react/core';
@@ -27,6 +28,7 @@ function App() {
                   <Route path="/" element={<Home />} key="home" />
                   <Route path="/profile/*" element={<Profile />} key="profile" />
                   <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
+                  <Route path="/details/*" element={<Details />} key="details" />
                 </Routes>
               </ScreenWrapper>
             </BrowserRouter>
