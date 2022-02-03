@@ -57,6 +57,7 @@ describe('Tokenized time collection', () => {
       ethers.constants.Zero,
       BigNumber.from(300),
       minter.address,
+      minter.address,
       ethers.constants.AddressZero,
       ethers.constants.AddressZero,
       false,
@@ -234,7 +235,7 @@ describe('Tokenized time collection', () => {
       300
     );
     await expect(
-      nftCollection.changeTokenBuyingConditions(
+      nftCollection.changeBuyingConditions(
         ethers.constants.Zero,
         ethers.constants.AddressZero,
         ethers.constants.Zero,
@@ -268,7 +269,7 @@ describe('Tokenized time collection', () => {
     await expect(
       nftCollection
         .connect(otherAccount)
-        .changeTokenBuyingConditions(
+        .changeBuyingConditions(
           ethers.constants.Zero,
           testToken.address,
           ethers.constants.One,
@@ -290,7 +291,7 @@ describe('Tokenized time collection', () => {
     );
 
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
@@ -304,6 +305,7 @@ describe('Tokenized time collection', () => {
       BigNumber.from(10000000),
       ethers.constants.One,
       BigNumber.from(300),
+      minter.address,
       minter.address,
       testToken.address,
       ethers.constants.AddressZero,
@@ -328,7 +330,7 @@ describe('Tokenized time collection', () => {
     await expect(
       nftCollection
         .connect(otherAccount)
-        .changeTokenBuyingConditions(
+        .changeBuyingConditions(
           ethers.constants.Zero,
           ethers.constants.AddressZero,
           ethers.constants.Zero,
@@ -349,7 +351,7 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
@@ -404,7 +406,7 @@ describe('Tokenized time collection', () => {
     );
   });
 
-  it('Should revert a buyToken transaction because the token is not for sale', async () => {
+  it('Should revert a buy transaction because the token is not for sale', async () => {
     await nftCollection.mint(
       'One dev hour v1',
       'One development hour to be used for any dao',
@@ -415,19 +417,19 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
       ethers.constants.AddressZero,
       false
     );
-    await expect(nftCollection.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
+    await expect(nftCollection.connect(buyer).buy(ethers.constants.Zero)).to.be.revertedWith(
       'NotForSale(0)'
     );
   });
 
-  it("Should revert a buyToken transaction because the buyer doesn't have enough funds", async () => {
+  it("Should revert a buy transaction because the buyer doesn't have enough funds", async () => {
     await nftCollection.mint(
       'One dev hour v1',
       'One development hour to be used for any dao',
@@ -438,14 +440,14 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
       ethers.constants.AddressZero,
       true
     );
-    await expect(nftCollection.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
+    await expect(nftCollection.connect(buyer).buy(ethers.constants.Zero)).to.be.revertedWith(
       'ERC20: transfer amount exceeds balance'
     );
   });
@@ -461,15 +463,15 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
       ethers.constants.AddressZero,
       true
     );
-    await expect(nftCollection.buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      `CantBuyYourOwnToken("${minter.address}", 0)`
+    await expect(nftCollection.buy(ethers.constants.Zero)).to.be.revertedWith(
+      `CanNotBuyYourOwnToken("${minter.address}", 0)`
     );
   });
 
@@ -484,7 +486,7 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
@@ -495,7 +497,7 @@ describe('Tokenized time collection', () => {
     await testToken
       .connect(buyer)
       .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
-    await nftCollection.connect(buyer).buyToken(ethers.constants.Zero);
+    await nftCollection.connect(buyer).buy(ethers.constants.Zero);
     expect(await testToken.balanceOf(buyer.address)).to.equal(ethers.BigNumber.from(99));
     expect(await testToken.balanceOf(minter.address)).to.equal(ethers.constants.One);
     expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
@@ -512,7 +514,7 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
@@ -523,7 +525,7 @@ describe('Tokenized time collection', () => {
     await testToken
       .connect(buyer)
       .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
-    await nftCollection.connect(buyer).buyToken(ethers.constants.Zero);
+    await nftCollection.connect(buyer).buy(ethers.constants.Zero);
     expect(await testToken.balanceOf(buyer.address)).to.equal(ethers.BigNumber.from(99));
     expect(await testToken.balanceOf(minter.address)).to.equal(ethers.constants.One);
     expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
@@ -540,7 +542,7 @@ describe('Tokenized time collection', () => {
       300
     );
     await nftCollection.toggleCurrencyAllowance(testToken.address);
-    await nftCollection.changeTokenBuyingConditions(
+    await nftCollection.changeBuyingConditions(
       ethers.constants.Zero,
       testToken.address,
       ethers.constants.One,
@@ -552,8 +554,8 @@ describe('Tokenized time collection', () => {
       .connect(buyer)
       .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
 
-    await expect(nftCollection.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      `NotAuthorizedBuyer("${buyer.address}", 0)`
+    await expect(nftCollection.connect(buyer).buy(ethers.constants.Zero)).to.be.revertedWith(
+      `UnauthorizedBuyer("${buyer.address}", 0)`
     );
   });
 
@@ -575,7 +577,7 @@ describe('Tokenized time collection', () => {
       .transferFrom(minter.address, otherAccount.address, ethers.constants.Zero);
     await nftCollection
       .connect(otherAccount)
-      .changeTokenBuyingConditions(
+      .changeBuyingConditions(
         ethers.constants.Zero,
         testToken.address,
         ethers.BigNumber.from(100),
@@ -586,7 +588,7 @@ describe('Tokenized time collection', () => {
     await testToken
       .connect(buyer)
       .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
-    await nftCollection.connect(buyer).buyToken(ethers.constants.Zero);
+    await nftCollection.connect(buyer).buy(ethers.constants.Zero);
     expect(await testToken.balanceOf(buyer.address)).to.equal(ethers.constants.Zero);
     expect(await testToken.balanceOf(minter.address)).to.equal(ethers.BigNumber.from(10));
     expect(await testToken.balanceOf(otherAccount.address)).to.equal(ethers.BigNumber.from(90));
