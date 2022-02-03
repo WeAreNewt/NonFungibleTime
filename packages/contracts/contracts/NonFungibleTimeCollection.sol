@@ -10,9 +10,10 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 
-/// @title Non Fungible Time collection
-/// @notice Everything created can change a lot, we are still building it.
-/// @dev Everything
+/// @title Non-Fungible Time collection
+/// @author The Newt team
+/// @notice A primitive to mint time, our most valuable asset, on-chain
+/// @dev An ERC721 contract with mint, buy, and transfer functions
 contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
