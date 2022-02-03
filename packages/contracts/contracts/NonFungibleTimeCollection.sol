@@ -301,8 +301,8 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
                                 )
                             ),
                             _getTokenURIAfterImage(
-                                token.minter,
                                 token.category,
+                                token.minter,
                                 token.availabilityFrom,
                                 token.availabilityTo,
                                 token.duration,
@@ -336,14 +336,15 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
 
     /// @dev Generates the string with the final part of the token URI that goes after the image.
     /// @param category Type or category label that represents the activity for what the time is being tokenized.
+    /// @param minter The minter of the token, whose time was tokenized.
     /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
     /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
     /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
     /// @param redeemed A boolean representing if the token is redeemed or not.
     /// @return Bytes representing with the final part of the token URI.
     function _getTokenURIAfterImage(
-        address minter,
         string memory category,
+        address minter,
         uint256 availabilityFrom,
         uint256 availabilityTo,
         uint256 duration,
