@@ -10,9 +10,10 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 
-/// @title Non Fungible Time collection
-/// @notice Everything created can change a lot, we are still building it.
-/// @dev Everything
+/// @title Non-Fungible Time collection
+/// @author The Newt team
+/// @notice A primitive to mint time, our most valuable asset, on-chain
+/// @dev An ERC721 contract with mint, buy, and transfer functions
 contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
@@ -27,6 +28,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     event TokenRoyaltyReceiverChanged(uint256 indexed tokenId, address royaltyReceiver);
     event TokenRedeemed(uint256 indexed tokenId);
     event CurrencyAllowanceToggled(address indexed currency);
+    event SvgGeneratorSet(address indexed svgGenerator);
 
     error TokenDoesntExist(uint256 tokenId);
     error OnlyTokenOwner(uint256 tokenId);
@@ -216,6 +218,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param newSvgGenerator The address of a contract following the ISvgGenerator signature.
     function setSvgGenerator(address newSvgGenerator) external onlyOwner {
         svgGenerator = newSvgGenerator;
+        emit SvgGeneratorSet(newSvgGenerator);
     }
 
     /// @dev Gets the royalty information of the token with the given tokenId.
