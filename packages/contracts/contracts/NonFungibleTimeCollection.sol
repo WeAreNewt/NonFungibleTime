@@ -58,7 +58,6 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         string category;
     }
 
-    uint256 internal _tokenCounter;
     uint16 internal constant BASIS_POINTS = 10000;
 
     modifier onlyExistingTokenId(uint256 tokenId) {
@@ -76,6 +75,8 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     }
 
     address public svgGenerator;
+    uint256 public totalMinted;
+    uint256 public totalSupply;
     mapping(uint256 => Token) public tokens;
     mapping(address => bool) public isCurrencyAllowed;
 
@@ -124,7 +125,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         if (!_areValidTimeParams(availabilityFrom, availabilityTo, duration)) {
             revert InvalidTimeParams();
         }
-        _safeMint(msg.sender, _tokenCounter);
+        _safeMint(msg.sender, totalMinted);
         Token memory newToken = Token(
             availabilityFrom,
             availabilityTo,
@@ -140,8 +141,9 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
             description,
             category
         );
-        tokens[_tokenCounter] = newToken;
-        return _tokenCounter++;
+        tokens[totalMinted] = newToken;
+        totalSupply++;
+        return totalMinted++;
     }
 
     /// @dev Buys the token with the given tokenId.
@@ -223,6 +225,13 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         token.redeemed = true;
         tokens[tokenId] = token;
         emit TokenRedeemed(tokenId);
+    }
+
+    /// @dev Burns the token with the given tokenId sending it to the address(0).
+    /// @param tokenId Token id of the NFT that you are burning.
+    function burn(uint256 tokenId) external onlyExistingTokenId(tokenId) onlyTokenOwner(tokenId) {
+        totalSupply--;
+        _burn(tokenId);
     }
 
     /// @dev Toggles the payment allowance of the given currency.
