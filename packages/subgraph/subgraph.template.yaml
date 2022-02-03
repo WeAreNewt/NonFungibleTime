@@ -41,4 +41,6 @@ dataSources:
           handler: handleCurrencyAllowanceToggled
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: SvgGeneratorSet(indexed address)
+          handler: handleSvgGeneratorSet
       file: ./src/mapping/nonfungibletime.ts

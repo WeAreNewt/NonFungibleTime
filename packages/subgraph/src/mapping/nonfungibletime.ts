@@ -5,6 +5,7 @@ import {
   TokenBuyingConditionsChanged,
   TokenRedeemed,
   Transfer,
+  SetSvgGeneratorCall,
 } from '../../generated/TimeCollection/TimeCollection';
 import {
   BuyingConditionChange,
@@ -203,4 +204,9 @@ export function handleTransfer(event: Transfer): void {
     nft.owner = to;
     nft.save();
   }
+}
+
+export function handleSvgGeneratorSet(event: SetSvgGeneratorCall): void {
+  // Loop through all NFTs
+  // Requires totalSupply
 }

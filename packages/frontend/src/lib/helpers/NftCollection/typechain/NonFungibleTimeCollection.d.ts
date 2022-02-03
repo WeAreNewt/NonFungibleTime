@@ -234,6 +234,7 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "CurrencyAllowanceToggled(address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "SvgGeneratorSet(address)": EventFragment;
     "TokenBought(uint256,address,address)": EventFragment;
     "TokenBuyingConditionsChanged(uint256,address,uint256,address,bool)": EventFragment;
     "TokenRedeemed(uint256)": EventFragment;
@@ -245,6 +246,7 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CurrencyAllowanceToggled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SvgGeneratorSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokenBought"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "TokenBuyingConditionsChanged"
@@ -278,6 +280,10 @@ export type CurrencyAllowanceToggledEvent = TypedEvent<
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
+>;
+
+export type SvgGeneratorSetEvent = TypedEvent<
+  [string] & { svgGenerator: string }
 >;
 
 export type TokenBoughtEvent = TypedEvent<
@@ -934,6 +940,14 @@ export class NonFungibleTimeCollection extends BaseContract {
       [string, string],
       { previousOwner: string; newOwner: string }
     >;
+
+    "SvgGeneratorSet(address)"(
+      svgGenerator?: string | null
+    ): TypedEventFilter<[string], { svgGenerator: string }>;
+
+    SvgGeneratorSet(
+      svgGenerator?: string | null
+    ): TypedEventFilter<[string], { svgGenerator: string }>;
 
     "TokenBought(uint256,address,address)"(
       tokenId?: BigNumberish | null,
