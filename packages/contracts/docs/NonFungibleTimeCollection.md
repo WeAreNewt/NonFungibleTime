@@ -1,12 +1,12 @@
 # NonFungibleTimeCollection
 
+*The Newt team*
 
+> Non-Fungible Time collection
 
-> Non Fungible Time collection
+A primitive to mint time, our most valuable asset, on-chain
 
-Everything created can change a lot, we are still building it.
-
-*Everything*
+*An ERC-721 contract with mint, buy, and transfer functions*
 
 ## Methods
 
