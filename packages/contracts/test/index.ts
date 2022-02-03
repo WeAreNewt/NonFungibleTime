@@ -553,7 +553,7 @@ describe('Tokenized time collection', () => {
       .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
 
     await expect(nftCollection.connect(buyer).buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      `NotAuthorizedBuyer("${buyer.address}", 0)`
+      `UnauthorizedBuyer("${buyer.address}", 0)`
     );
   });
 

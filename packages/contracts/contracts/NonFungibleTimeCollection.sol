@@ -32,7 +32,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     error OnlyTokenOwner(uint256 tokenId);
     error OnlyCurrentRoyaltyReceiver(uint256 tokenId);
     error NotForSale(uint256 tokenId);
-    error NotAuthorizedBuyer(address buyer, uint256 tokenId);
+    error UnauthorizedBuyer(address buyer, uint256 tokenId);
     error CanNotBuyYourOwnToken(address buyer, uint256 tokenId);
     error AlreadyRedeemed(uint256 tokenId);
     error UnallowedCurrency(uint256 tokenId, address currency);
@@ -157,7 +157,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
             revert NotForSale(tokenId);
         }
         if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer) {
-            revert NotAuthorizedBuyer(msg.sender, tokenId);
+            revert UnauthorizedBuyer(msg.sender, tokenId);
         }
         token.forSale = false;
         tokens[tokenId] = token;
