@@ -24,9 +24,10 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "buyToken(uint256)": FunctionFragment;
-    "changeTokenBuyingConditions(uint256,address,uint256,address,bool)": FunctionFragment;
-    "changeTokenRoyaltyReceiver(uint256,address)": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
+    "buy(uint256)": FunctionFragment;
+    "changeBuyingConditions(uint256,address,uint256,address,bool)": FunctionFragment;
+    "changeRoyaltyReceiver(uint256,address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "initialize(string,string,bool,address,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
@@ -47,6 +48,8 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
     "toggleCurrencyAllowance(address)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "tokens(uint256)": FunctionFragment;
+    "totalMinted()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
@@ -56,16 +59,14 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "buy", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "buyToken",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "changeTokenBuyingConditions",
+    functionFragment: "changeBuyingConditions",
     values: [BigNumberish, string, BigNumberish, string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "changeTokenRoyaltyReceiver",
+    functionFragment: "changeRoyaltyReceiver",
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
@@ -148,6 +149,14 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "totalMinted",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
@@ -158,13 +167,14 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "buyToken", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "changeTokenBuyingConditions",
+    functionFragment: "changeBuyingConditions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "changeTokenRoyaltyReceiver",
+    functionFragment: "changeRoyaltyReceiver",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -220,6 +230,14 @@ interface NonFungibleTimeCollectionInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokens", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalMinted",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -368,12 +386,17 @@ export class NonFungibleTimeCollection extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    buyToken(
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    buy(
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    changeTokenBuyingConditions(
+    changeBuyingConditions(
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
@@ -382,7 +405,7 @@ export class NonFungibleTimeCollection extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    changeTokenRoyaltyReceiver(
+    changeRoyaltyReceiver(
       tokenId: BigNumberish,
       royaltyReceiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -506,6 +529,7 @@ export class NonFungibleTimeCollection extends BaseContract {
         string,
         string,
         string,
+        string,
         boolean,
         boolean,
         string,
@@ -517,6 +541,7 @@ export class NonFungibleTimeCollection extends BaseContract {
         duration: BigNumber;
         price: BigNumber;
         royaltyBasisPoints: BigNumber;
+        minter: string;
         royaltyReceiver: string;
         currency: string;
         allowedBuyer: string;
@@ -527,6 +552,10 @@ export class NonFungibleTimeCollection extends BaseContract {
         category: string;
       }
     >;
+
+    totalMinted(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transferFrom(
       from: string,
@@ -549,12 +578,17 @@ export class NonFungibleTimeCollection extends BaseContract {
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  buyToken(
+  burn(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  buy(
     tokenId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  changeTokenBuyingConditions(
+  changeBuyingConditions(
     tokenId: BigNumberish,
     currency: string,
     price: BigNumberish,
@@ -563,7 +597,7 @@ export class NonFungibleTimeCollection extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  changeTokenRoyaltyReceiver(
+  changeRoyaltyReceiver(
     tokenId: BigNumberish,
     royaltyReceiver: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -678,6 +712,7 @@ export class NonFungibleTimeCollection extends BaseContract {
       string,
       string,
       string,
+      string,
       boolean,
       boolean,
       string,
@@ -689,6 +724,7 @@ export class NonFungibleTimeCollection extends BaseContract {
       duration: BigNumber;
       price: BigNumber;
       royaltyBasisPoints: BigNumber;
+      minter: string;
       royaltyReceiver: string;
       currency: string;
       allowedBuyer: string;
@@ -699,6 +735,10 @@ export class NonFungibleTimeCollection extends BaseContract {
       category: string;
     }
   >;
+
+  totalMinted(overrides?: CallOverrides): Promise<BigNumber>;
+
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
   transferFrom(
     from: string,
@@ -721,9 +761,11 @@ export class NonFungibleTimeCollection extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    buyToken(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    changeTokenBuyingConditions(
+    buy(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    changeBuyingConditions(
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
@@ -732,7 +774,7 @@ export class NonFungibleTimeCollection extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    changeTokenRoyaltyReceiver(
+    changeRoyaltyReceiver(
       tokenId: BigNumberish,
       royaltyReceiver: string,
       overrides?: CallOverrides
@@ -845,6 +887,7 @@ export class NonFungibleTimeCollection extends BaseContract {
         string,
         string,
         string,
+        string,
         boolean,
         boolean,
         string,
@@ -856,6 +899,7 @@ export class NonFungibleTimeCollection extends BaseContract {
         duration: BigNumber;
         price: BigNumber;
         royaltyBasisPoints: BigNumber;
+        minter: string;
         royaltyReceiver: string;
         currency: string;
         allowedBuyer: string;
@@ -866,6 +910,10 @@ export class NonFungibleTimeCollection extends BaseContract {
         category: string;
       }
     >;
+
+    totalMinted(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferFrom(
       from: string,
@@ -1053,12 +1101,17 @@ export class NonFungibleTimeCollection extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    buyToken(
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    buy(
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    changeTokenBuyingConditions(
+    changeBuyingConditions(
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
@@ -1067,7 +1120,7 @@ export class NonFungibleTimeCollection extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    changeTokenRoyaltyReceiver(
+    changeRoyaltyReceiver(
       tokenId: BigNumberish,
       royaltyReceiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1180,6 +1233,10 @@ export class NonFungibleTimeCollection extends BaseContract {
 
     tokens(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
+    totalMinted(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
     transferFrom(
       from: string,
       to: string,
@@ -1205,12 +1262,17 @@ export class NonFungibleTimeCollection extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    buyToken(
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    buy(
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    changeTokenBuyingConditions(
+    changeBuyingConditions(
       tokenId: BigNumberish,
       currency: string,
       price: BigNumberish,
@@ -1219,7 +1281,7 @@ export class NonFungibleTimeCollection extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    changeTokenRoyaltyReceiver(
+    changeRoyaltyReceiver(
       tokenId: BigNumberish,
       royaltyReceiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1334,6 +1396,10 @@ export class NonFungibleTimeCollection extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    totalMinted(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferFrom(
       from: string,

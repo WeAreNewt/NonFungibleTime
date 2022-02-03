@@ -29,7 +29,7 @@ export type BuyTokenParamsType = {
     price: BigNumber;
 };
 
-export type ChangeTokenBuyingConditionsParamsType = {
+export type ChangeBuyingConditionsParamsType = {
     userAddress: string;
     tokenId: number;
     currency: string;
@@ -38,7 +38,7 @@ export type ChangeTokenBuyingConditionsParamsType = {
     forSale: boolean;
 };
 
-export type ChangeTokenRoyaltyReceiverParamsType = {
+export type ChangeRoyaltyReceiverParamsType = {
     userAddress: string;
     tokenId: string;
     royaltyReceiver: string;
@@ -59,6 +59,7 @@ export interface TokenInfo {
     duration: BigNumber;
     price: BigNumber;
     royaltyBasisPoints: BigNumber;
+    minter: string;
     royaltyReceiver: string;
     currency: string;
     allowedBuyer: string;
@@ -75,19 +76,20 @@ export interface TokenInfo {
     5: string;
     6: string;
     7: string;
-    8: boolean;
+    8: string;
     9: boolean;
-    10: string;
+    10: boolean;
     11: string;
     12: string;
+    13: string;
 
 }
 
 export interface NftCollectionInterface {
     mint: (args: MintParamsType) => EthereumTransactionTypeExtended[];
     buyToken: (args: BuyTokenParamsType) => Promise<EthereumTransactionTypeExtended[]>;
-    changeTokenBuyingConditions: (args: ChangeTokenBuyingConditionsParamsType) => EthereumTransactionTypeExtended[];
-    changeTokenRoyaltyReceiver: (args: ChangeTokenRoyaltyReceiverParamsType) => EthereumTransactionTypeExtended[];
+    changeBuyingConditions: (args: ChangeBuyingConditionsParamsType) => EthereumTransactionTypeExtended[];
+    changeRoyaltyReceiver: (args: ChangeRoyaltyReceiverParamsType) => EthereumTransactionTypeExtended[];
     redeem: (args: RedeemParamsType) => EthereumTransactionTypeExtended[];
     tokens: (args: TokensParamsType) => Promise<TokenInfo>;
 }
@@ -141,7 +143,7 @@ export class NftCollectionService
         if (currency === API_ETH_MOCK_ADDRESS) {
             const txCallback: () => Promise<transactionType> = this.generateTxCallback({
                 rawTxMethod: async () =>
-                    collectionContract.populateTransaction.buyToken(tokenId),
+                    collectionContract.populateTransaction.buy(tokenId),
                 from: userAddress,
                 value: price.toString(),
             });
@@ -179,7 +181,7 @@ export class NftCollectionService
 
             const txCallback: () => Promise<transactionType> = this.generateTxCallback({
                 rawTxMethod: async () =>
-                    collectionContract.populateTransaction.buyToken(tokenId),
+                    collectionContract.populateTransaction.buy(tokenId),
                 from: userAddress,
                 value: DEFAULT_NULL_VALUE_ON_TX,
             });
@@ -194,16 +196,16 @@ export class NftCollectionService
         }
     }
 
-    public changeTokenBuyingConditions(
+    public changeBuyingConditions(
         @isEthAddress('userAddress')
         @isEthAddress('currency')
-        { userAddress, tokenId, currency, price, allowedBuyer, forSale }: ChangeTokenBuyingConditionsParamsType,
+        { userAddress, tokenId, currency, price, allowedBuyer, forSale }: ChangeBuyingConditionsParamsType,
     ): EthereumTransactionTypeExtended[] {
 
         const collectionContract = this.getContractInstance(this.collectionAddress);
         const txCallback: () => Promise<transactionType> = this.generateTxCallback({
             rawTxMethod: async () =>
-                collectionContract.populateTransaction.changeTokenBuyingConditions(tokenId, currency, price, allowedBuyer, forSale),
+                collectionContract.populateTransaction.changeBuyingConditions(tokenId, currency, price, allowedBuyer, forSale),
             from: userAddress,
             value: DEFAULT_NULL_VALUE_ON_TX,
         });
@@ -217,16 +219,16 @@ export class NftCollectionService
         ];
     }
 
-    public changeTokenRoyaltyReceiver(
+    public changeRoyaltyReceiver(
         @isEthAddress('userAddress')
         @isEthAddress('royaltyReceiver')
-        { userAddress, tokenId, royaltyReceiver }: ChangeTokenRoyaltyReceiverParamsType,
+        { userAddress, tokenId, royaltyReceiver }: ChangeRoyaltyReceiverParamsType,
     ): EthereumTransactionTypeExtended[] {
 
         const collectionContract = this.getContractInstance(this.collectionAddress);
         const txCallback: () => Promise<transactionType> = this.generateTxCallback({
             rawTxMethod: async () =>
-                collectionContract.populateTransaction.changeTokenRoyaltyReceiver(tokenId, royaltyReceiver),
+                collectionContract.populateTransaction.changeRoyaltyReceiver(tokenId, royaltyReceiver),
             from: userAddress,
             value: DEFAULT_NULL_VALUE_ON_TX,
         });
