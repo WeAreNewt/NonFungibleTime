@@ -489,7 +489,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 ### tokens
 
 ```solidity
-function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address payable royaltyReceiver, address currency, address allowedBuyer, bool redeemed, bool forSale, string name, string description, string category)
+function tokens(uint256) external view returns (uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 price, uint256 royaltyBasisPoints, address minter, address payable royaltyReceiver, address currency, address allowedBuyer, bool redeemed, bool forSale, string name, string description, string category)
 ```
 
 
@@ -511,6 +511,7 @@ function tokens(uint256) external view returns (uint256 availabilityFrom, uint25
 | duration | uint256 | undefined
 | price | uint256 | undefined
 | royaltyBasisPoints | uint256 | undefined
+| minter | address | undefined
 | royaltyReceiver | address payable | undefined
 | currency | address | undefined
 | allowedBuyer | address | undefined
