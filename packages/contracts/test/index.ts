@@ -469,7 +469,7 @@ describe('Tokenized time collection', () => {
       true
     );
     await expect(nftCollection.buyToken(ethers.constants.Zero)).to.be.revertedWith(
-      `CantBuyYourOwnToken("${minter.address}", 0)`
+      `CanNotBuyYourOwnToken("${minter.address}", 0)`
     );
   });
 
