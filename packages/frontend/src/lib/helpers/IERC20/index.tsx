@@ -10,7 +10,7 @@ import {
     isPositiveOrMinusOneAmount,
     valueToWei,
     SUPER_BIG_ALLOWANCE_NUMBER,
-    API_ETH_MOCK_ADDRESS
+    ZERO_ADDRESS
 } from '../base-service';
 
 import { IERC20Detailed } from './typechain/IERC20Detailed';
@@ -79,7 +79,7 @@ export class ERC20Service
         @isPositiveOrMinusOneAmount('amount')
         { user, token, spender, amount }: ApproveType,
     ): Promise<boolean> {
-        if (token.toLowerCase() === API_ETH_MOCK_ADDRESS.toLowerCase()) return true;
+        if (token.toLowerCase() === ZERO_ADDRESS.toLowerCase()) return true;
         const decimals = await this.decimalsOf({ token });
         const erc20Contract: IERC20Detailed = this.getContractInstance(token);
         const allowance: BigNumber = await erc20Contract.allowance(user, spender);
@@ -95,7 +95,7 @@ export class ERC20Service
         @isEthAddress('token')
         { token }: DecimalsOfType,
     ): Promise<number> {
-        if (token.toLowerCase() === API_ETH_MOCK_ADDRESS.toLowerCase()) return 18;
+        if (token.toLowerCase() === ZERO_ADDRESS.toLowerCase()) return 18;
         if (!this.tokenDecimals[token]) {
             const erc20Contract = this.getContractInstance(token);
             this.tokenDecimals[token] = await erc20Contract.decimals();
