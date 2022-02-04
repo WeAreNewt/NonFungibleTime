@@ -40,8 +40,8 @@ export const gasLimitRecommendations: GasRecommendationType = {
     },
 };
 
-export const API_ETH_MOCK_ADDRESS =
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const ZERO_ADDRESS =
+    '0x0000000000000000000000000000000000000000';
 
 const DEFAULT_SURPLUS = 30; // 30%
 // polygon gas estimation is very off for some reason

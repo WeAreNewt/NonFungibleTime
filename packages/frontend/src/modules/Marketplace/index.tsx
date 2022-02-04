@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client';
 import React from 'react';
 import NFTCard from '../../components/NFTCard';
 import { SalesDocument } from '../../lib/graphql/index';
+import { ZERO_ADDRESS } from '../../lib/helpers/base-service';
 import { Category, NFTProps } from '../../types';
 
 const sampleNFTs: NFTProps[] = [
@@ -12,8 +13,12 @@ const sampleNFTs: NFTProps[] = [
     title: 'Test 1',
     description: "Here's a test NFT on my account",
     cost: 1,
-    currencySymbol: 'ETH',
-    currencyAddress: '0x0',
+    currency: {
+      id: ZERO_ADDRESS,
+      symbol: 'ETH',
+      decimals: 18,
+      acceptable: true,
+    },
     tokenId: 0,
     owner: '0x0',
     tokenURI: '',
@@ -22,6 +27,8 @@ const sampleNFTs: NFTProps[] = [
     availabilityTo: 'May 12, 2022 9:00 EST',
     availablilityFrom: 'May 15, 2022 9:00 EST',
     royaltyPercentage: 5,
+    redeemed: false,
+    forSale: true,
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -30,8 +37,12 @@ const sampleNFTs: NFTProps[] = [
     title: 'Test 2',
     description: "Here's another test NFT on my account",
     cost: 5,
-    currencySymbol: 'DAI',
-    currencyAddress: '0x0',
+    currency: {
+      id: ZERO_ADDRESS,
+      symbol: 'ETH',
+      decimals: 18,
+      acceptable: true,
+    },
     tokenId: 1,
     owner: '0x1',
     tokenURI: '',
@@ -40,6 +51,8 @@ const sampleNFTs: NFTProps[] = [
     availabilityTo: 'May 12, 2022 9:00 EST',
     availablilityFrom: 'May 15, 2022 9:00 EST',
     royaltyPercentage: 5,
+    redeemed: false,
+    forSale: true,
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -48,8 +61,12 @@ const sampleNFTs: NFTProps[] = [
     title: 'Test 3',
     description: "Here's a test NFT on my account",
     cost: 1,
-    currencySymbol: 'ETH',
-    currencyAddress: '0x0',
+    currency: {
+      id: ZERO_ADDRESS,
+      symbol: 'ETH',
+      decimals: 18,
+      acceptable: true,
+    },
     tokenId: 2,
     owner: '0x2',
     tokenURI: '',
@@ -58,6 +75,8 @@ const sampleNFTs: NFTProps[] = [
     availabilityTo: 'May 12, 2022 9:00 EST',
     availablilityFrom: 'May 15, 2022 9:00 EST',
     royaltyPercentage: 5,
+    redeemed: false,
+    forSale: true,
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -66,8 +85,12 @@ const sampleNFTs: NFTProps[] = [
     title: 'Test 4',
     description: "Here's another test NFT on my account",
     cost: 5,
-    currencySymbol: 'DAI',
-    currencyAddress: '0x0',
+    currency: {
+      id: ZERO_ADDRESS,
+      symbol: 'ETH',
+      decimals: 18,
+      acceptable: true,
+    },
     tokenId: 3,
     owner: '0x3',
     tokenURI: '',
@@ -76,6 +99,8 @@ const sampleNFTs: NFTProps[] = [
     availabilityTo: 'May 12, 2022 9:00 EST',
     availablilityFrom: 'May 15, 2022 9:00 EST',
     royaltyPercentage: 5,
+    redeemed: false,
+    forSale: true,
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -84,8 +109,12 @@ const sampleNFTs: NFTProps[] = [
     title: 'Test 5',
     description: "Here's a test NFT on my account",
     cost: 1,
-    currencySymbol: 'ETH',
-    currencyAddress: '0x0',
+    currency: {
+      id: ZERO_ADDRESS,
+      symbol: 'ETH',
+      decimals: 18,
+      acceptable: true,
+    },
     tokenId: 4,
     owner: '0x4',
     tokenURI: '',
@@ -94,6 +123,8 @@ const sampleNFTs: NFTProps[] = [
     availabilityTo: 'May 12, 2022 9:00 EST',
     availablilityFrom: 'May 15, 2022 9:00 EST',
     royaltyPercentage: 5,
+    redeemed: false,
+    forSale: true,
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -102,8 +133,12 @@ const sampleNFTs: NFTProps[] = [
     title: 'Test 6',
     description: "Here's another test NFT on my account",
     cost: 5,
-    currencySymbol: 'DAI',
-    currencyAddress: '0x0',
+    currency: {
+      id: ZERO_ADDRESS,
+      symbol: 'ETH',
+      decimals: 18,
+      acceptable: true,
+    },
     tokenId: 5,
     owner: '0x5',
     tokenURI: '',
@@ -112,6 +147,8 @@ const sampleNFTs: NFTProps[] = [
     availabilityTo: 'May 12, 2022 9:00 EST',
     availablilityFrom: 'May 15, 2022 9:00 EST',
     royaltyPercentage: 5,
+    redeemed: false,
+    forSale: true,
   },
 ];
 
