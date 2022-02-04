@@ -1,7 +1,7 @@
 import { NonFungibleTimeCollection } from './typechain/NonFungibleTimeCollection';
 import { NonFungibleTimeCollection__factory } from './typechain/NonFungibleTimeCollection__factory';
 import { BigNumber, providers } from 'ethers';
-import BaseService, { API_ETH_MOCK_ADDRESS, SUPER_BIG_ALLOWANCE_NUMBER } from '../base-service';
+import BaseService, { ZERO_ADDRESS, SUPER_BIG_ALLOWANCE_NUMBER } from '../base-service';
 import {
     eEthereumTxType,
     EthereumTransactionTypeExtended,
@@ -33,7 +33,7 @@ export type ChangeBuyingConditionsParamsType = {
     userAddress: string;
     tokenId: number;
     currency: string;
-    price: number;
+    price: BigNumber;
     allowedBuyer: string;
     forSale: boolean;
 };
@@ -140,7 +140,7 @@ export class NftCollectionService
         const currency = token[7];
         const price = token[3];
         // No approval required and amount passed through value for purchases with base tokens (ETH, MATIC, etc.)
-        if (currency === API_ETH_MOCK_ADDRESS) {
+        if (currency === ZERO_ADDRESS) {
             const txCallback: () => Promise<transactionType> = this.generateTxCallback({
                 rawTxMethod: async () =>
                     collectionContract.populateTransaction.buy(tokenId),

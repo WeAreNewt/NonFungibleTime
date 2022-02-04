@@ -30,6 +30,9 @@ query Sales(
     id
     timestamp
     price
+    royaltyReceiver {
+      id
+    }
     currency {
       id
       decimals
