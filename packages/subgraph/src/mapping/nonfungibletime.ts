@@ -17,7 +17,7 @@ import {
   Transfer as TransferEvent,
   User,
 } from '../../generated/schema';
-import { ethereum, log, BigInt } from '@graphprotocol/graph-ts';
+import { ethereum, log, BigInt, dataSource } from '@graphprotocol/graph-ts';
 import { ERC721 } from '../../generated/TimeCollection/ERC721';
 import { ERC20 } from '../../generated/TimeCollection/ERC20';
 
@@ -92,6 +92,7 @@ export function handleTokenBuyingConditionsChanged(event: TokenBuyingConditionsC
     nft.currency = event.params.currency.toHexString();
     nft.forSale = event.params.forSale;
     nft.allowedBuyer = event.params.allowedBuyer.toHexString();
+    nft.save();
   } else {
     log.warning(`Buying condition update for non-existant tokenId {}`, [
       event.params.tokenId.toString(),
@@ -150,14 +151,19 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
     const decimals = contract.try_decimals();
     if (!decimals.reverted) {
       token.decimals = decimals.value;
+    } else {
+      log.warning(`Failed to fetch decimals for payment currency {}`, [
+        event.params.currency.toHexString(),
+      ]);
     }
     const symbol = contract.try_symbol();
     if (!symbol.reverted) {
       token.symbol = symbol.value;
+    } else {
+      log.warning(`Failed to fetch symbol for payment currency {}`, [
+        event.params.currency.toHexString(),
+      ]);
     }
-    log.warning(`Failed to fetch decimals for payment currency {}`, [
-      event.params.currency.toHexString(),
-    ]);
     token.save();
   }
 }
@@ -198,6 +204,22 @@ export function handleTransfer(event: Transfer): void {
       nft.royaltyBasisPoints = values.value4;
       nft.creator = values.value5.toHexString();
       nft.royaltyReceiver = values.value6.toHexString();
+
+      // Network base token is supported by default but must be manually added since it's non-ERC20
+      const currency = PaymentToken.load(values.value7.toHexString());
+      if (!currency) {
+        const network = dataSource.network();
+        // === does not work for string comparison
+        // eslint-disable-next-line eqeqeq
+        if (network == 'mumbai' || network == 'polygon') {
+          const baseToken = new PaymentToken(values.value7.toHexString());
+          baseToken.symbol = 'MATIC';
+          baseToken.decimals = 18;
+          baseToken.acceptable = true;
+          baseToken.save();
+        }
+      }
+
       nft.currency = values.value7.toHexString();
       nft.allowedBuyer = values.value8.toHexString();
       nft.redeemed = values.value9;
