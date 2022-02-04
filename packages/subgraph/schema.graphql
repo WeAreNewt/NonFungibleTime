@@ -22,6 +22,8 @@ type Nft @entity {
   royaltyBasisPoints: BigInt!
   price: BigInt!
   currency: PaymentToken!
+  mintTimestamp: Int!
+  lastPurchaseTimestamp: Int!
 }
 
 type User @entity {
@@ -107,4 +109,5 @@ type PaymentToken @entity {
   id: ID!
   decimals: Int!
   acceptable: Boolean!
+  symbol: String!
 }
