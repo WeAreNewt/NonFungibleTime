@@ -3,23 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { NFTProps } from '../../types';
 
 
-export default function NFTCard({ address, name, avatar, date, category, title, description, cost, currencyAddress, currencySymbol, tokenId, owner }: NFTProps) {
+export default function NFTCard({ address, name, avatar, category, title, description, cost, currencyAddress, currencySymbol, tokenId, owner, tokenURI, creator, availabilityTo, availablilityFrom, duration, royaltyPercentage }: NFTProps) {
     const navigate = useNavigate()
     return (
         <div className="border p-3 cursor-pointer" onClick={() => navigate('/details/' + tokenId, {
             state: {
-                address,
-                name,
-                avatar,
-                date,
-                category,
-                title,
-                description,
-                cost,
-                currencyAddress,
-                currencySymbol,
-                tokenId,
-                owner
+                nft: {
+                    address,
+                    name,
+                    avatar,
+                    category,
+                    title,
+                    description,
+                    cost,
+                    currencyAddress,
+                    currencySymbol,
+                    tokenId,
+                    owner,
+                    tokenURI,
+                    creator,
+                    availabilityTo,
+                    availablilityFrom,
+                    duration,
+                    royaltyPercentage,
+                }
             }
         })}>
             {/** Seller name/address + avatar */}

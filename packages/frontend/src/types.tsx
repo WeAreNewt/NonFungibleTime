@@ -12,12 +12,17 @@ export interface NFTProps {
     name?: string;
     avatar?: string;
     category: Category;
-    date: string;
     title: string;
     description: string;
     cost: number;
     currencySymbol: string;
     currencyAddress: string;
     tokenId: number;
+    tokenURI: string;
     owner: string;
+    creator: string;
+    duration: number;
+    availabilityTo: string;
+    availablilityFrom: string;
+    royaltyPercentage: number;
 }
