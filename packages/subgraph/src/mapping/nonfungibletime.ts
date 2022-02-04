@@ -43,7 +43,9 @@ export function handleTokenBought(event: TokenBought): void {
   const contract = TimeCollection.bind(event.address);
   const token = contract.try_tokens(event.params.tokenId);
   const nftParams = token.value;
-  if (!token.reverted) {
+  const nft = Nft.load(event.params.tokenId.toString());
+  const BASIS_POINTS = 10000;
+  if (!token.reverted && nft) {
     const purchase = new Sale(event.transaction.hash.toHexString() + '-sale');
     purchase.txHash = event.transaction.hash.toHexString();
     purchase.nft = event.params.tokenId.toString();
@@ -60,9 +62,15 @@ export function handleTokenBought(event: TokenBought): void {
     purchase.from = from;
     purchase.price = nftParams.value3;
     purchase.currency = nftParams.value7.toHexString();
-    purchase.royaltyAccrued = nftParams.value4.times(nftParams.value3);
+    purchase.royaltyAccrued = nftParams.value4
+      .times(nftParams.value3)
+      .div(BigInt.fromI32(BASIS_POINTS));
     purchase.royaltyReceiver = nftParams.value6.toHexString();
     purchase.save();
+    nft.forSale = false;
+    nft.owner = to;
+    nft.lastPurchaseTimestamp = event.block.timestamp.toI32();
+    nft.save();
   } else {
     log.warning(`Token purchase event for non-existant tokenId {}`, [
       event.params.tokenId.toString(),
@@ -115,6 +123,8 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
     if (nft) {
       const uri = getTokenURI(event, event.params.tokenId);
       nft.tokenURI = uri;
+      nft.redeemed = true;
+      nft.forSale = false;
       nft.save();
     } else {
       log.warning('Token redeem for nft unregistered to subgraph {}', [
@@ -140,6 +150,10 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
     const decimals = contract.try_decimals();
     if (!decimals.reverted) {
       token.decimals = decimals.value;
+    }
+    const symbol = contract.try_symbol();
+    if (!symbol.reverted) {
+      token.symbol = symbol.value;
     }
     log.warning(`Failed to fetch decimals for payment currency {}`, [
       event.params.currency.toHexString(),
@@ -196,6 +210,7 @@ export function handleTransfer(event: Transfer): void {
       nft.tokenURI = uri;
       nft.contractAddress = event.address.toHexString();
       nft.owner = to;
+      nft.mintTimestamp = event.block.timestamp.toI32();
       nft.save();
     } else {
       log.warning(`Token transfer event for non-existant tokenId {}`, [
