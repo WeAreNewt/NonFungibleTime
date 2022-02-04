@@ -4,10 +4,10 @@ pragma solidity ^0.8.4;
 import './interfaces/ISvgGenerator.sol';
 import 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 
 /// @title Non-Fungible Time collection
@@ -15,7 +15,7 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 /// @notice A primitive to mint time, our most valuable asset, on-chain
 /// @dev An ERC-721 contract with mint, buy, and transfer functions
 contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
     event TokenBuyingConditionsChanged(
@@ -392,7 +392,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
                 revert TransferFailed();
             }
         } else {
-            IERC20(currency).safeTransferFrom(sender, receiver, amount);
+            IERC20Upgradeable(currency).safeTransferFrom(sender, receiver, amount);
         }
     }
 
