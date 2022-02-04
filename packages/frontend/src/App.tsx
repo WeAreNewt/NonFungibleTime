@@ -14,14 +14,14 @@ import { ThemeProvider } from './ThemeContext';
 import { createApolloClient } from './apollo/client';
 import { ApolloProvider } from '@apollo/client';
 import { ErrorBoundary } from './ErrorBoundary';
-import { config } from './config';
+import { ChainId, networkConfigs } from './lib/config';
 
 function getWeb3Library(provider: any): ethers.providers.Web3Provider {
   return new ethers.providers.Web3Provider(provider);
 }
 
 const apolloClient = createApolloClient({
-  uri: config.THEGRAPH_URI,
+  uri: networkConfigs[ChainId.mumbai].subgraphApi,
 });
 
 function App() {
