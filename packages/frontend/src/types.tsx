@@ -1,12 +1,12 @@
 import { PaymentToken } from "./lib/graphql";
 
 export enum Category {
-    business = "Business",
-    development = "Development",
-    community = "Community",
-    advertising = "Advertising",
-    design = "Design",
-    other = "Other",
+    business = 'Business',
+    development = 'Development',
+    community = 'Community',
+    advertising = 'Advertising',
+    design = 'Design',
+    other = 'Other',
 }
 
 export interface NFTProps {
