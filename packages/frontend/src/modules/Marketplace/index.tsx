@@ -35,7 +35,8 @@ const sampleNFTs: NFTProps[] = [
     name: 'soliditychad.eth',
     category: Category.business,
     title: 'Test 2',
-    description: "Here's another test NFT on my account",
+    description:
+      "Here's another test NFT on my account. Quis in Lorem id enim minim commodo. Enim veniam ad nostrud labore duis. Quis laboris mollit culpa id ad. Aliqua magna veniam ut laboris fugiat non anim ea quis aliquip ad occaecat ea. In amet Lorem laborum sunt.Reprehenderit ut enim exercitation nisi ad eu amet sunt ipsum ex do duis ea proident. Cillum sit ut ullamco laborum minim proident ipsum fugiat elit sunt. Eiusmod enim do commodo proident ullamco. Quis amet consectetur qui est irure sunt proident sint irure et amet. ",
     cost: 5,
     currency: {
       id: ZERO_ADDRESS,
@@ -160,16 +161,18 @@ export default function Marketplace() {
   });
   // TODO: Populate nft cards with sales
   console.log('data', data);
-  console.log('loading', loading)
-  console.log('error', error)
+  console.log('loading', loading);
+  console.log('error', error);
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <div className="basis-1/5">
+    <div className="flex h-full flex-col max-w-6xl m-auto">
+      <div className="">
         <div className="p-10 flex flex-row justify-between">
           {/** Marketplace Header */}
-          <div className="w-1/4 p-5 justify-items-start">
-            <div className="items-center">Explore Marketplace</div>
+          <div className="w-1/2 justify-items-start">
+            <div className="items-center text-gray-900 text-4xl font-extrabold">
+              Explore marketplace
+            </div>
           </div>
 
           {/** Filter, TODO: Selector instead of button*/}
@@ -183,13 +186,9 @@ export default function Marketplace() {
         </div>
       </div>
       {/** NFT Display */}
-      <div className="basis-4/5 grid grid-cols-3">
+      <div className="grid grid-cols-3 gap-4 p-10">
         {sampleNFTs.map((nft) => {
-          return (
-            <div className="p-10">
-              <NFTCard {...nft} />
-            </div>
-          );
+          return <NFTCard {...nft} />;
         })}
       </div>
     </div>
