@@ -4,36 +4,38 @@ import ConnectButton from '../ConnectButton';
 import { FaClock } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import Toggle from '../../ThemeToggle';
+import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 
 interface Navigation {
   link: string;
   title: string;
 }
 
-// Navbar Links
-const navigation: Navigation[] = [
-  {
-    link: '/profile',
-    title: 'Profile',
-  },
-  {
-    link: '/marketplace',
-    title: 'Marketplace',
-  },
-  {
-    link: 'https://discord.gg/newt',
-    title: 'Discord',
-  },
-  {
-    link: 'https://github.com/wearenewt/NonFungibleTime',
-    title: 'Code',
-  },
-];
-
 export default function Navbar() {
+  const { currentAccount } = useAppDataProvider();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const activePage = location.pathname.split('/')[1];
+
+  // Navbar Links
+  const navigation: Navigation[] = [
+    {
+      link: '/profile/' + currentAccount,
+      title: 'Profile',
+    },
+    {
+      link: '/marketplace',
+      title: 'Marketplace',
+    },
+    {
+      link: 'https://discord.gg/newt',
+      title: 'Discord',
+    },
+    {
+      link: 'https://github.com/wearenewt/NonFungibleTime',
+      title: 'Code',
+    },
+  ];
 
   return (
     <nav>
