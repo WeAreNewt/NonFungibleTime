@@ -4,19 +4,36 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDataProvider } from '../../lib/providers/app-data-provider'
 import { Dialog } from '@headlessui/react'
 import { NFTProps } from '../../types'
+import { PaymentToken } from '../../lib/graphql'
+import { ZERO_ADDRESS, isEthAddress } from '../../lib/helpers/base-service'
+import { BuyTokenParamsType, ChangeBuyingConditionsParamsType, RedeemParamsType } from '../../lib/helpers/NftCollection'
+import { BigNumber } from 'ethers'
+import { useWeb3React } from '@web3-react/core'
+import { formatUnits, parseUnits } from 'ethers/lib/utils'
 
 
 interface NftState {
     nft?: NFTProps
 }
 
+interface BuyingConditions {
+    forSale: boolean;
+    price: number;
+    currency: PaymentToken;
+    whitelistedBuyer: string;
+}
+
 export default function NFTDetails() {
-    const { currentAccount } = useAppDataProvider();
-    const [owner, setOwner] = useState<Boolean>(true);
+    const { currentAccount, nftCollectionService } = useAppDataProvider();
+    const [owner, setOwner] = useState<Boolean>(false);
     const location = useLocation();
+    const { library: provider } = useWeb3React()
     const state = location.state as NftState;
     const [nft, setNft] = useState<NFTProps>();
     const [uri, setURI] = useState<string>();
+    const [formError, setFormError] = useState<string | undefined>(undefined)
+    const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({} as BuyingConditions);
+    const [ownerSelectedMode, setOwnerSelectedMode] = useState<string>("update");
     const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false)
     const navigate = useNavigate();
     const path = location.pathname.split('/');
@@ -28,11 +45,75 @@ export default function NFTDetails() {
         setURI(data.image);
     }
 
-    const buy = () => {
-        // Trigger purchase (+ approval if required)
+
+
+    // Trigger buy transaction (+ approval if required)
+    const buy = async () => {
+        if (nft && currentAccount) {
+            const input: BuyTokenParamsType = { userAddress: currentAccount, tokenId: nft.tokenId, currency: nft.currency.id, price: BigNumber.from(nft.cost) }
+            setFormError(undefined);
+            const txs = await nftCollectionService.buyToken(input)
+            const tx = txs[0]
+            const extendedTxData = await tx.tx();
+            const { from, ...txData } = extendedTxData;
+            const signer = provider.getSigner(from);
+            const txResponse = await signer.sendTransaction({
+                ...txData,
+                value: txData.value ? BigNumber.from(txData.value) : undefined,
+            });
+            console.log(txResponse)
+        } else {
+            setFormError('No wallet connected')
+        }
     }
 
+    // Trigger redeem transaction
+    const redeem = async () => {
+        if (nft && currentAccount) {
+            const input: RedeemParamsType = { userAddress: currentAccount, tokenId: nft.tokenId }
+            setFormError(undefined);
+            const txs = await nftCollectionService.redeem(input)
+            const tx = txs[0]
+            const extendedTxData = await tx.tx();
+            const { from, ...txData } = extendedTxData;
+            const signer = provider.getSigner(from);
+            const txResponse = await signer.sendTransaction({
+                ...txData,
+                value: txData.value ? BigNumber.from(txData.value) : undefined,
+            });
+            console.log(txResponse)
+        } else {
+            setFormError('No wallet connected')
+        }
+    }
 
+    // Trigger changeBuyingConditions transaction
+    const changeBuyingConditions = async () => {
+        if (nft && currentAccount && buyingConditions) {
+            if (isEthAddress(buyingConditions.whitelistedBuyer)) {
+                const formattedPrice = parseUnits(buyingConditions.price.toString(), buyingConditions.currency.decimals);
+                const input: ChangeBuyingConditionsParamsType = { userAddress: currentAccount, tokenId: nft.tokenId, currency: buyingConditions.currency.id, price: formattedPrice, allowedBuyer: buyingConditions.whitelistedBuyer, forSale: buyingConditions.forSale }
+                console.log(input)
+                setFormError(undefined);
+                const txs = await nftCollectionService.changeBuyingConditions(input)
+                const tx = txs[0]
+                const extendedTxData = await tx.tx();
+                const { from, ...txData } = extendedTxData;
+                const signer = provider.getSigner(from);
+                const txResponse = await signer.sendTransaction({
+                    ...txData,
+                    value: txData.value ? BigNumber.from(txData.value) : undefined,
+                });
+                console.log(txResponse)
+            } else {
+                setFormError('Whitelisted buyer is not a valid ethereum address')
+            }
+        } else {
+            setFormError('No wallet connected')
+        }
+    }
+
+    // Get NFT data from state parameters or subgraph query
     useEffect(() => {
         if (state && state.nft) {
             setNft(state.nft);
@@ -43,20 +124,45 @@ export default function NFTDetails() {
         }
     }, [path, currentAccount, state])
 
-    // Render URI
+    // Render token svg
     useEffect(() => {
         if (nft) {
             fetchURI(nft);
+            // All of these fields will come from nft once fetching from subgraph
+            setBuyingConditions({
+                forSale: nft.forSale,
+                price: nft.cost,
+                currency: {
+                    acceptable: true,
+                    decimals: 18,
+                    id: ZERO_ADDRESS,
+                    symbol: nft.currency.symbol,
+                },
+                whitelistedBuyer: "0x0000000000000000000000000000000000000000",
+            })
         }
     }, [nft])
+
+    // Hard-coded for now, will come from app-data-provider
+    const availableCurrencies: Record<string, PaymentToken> = {
+        'MATIC': {
+            acceptable: true,
+            id: ZERO_ADDRESS,
+            symbol: 'MATIC',
+            decimals: 18
+        }
+    }
+
+    // Styling for owner buttons
+    const selected = "items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer"
+    const unselected = "items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer"
 
     if (!nft) {
         return <FaSpinner />
     } else {
-        console.log(nft)
         return (
-            <div className="h-full">
-                <FaChevronCircleLeft onClick={() => navigate(-1)} className="text-black dark:text-white cursor-pointer" />
+            <div className="h-full text-black dark:text-white">
+                <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" />
                 <div className="flex flex-row">
                     {/** Column 1: NFT Image + buy/sell/redeem options */}
                     <div className="basis-1/3">
@@ -64,21 +170,69 @@ export default function NFTDetails() {
                             <div className="w-full bg-white rounded-md border border-gray-300">
                                 <img alt="token uri" src={uri} className="p-3" />
                             </div>
-                            {/** Buy or Sell/Redeem */}
-                            {!owner ? <div className="text-black dark:text-white">
-                                Price
-                                <div className="text-black dark:text-white">{nft.cost.toString()} {nft.currencySymbol}</div>
-                                <div className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer" onClick={() => buy()}>
-                                    Buy Now
-                                </div>
-                            </div> : <div className="w-1/4 p-5 justify-items-start flex-1">
-                                <div className="flex flex-row justify-evenly w-full">
-                                    <div className="w-full bg-white rounded-md border border-gray-300">
-                                        <img alt="token uri" src={uri} className="p-3" />
-                                        <img alt="token uri" src={uri} className="p-3" />
+                            {/** If redeemed -> show redeemed message
+                             *   if not redeemed -> display panel based on nft ownership 
+                             *      if not owner -> display purchase panel or not for sale
+                             *      if owner -> display panel to toggle between redeem or change selling options
+                             * */}
+                            {
+                                nft.redeemed ? <div>This NFT has been redeemed</div> : !owner ?
+                                    (nft.forSale ? <div>
+                                        Price
+                                        <div >{formatUnits(nft.cost.toString(), 18)} {nft.currency.symbol}</div>
+                                        <div className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer" onClick={() => buy()}>
+                                            Buy Now
+                                        </div>
+                                    </div> : <div>This NFT is not for sale</div>) :
+                                    <div className="flex flex-col p-5">
+                                        <div className="flex flex-row">
+                                            <div className={ownerSelectedMode === 'update' ? selected : unselected} onClick={() => setOwnerSelectedMode("update")}>
+                                                Update Selling Options
+                                            </div>
+                                            <div className={ownerSelectedMode === 'redeem' ? selected : unselected} onClick={() => setOwnerSelectedMode("redeem")}>
+                                                Redeem
+                                            </div>
+                                        </div>
+                                        {
+                                            ownerSelectedMode === 'redeem' ?
+                                                <div className="flex flex-col">
+                                                    <div>This NFT has not yet been redeemed. Note: This is a one time action and cannot be reversed</div>
+                                                    <div className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer" onClick={() => redeem()}>
+                                                        Redeem
+                                                    </div>
+                                                </div> :
+                                                <div className="flex flex-col">
+                                                    {/** For sale toggle */}
+                                                    <label className="relative flex justify-between items-center p-2 text-xl">
+                                                        For Sale
+                                                        <input type="checkbox" className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md cursor-pointer" checked={buyingConditions.forSale} onChange={() => { setBuyingConditions({ ...buyingConditions, forSale: !buyingConditions.forSale }) }} />
+                                                        <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-indigo-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6 cursor-pointer"></span>
+                                                    </label>
+                                                    {/** Price and currency */}
+                                                    <div className='flex flex-row'>
+                                                        <label className="relative flex justify-between items-center p-2 text-xl">
+                                                            Price
+                                                            <input className="text-black" type="number" onChange={(e) => { setBuyingConditions({ ...buyingConditions, price: Number(e.target.value) }) }} />
+                                                        </label>
+                                                        <label className="relative flex justify-between items-center p-2 text-xl">
+                                                            Currency
+                                                            <select className="text-black" onChange={(e) => { setBuyingConditions({ ...buyingConditions, currency: availableCurrencies[e.target.value] }) }} >
+                                                                {Object.entries(availableCurrencies).map(currency => <option key={currency[0]}>{currency[0]}</option>)}
+                                                            </select>
+                                                        </label>
+                                                    </div>
+                                                    {/** Whitelist buyer */}
+                                                    <label className="relative flex justify-between items-center p-2 text-xl">
+                                                        Whitelist Buyer Address
+                                                        <input className="text-black" type="text" onChange={(e) => { setBuyingConditions({ ...buyingConditions, whitelistedBuyer: e.target.value }) }} placeholder='Reserve NFT for a single buyer' />
+                                                    </label>
+                                                    <div className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer" onClick={() => changeBuyingConditions()}>
+                                                        Update
+                                                    </div>
+                                                </div>
+                                        }
                                     </div>
-                                </div>
-                            </div>}
+                            }
                         </div>
                     </div>
 
@@ -88,8 +242,8 @@ export default function NFTDetails() {
                         <div className="flex flex-row justify-between p-5">
                             <div className="flex-start">
                                 <div className="flex flex-col">
-                                    <div className="text-black dark:text-white">{nft.title}</div>
-                                    <div className="text-black dark:text-white">{nft.category}</div>
+                                    <div >{nft.title}</div>
+                                    <div >{nft.category}</div>
                                 </div>
                             </div>
                             {/** Share Profile */}
@@ -144,44 +298,41 @@ export default function NFTDetails() {
                         <div className="flex flex-row p-5">
                             <div className="flex-start">
                                 <div className="flex flex-col">
-                                    <div className="text-black dark:text-white">Created By</div>
+                                    <div >Created By</div>
                                     <div className="flex flex-row">
-                                        <img src={nft.avatar} alt="creator avatar" />
-                                        <div>{nft.creator}</div>
+                                        <div >{nft.creator}</div>
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <div className="text-black dark:text-white">Owned By</div>
+                                    <div >Owned By</div>
                                     <div className="flex flex-row">
-                                        <img src={nft.avatar} alt="owner avatar" />
                                         <div>{nft.owner}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="flex flex-col p-5">
-
-                            <div className="text-black dark:text-white">Description</div>
-                            <div className="text-black dark:text-white">{nft.description}</div>
+                            <div >Description</div>
+                            <div >{nft.description}</div>
                         </div>
                         <div className="text-black dark:text-white p-5">Details</div>
                         <div className="flex flex-col p-5">
-                            <div className="text-black dark:text-white">Duration</div>
-                            <div className="text-black dark:text-white">{nft.duration.toString()} hours</div>
+                            <div >Duration</div>
+                            <div >{nft.duration.toString()} hours</div>
                         </div>
                         <div className="flex flex-row p-5">
                             <div className="flex flex-col">
-                                <div className="text-black dark:text-white">Availability From</div>
-                                <div className="text-black dark:text-white">{nft.availablilityFrom}</div>
+                                <div >Availability From</div>
+                                <div >{nft.availablilityFrom}</div>
                             </div>
                             <div className="flex flex-col p-5">
-                                <div className="text-black dark:text-white">Availability To</div>
-                                <div className="text-black dark:text-white">{nft.availabilityTo} hours</div>
+                                <div >Availability To</div>
+                                <div >{nft.availabilityTo}</div>
                             </div>
                         </div>
                         <div className="flex flex-col p-5">
-                            <div className="text-black dark:text-white">Royalties</div>
-                            <div className="text-black dark:text-white">{nft.royaltyPercentage.toString()} %</div>
+                            <div >Royalties</div>
+                            <div >{nft.royaltyPercentage.toString()} %</div>
                         </div>
                     </div >
                 </div>
