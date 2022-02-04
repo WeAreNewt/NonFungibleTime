@@ -36,7 +36,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "codegen:graphql": "graphql-codegen"
+    "codegen:graphql": "env-cmd -f .env graphql-codegen"
   },
   "husky": {
     "hooks": {
@@ -62,7 +62,7 @@
     ]
   },
   "lint-staged": {
-    "*.ts": [
+    "*.(ts|tsx)": [
       "eslint --fix",
       "prettier --write"
     ],
@@ -80,6 +80,7 @@
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "autoprefixer": "^10.4.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",

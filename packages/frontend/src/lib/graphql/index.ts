@@ -180,12 +180,15 @@ export type Nft = {
   forSale: Scalars['Boolean'];
   history?: Maybe<Array<NftStatusChange>>;
   id: Scalars['ID'];
+  lastPurchaseTimestamp: Scalars['Int'];
+  mintTimestamp: Scalars['Int'];
   name: Scalars['String'];
   owner: User;
   price: Scalars['BigInt'];
   redeemed: Scalars['Boolean'];
   /** out of 10000 */
   royaltyBasisPoints: Scalars['BigInt'];
+  royaltyReceiver: User;
   tokenId: Scalars['BigInt'];
   tokenURI: Scalars['String'];
   work: Scalars['String'];
@@ -378,6 +381,22 @@ export type Nft_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  lastPurchaseTimestamp?: InputMaybe<Scalars['Int']>;
+  lastPurchaseTimestamp_gt?: InputMaybe<Scalars['Int']>;
+  lastPurchaseTimestamp_gte?: InputMaybe<Scalars['Int']>;
+  lastPurchaseTimestamp_in?: InputMaybe<Array<Scalars['Int']>>;
+  lastPurchaseTimestamp_lt?: InputMaybe<Scalars['Int']>;
+  lastPurchaseTimestamp_lte?: InputMaybe<Scalars['Int']>;
+  lastPurchaseTimestamp_not?: InputMaybe<Scalars['Int']>;
+  lastPurchaseTimestamp_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  mintTimestamp?: InputMaybe<Scalars['Int']>;
+  mintTimestamp_gt?: InputMaybe<Scalars['Int']>;
+  mintTimestamp_gte?: InputMaybe<Scalars['Int']>;
+  mintTimestamp_in?: InputMaybe<Array<Scalars['Int']>>;
+  mintTimestamp_lt?: InputMaybe<Scalars['Int']>;
+  mintTimestamp_lte?: InputMaybe<Scalars['Int']>;
+  mintTimestamp_not?: InputMaybe<Scalars['Int']>;
+  mintTimestamp_not_in?: InputMaybe<Array<Scalars['Int']>>;
   name?: InputMaybe<Scalars['String']>;
   name_contains?: InputMaybe<Scalars['String']>;
   name_ends_with?: InputMaybe<Scalars['String']>;
@@ -426,6 +445,20 @@ export type Nft_Filter = {
   royaltyBasisPoints_lte?: InputMaybe<Scalars['BigInt']>;
   royaltyBasisPoints_not?: InputMaybe<Scalars['BigInt']>;
   royaltyBasisPoints_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  royaltyReceiver?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_contains?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_ends_with?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_gt?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_gte?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_in?: InputMaybe<Array<Scalars['String']>>;
+  royaltyReceiver_lt?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_lte?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not_contains?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not_ends_with?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not_in?: InputMaybe<Array<Scalars['String']>>;
+  royaltyReceiver_not_starts_with?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_starts_with?: InputMaybe<Scalars['String']>;
   tokenId?: InputMaybe<Scalars['BigInt']>;
   tokenId_gt?: InputMaybe<Scalars['BigInt']>;
   tokenId_gte?: InputMaybe<Scalars['BigInt']>;
@@ -476,11 +509,14 @@ export enum Nft_OrderBy {
   ForSale = 'forSale',
   History = 'history',
   Id = 'id',
+  LastPurchaseTimestamp = 'lastPurchaseTimestamp',
+  MintTimestamp = 'mintTimestamp',
   Name = 'name',
   Owner = 'owner',
   Price = 'price',
   Redeemed = 'redeemed',
   RoyaltyBasisPoints = 'royaltyBasisPoints',
+  RoyaltyReceiver = 'royaltyReceiver',
   TokenId = 'tokenId',
   TokenUri = 'tokenURI',
   Work = 'work'
@@ -496,6 +532,7 @@ export type PaymentToken = {
   acceptable: Scalars['Boolean'];
   decimals: Scalars['Int'];
   id: Scalars['ID'];
+  symbol: Scalars['String'];
 };
 
 export type PaymentToken_Filter = {
@@ -519,12 +556,27 @@ export type PaymentToken_Filter = {
   id_lte?: InputMaybe<Scalars['ID']>;
   id_not?: InputMaybe<Scalars['ID']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']>>;
+  symbol?: InputMaybe<Scalars['String']>;
+  symbol_contains?: InputMaybe<Scalars['String']>;
+  symbol_ends_with?: InputMaybe<Scalars['String']>;
+  symbol_gt?: InputMaybe<Scalars['String']>;
+  symbol_gte?: InputMaybe<Scalars['String']>;
+  symbol_in?: InputMaybe<Array<Scalars['String']>>;
+  symbol_lt?: InputMaybe<Scalars['String']>;
+  symbol_lte?: InputMaybe<Scalars['String']>;
+  symbol_not?: InputMaybe<Scalars['String']>;
+  symbol_not_contains?: InputMaybe<Scalars['String']>;
+  symbol_not_ends_with?: InputMaybe<Scalars['String']>;
+  symbol_not_in?: InputMaybe<Array<Scalars['String']>>;
+  symbol_not_starts_with?: InputMaybe<Scalars['String']>;
+  symbol_starts_with?: InputMaybe<Scalars['String']>;
 };
 
 export enum PaymentToken_OrderBy {
   Acceptable = 'acceptable',
   Decimals = 'decimals',
-  Id = 'id'
+  Id = 'id',
+  Symbol = 'symbol'
 }
 
 export type Query = {
@@ -805,13 +857,13 @@ export enum Redeem_OrderBy {
 export type Sale = NftStatusChange & {
   __typename?: 'Sale';
   blockNumber: Scalars['BigInt'];
-  creator: User;
   currency: PaymentToken;
   from: User;
   id: Scalars['ID'];
   nft: Nft;
   price: Scalars['BigInt'];
   royaltyAccrued: Scalars['BigInt'];
+  royaltyReceiver: User;
   timestamp: Scalars['BigInt'];
   to: User;
   txHash: Scalars['String'];
@@ -826,20 +878,6 @@ export type Sale_Filter = {
   blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
   blockNumber_not?: InputMaybe<Scalars['BigInt']>;
   blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  creator?: InputMaybe<Scalars['String']>;
-  creator_contains?: InputMaybe<Scalars['String']>;
-  creator_ends_with?: InputMaybe<Scalars['String']>;
-  creator_gt?: InputMaybe<Scalars['String']>;
-  creator_gte?: InputMaybe<Scalars['String']>;
-  creator_in?: InputMaybe<Array<Scalars['String']>>;
-  creator_lt?: InputMaybe<Scalars['String']>;
-  creator_lte?: InputMaybe<Scalars['String']>;
-  creator_not?: InputMaybe<Scalars['String']>;
-  creator_not_contains?: InputMaybe<Scalars['String']>;
-  creator_not_ends_with?: InputMaybe<Scalars['String']>;
-  creator_not_in?: InputMaybe<Array<Scalars['String']>>;
-  creator_not_starts_with?: InputMaybe<Scalars['String']>;
-  creator_starts_with?: InputMaybe<Scalars['String']>;
   currency?: InputMaybe<Scalars['String']>;
   currency_contains?: InputMaybe<Scalars['String']>;
   currency_ends_with?: InputMaybe<Scalars['String']>;
@@ -906,6 +944,20 @@ export type Sale_Filter = {
   royaltyAccrued_lte?: InputMaybe<Scalars['BigInt']>;
   royaltyAccrued_not?: InputMaybe<Scalars['BigInt']>;
   royaltyAccrued_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  royaltyReceiver?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_contains?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_ends_with?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_gt?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_gte?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_in?: InputMaybe<Array<Scalars['String']>>;
+  royaltyReceiver_lt?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_lte?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not_contains?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not_ends_with?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_not_in?: InputMaybe<Array<Scalars['String']>>;
+  royaltyReceiver_not_starts_with?: InputMaybe<Scalars['String']>;
+  royaltyReceiver_starts_with?: InputMaybe<Scalars['String']>;
   timestamp?: InputMaybe<Scalars['BigInt']>;
   timestamp_gt?: InputMaybe<Scalars['BigInt']>;
   timestamp_gte?: InputMaybe<Scalars['BigInt']>;
@@ -946,13 +998,13 @@ export type Sale_Filter = {
 
 export enum Sale_OrderBy {
   BlockNumber = 'blockNumber',
-  Creator = 'creator',
   Currency = 'currency',
   From = 'from',
   Id = 'id',
   Nft = 'nft',
   Price = 'price',
   RoyaltyAccrued = 'royaltyAccrued',
+  RoyaltyReceiver = 'royaltyReceiver',
   Timestamp = 'timestamp',
   To = 'to',
   TxHash = 'txHash'
@@ -1414,8 +1466,8 @@ export type SalesQueryVariables = Exact<{
 }>;
 
 
-export type SalesQuery = { __typename?: 'Query', sales: Array<{ __typename?: 'Sale', id: string, timestamp: any, price: any, creator: { __typename?: 'User', id: string }, currency: { __typename?: 'PaymentToken', id: string, decimals: number, acceptable: boolean }, nft: { __typename?: 'Nft', id: string, tokenId: any, tokenURI: string, contractAddress: string, availabilityFrom: any, availabilityTo: any } }> };
+export type SalesQuery = { __typename?: 'Query', sales: Array<{ __typename?: 'Sale', id: string, timestamp: any, price: any, currency: { __typename?: 'PaymentToken', id: string, decimals: number, acceptable: boolean }, nft: { __typename?: 'Nft', id: string, tokenId: any, tokenURI: string, contractAddress: string, availabilityFrom: any, availabilityTo: any } }> };
 
 export const NftFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NftFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Nft"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tokenId"}},{"kind":"Field","name":{"kind":"Name","value":"tokenURI"}},{"kind":"Field","name":{"kind":"Name","value":"contractAddress"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityTo"}}]}}]} as unknown as DocumentNode<NftFieldsFragment, unknown>;
 export const NftsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nfts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"NftFields"}}]}}]}},...NftFieldsFragmentDoc.definitions]} as unknown as DocumentNode<NftsQuery, NftsQueryVariables>;
-export const SalesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Sales"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Sale_orderBy"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderDirection"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Sale_filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"creator"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currency"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}},{"kind":"Field","name":{"kind":"Name","value":"acceptable"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nft"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"NftFields"}}]}}]}}]}},...NftFieldsFragmentDoc.definitions]} as unknown as DocumentNode<SalesQuery, SalesQueryVariables>;
+export const SalesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Sales"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Sale_orderBy"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderDirection"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Sale_filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"currency"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}},{"kind":"Field","name":{"kind":"Name","value":"acceptable"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nft"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"NftFields"}}]}}]}}]}},...NftFieldsFragmentDoc.definitions]} as unknown as DocumentNode<SalesQuery, SalesQueryVariables>;
