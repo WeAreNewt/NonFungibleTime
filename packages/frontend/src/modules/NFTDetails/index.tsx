@@ -183,6 +183,9 @@ export default function NFTDetails() {
                                         <div className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer" onClick={() => buy()}>
                                             Buy Now
                                         </div>
+                                        <div className="text-red-500 text-center">
+                                            {formError}
+                                        </div>
                                     </div> : <div>This NFT is not for sale</div>) :
                                     <div className="flex flex-col p-5">
                                         <div className="flex flex-row">
@@ -231,6 +234,9 @@ export default function NFTDetails() {
                                                     </div>
                                                 </div>
                                         }
+                                        <div className="text-red-500 text-center">
+                                            {formError}
+                                        </div>
                                     </div>
                             }
                         </div>
