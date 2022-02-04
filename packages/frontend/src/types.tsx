@@ -1,23 +1,25 @@
 export enum Category {
-    business = "Business",
-    development = "Development",
-    community = "Community",
-    advertising = "Advertising",
-    design = "Design",
-    other = "Other",
+  business = 'Business',
+  development = 'Development',
+  community = 'Community',
+  advertising = 'Advertising',
+  design = 'Design',
+  other = 'Other',
 }
 
 export interface NFTProps {
-    address: string;
-    name?: string;
-    avatar?: string;
-    category: Category;
-    date: string;
-    title: string;
-    description: string;
-    cost: number;
-    currencySymbol: string;
-    currencyAddress: string;
-    tokenId: number;
-    owner: string;
+  address: string;
+  name?: string;
+  avatar?: string;
+  category: Category;
+  date: string;
+  title: string;
+  description: string;
+  cost: number;
+  currencySymbol: string;
+  currencyAddress: string;
+  tokenId: number;
+  owner: string;
 }
+
+export type Maybe<T> = null | undefined | T;

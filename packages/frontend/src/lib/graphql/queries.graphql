@@ -30,9 +30,6 @@ query Sales(
     id
     timestamp
     price
-    creator {
-      id
-    }
     currency {
       id
       decimals
