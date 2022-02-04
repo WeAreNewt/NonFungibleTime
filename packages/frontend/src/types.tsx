@@ -18,4 +18,6 @@ export interface NFTProps {
     cost: number;
     currencySymbol: string;
     currencyAddress: string;
+    tokenId: number;
+    owner: string;
 }

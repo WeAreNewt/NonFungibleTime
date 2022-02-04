@@ -1,20 +1,36 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { NFTProps } from '../../types';
 
 
-export default function NFTCard({ address, name, avatar, date, category, title, description, cost, currencyAddress, currencySymbol }: NFTProps) {
-
+export default function NFTCard({ address, name, avatar, date, category, title, description, cost, currencyAddress, currencySymbol, tokenId, owner }: NFTProps) {
+    const navigate = useNavigate()
     return (
-        <div className="border p-3">
+        <div className="border p-3 cursor-pointer" onClick={() => navigate('/details/' + tokenId, {
+            state: {
+                address,
+                name,
+                avatar,
+                date,
+                category,
+                title,
+                description,
+                cost,
+                currencyAddress,
+                currencySymbol,
+                tokenId,
+                owner
+            }
+        })}>
             {/** Seller name/address + avatar */}
-            <div>{name}</div>
+            <div className="text-black dark:text-white" > {name}</div >
             {/** Tag */}
-            <div>{category}</div>
+            <div className="text-black dark:text-white" > {category}</div  >
             {/** NFT Description */}
-            <div>{title}</div>
-            <div>{description}</div>
+            < div className="text-black dark:text-white" > {title}</ div >
+            <div className="text-black dark:text-white">{description}</div>
             {/** Pricing */}
-            <div>{cost.toString() + ' ' + currencySymbol}</div>
-        </div>
+            <div className="text-black dark:text-white">{cost.toString() + ' ' + currencySymbol}</div>
+        </div >
     );
 }

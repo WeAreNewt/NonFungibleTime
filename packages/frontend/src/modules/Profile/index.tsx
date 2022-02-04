@@ -20,6 +20,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 1,
         currencySymbol: 'ETH',
         currencyAddress: '0x0',
+        tokenId: 0,
+        owner: '0x0',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -31,6 +33,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 5,
         currencySymbol: 'DAI',
         currencyAddress: '0x0',
+        tokenId: 1,
+        owner: '0x1',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -42,6 +46,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 1,
         currencySymbol: 'ETH',
         currencyAddress: '0x0',
+        tokenId: 2,
+        owner: '0x2',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -53,6 +59,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 5,
         currencySymbol: 'DAI',
         currencyAddress: '0x0',
+        tokenId: 3,
+        owner: '0x3',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -64,6 +72,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 1,
         currencySymbol: 'ETH',
         currencyAddress: '0x0',
+        tokenId: 4,
+        owner: '0x4',
     },
     {
         address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -75,6 +85,8 @@ const sampleNFTs: NFTProps[] = [
         cost: 5,
         currencySymbol: 'DAI',
         currencyAddress: '0x0',
+        tokenId: 5,
+        owner: '0x5',
     },
 ]
 
@@ -107,7 +119,7 @@ export default function Profile() {
     const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false)
     const location = useLocation();
     const path = location.pathname.split('/');
-    const baseUrl = "https://elated-kalam-a67780.netlify.app/"; // Preview Deploy
+    const baseUrl = "https://elated-kalam-a67780.netlify.app"; // Preview Deploy
 
     useEffect(() => {
         if (path[2] === currentAccount) {
@@ -152,7 +164,7 @@ export default function Profile() {
 
 
     return (
-        <div className="flex h-full flex-col overflow-hidden">
+        <div className="flex h-full flex-col">
             <div className="basis-1/4">
                 <div className="p-10 flex flex-row justify-between">
                     {/** Profile Header */}
@@ -161,7 +173,7 @@ export default function Profile() {
                             {/** Avatar/Blockie */}
                             <img alt="ens avatar" src="https://lh3.googleusercontent.com/nbLoKXUB707PZ2iBQ6JBVE8Ytu6Wms5HwiM3_Ssvi0LuAKS-CYU1mcdjr6naiyiaSY_FyYZHAdJWQ3emrHcff_k6-ZKPIKyMpCZN=w600" />
                             {/** ENS Name/Address */}
-                            <div>soliditychad.eth</div>
+                            <div className="text-black dark:text-white">{path[2]}</div>
                         </div>
                     </div>
 
@@ -305,7 +317,7 @@ export default function Profile() {
                                             </div>
                                         </div>
                                         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm" onClick={() => { navigator.clipboard.writeText(location.pathname) }}>
+                                            <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm" onClick={() => { navigator.clipboard.writeText(baseUrl + location.pathname) }}>
                                                 Copy URL
                                             </button>
                                             <button type="button" className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onClick={() => setShareProfileModalOpen(false)}>
@@ -315,8 +327,6 @@ export default function Profile() {
                                     </div>
                                 </div>
                             </Dialog>
-
-
                         </div>
                     </div>
                 </div >

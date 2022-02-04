@@ -15,6 +15,8 @@ const sampleNFTs: NFTProps[] = [
     cost: 1,
     currencySymbol: 'ETH',
     currencyAddress: '0x0',
+    tokenId: 0,
+    owner: '0x0',
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -26,6 +28,8 @@ const sampleNFTs: NFTProps[] = [
     cost: 5,
     currencySymbol: 'DAI',
     currencyAddress: '0x0',
+    tokenId: 1,
+    owner: '0x1',
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -37,6 +41,8 @@ const sampleNFTs: NFTProps[] = [
     cost: 1,
     currencySymbol: 'ETH',
     currencyAddress: '0x0',
+    tokenId: 2,
+    owner: '0x2',
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -48,6 +54,8 @@ const sampleNFTs: NFTProps[] = [
     cost: 5,
     currencySymbol: 'DAI',
     currencyAddress: '0x0',
+    tokenId: 3,
+    owner: '0x3',
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -59,6 +67,8 @@ const sampleNFTs: NFTProps[] = [
     cost: 1,
     currencySymbol: 'ETH',
     currencyAddress: '0x0',
+    tokenId: 4,
+    owner: '0x4',
   },
   {
     address: '0x2DC2791962219Ad52460107a09522Bb2B4e6fFDe',
@@ -70,6 +80,8 @@ const sampleNFTs: NFTProps[] = [
     cost: 5,
     currencySymbol: 'DAI',
     currencyAddress: '0x0',
+    tokenId: 5,
+    owner: '0x5',
   },
 ];
 

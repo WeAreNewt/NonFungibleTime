@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ConnectButton from '../ConnectButton';
 import { FaClock } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
+import Toggle from '../../ThemeToggle';
 
 interface Navigation {
   link: string;
@@ -36,7 +37,7 @@ export default function Navbar() {
 
   return (
     <nav>
-      <div className="max-w-8xl mx-auto px-1 sm:px-6 lg:px-12 border-b-2 border-color-gray-500">
+      <div className="max-w-8xl mx-auto px-1 sm:px-6 lg:px-12 border-b border-color-gray-500">
         <div className="relative flex items-center justify-between h-20">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/** Mobile Menu Icon */}
@@ -93,7 +94,7 @@ export default function Navbar() {
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             {/** Menu Items */}
             <div className="hidden sm:block sm:ml-6">
-              <div className="flex space-x-4">
+              <div className="flex space-x-5">
                 {navigation.map((link, index) => {
                   return (
                     <div key={index}>
@@ -102,7 +103,7 @@ export default function Navbar() {
                           href={link.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-500 px-3 py-2 rounded-md text-lg font-semibold"
+                          className="text-gray-500 dark:text-white px-3 py-2 rounded-md text-lg font-semibold"
                           aria-current={undefined}
                         >
                           {link.title}
@@ -114,7 +115,7 @@ export default function Navbar() {
                           className={
                             activePage === link.title.toLowerCase()
                               ? 'text-indigo-600 px-3 py-2 rounded-md text-lg font-semibold'
-                              : 'text-gray-500 px-3 py-2 rounded-md text-lg font-semibold'
+                              : 'text-gray-500 dark:text-white px-3 py-2 rounded-md text-lg font-semibold'
                           }
                           aria-current={
                             activePage === link.title.toLowerCase() ? 'page' : undefined
@@ -126,6 +127,7 @@ export default function Navbar() {
                     </div>
                   );
                 })}
+                <Toggle />
               </div>
             </div>
 
