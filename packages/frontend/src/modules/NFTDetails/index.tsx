@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { FaShareAlt, FaChevronCircleLeft, FaSpinner } from 'react-icons/fa';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { Dialog } from '@headlessui/react';
-import { NFTProps } from '../../types';
+import { useWeb3React } from '@web3-react/core';
+import { BigNumber } from 'ethers';
+import { parseUnits } from 'ethers/lib/utils';
+import React, { useEffect, useState } from 'react';
+import { FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { CategoryDisplay } from '../../components/Category';
+import { FieldLabel } from '../../components/FieldLabel';
+import { PriceDisplay } from '../../components/PriceDisplay';
+import { UserDetail } from '../../components/UserDetail';
 import { PaymentToken } from '../../lib/graphql';
-import { ZERO_ADDRESS, isEthAddress } from '../../lib/helpers/base-service';
+import { isEthAddress, ZERO_ADDRESS } from '../../lib/helpers/base-service';
+import { formatEthAddress } from '../../lib/helpers/format';
 import {
   BuyTokenParamsType,
   ChangeBuyingConditionsParamsType,
   RedeemParamsType,
 } from '../../lib/helpers/NftCollection';
-import { BigNumber } from 'ethers';
-import { useWeb3React } from '@web3-react/core';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
-import { PriceDisplay } from '../../components/PriceDisplay';
+import { useAppDataProvider } from '../../lib/providers/app-data-provider';
+import { NFTProps } from '../../types';
 
 interface NftState {
   nft?: NFTProps;
@@ -25,6 +29,14 @@ interface BuyingConditions {
   price: number;
   currency: PaymentToken;
   whitelistedBuyer: string;
+}
+
+function HeadingSeparator({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="pb-5 border-b border-b-gray-200 mb-5">
+      <h3 className="text-lg leading-7 font-semibold ">{children}</h3>
+    </div>
+  );
 }
 
 export default function NFTDetails() {
@@ -182,13 +194,13 @@ export default function NFTDetails() {
     return <FaSpinner />;
   } else {
     return (
-      <div className=" text-black dark:text-white p-10">
+      <div className=" text-black dark:text-white p-10 bg-slate-100">
         {/* <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" /> */}
-        <div className="flex flex-row gap-10">
+        <div className="flex flex-col sm:flex-row  gap-10 ">
           {/** Column 1: NFT Image + buy/sell/redeem options */}
-          <div className="flex w-1/3 flex-col gap-5">
+          <div className="flex w-full sm:w-1/3 md:w-1/4 flex-col gap-5 ">
             <div className="w-full bg-white rounded-md border border-gray-300">
-              <img alt="token uri" src={uri} className="p-3" w-full />
+              <img alt="token uri" src={uri} />
             </div>
             {/** If redeemed -> show redeemed message
              *   if not redeemed -> display panel based on nft ownership
@@ -200,7 +212,7 @@ export default function NFTDetails() {
             ) : !owner ? (
               nft.forSale ? (
                 <div>
-                  <div className="text-sm leading-5 font-semibold text-gray-500">Price</div>
+                  <FieldLabel>Price</FieldLabel>
                   <PriceDisplay amount={nft.cost} currency={nft.currency} />
                   <div
                     className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
@@ -320,14 +332,14 @@ export default function NFTDetails() {
             )}
           </div>
 
-          {/** Column 2: NFT Details */}
-          <div className="basis-2/3">
+          {/* * Column 2: NFT Details */}
+          <div className="space-y-5 w-full md:w-1/2 flex-1">
             {/** Title and Category */}
-            <div className="flex flex-row justify-between p-5">
+            <div className="flex flex-row justify-between">
               <div className="flex-start">
                 <div className="flex flex-col">
-                  <div>{nft.title}</div>
-                  <div>{nft.category}</div>
+                  <div className="text-4xl leading-10 font-extrabold mb-2">{nft.title}</div>
+                  <CategoryDisplay>{nft.category}</CategoryDisplay>
                 </div>
               </div>
               {/** Share Profile */}
@@ -418,46 +430,51 @@ export default function NFTDetails() {
                 </div>
               </div>
             </div>
-
             {/** Creator / Owner */}
-            <div className="flex flex-row p-5">
-              <div className="flex-start">
-                <div className="flex flex-col">
-                  <div>Created By</div>
-                  <div className="flex flex-row">
-                    <div>{nft.creator}</div>
-                  </div>
+            <div className="flex max-w-xl">
+              <div className="w-1/2">
+                <FieldLabel className="mb-2">Created By</FieldLabel>
+                <div className="flex">
+                  <UserDetail name={nft.creator} caption={'Dec 16, 2021'} />
                 </div>
-                <div className="flex flex-col">
-                  <div>Owned By</div>
-                  <div className="flex flex-row">
-                    <div>{nft.owner}</div>
-                  </div>
+              </div>
+              <div className="w-1/2">
+                <FieldLabel className="mb-2">Owned By</FieldLabel>
+                <div className="flex">
+                  <UserDetail name={formatEthAddress(nft.owner)} caption={'Dec 16, 2021'} />
                 </div>
               </div>
             </div>
-            <div className="flex flex-col p-5">
-              <div>Description</div>
-              <div>{nft.description}</div>
+
+            <div className="flex flex-col">
+              <HeadingSeparator>Description</HeadingSeparator>
+
+              <div className="text-sm leading-5 text-gray-900">{nft.description}</div>
             </div>
-            <div className="text-black dark:text-white p-5">Details</div>
-            <div className="flex flex-col p-5">
-              <div>Duration</div>
-              <div>{nft.duration.toString()} hours</div>
-            </div>
-            <div className="flex flex-row p-5">
-              <div className="flex flex-col">
-                <div>Availability From</div>
-                <div>{nft.availablilityFrom}</div>
+
+            <div className="flex flex-col">
+              <HeadingSeparator>Details</HeadingSeparator>
+              <div className="space-y-5">
+                <div>
+                  <FieldLabel className="mb-2">Duration</FieldLabel>
+                  <div>{nft.duration} hours</div>
+                </div>
+                <div className="flex gap-5">
+                  <div>
+                    <FieldLabel className="mb-2">Availability From</FieldLabel>
+                    <div>{nft.availablilityFrom}</div>
+                  </div>
+                  <div>
+                    <FieldLabel className="mb-2">Availability To</FieldLabel>
+                    <div>{nft.availabilityTo}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <FieldLabel className="mb-2">Royalities</FieldLabel>
+                  <div>{nft.royaltyPercentage.toString()} %</div>
+                </div>
               </div>
-              <div className="flex flex-col p-5">
-                <div>Availability To</div>
-                <div>{nft.availabilityTo}</div>
-              </div>
-            </div>
-            <div className="flex flex-col p-5">
-              <div>Royalties</div>
-              <div>{nft.royaltyPercentage.toString()} %</div>
             </div>
           </div>
         </div>
