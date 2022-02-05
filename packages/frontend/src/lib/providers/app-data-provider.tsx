@@ -1,6 +1,9 @@
+import { useQuery } from '@apollo/client';
 import { ethers, providers } from 'ethers';
 import React, { useContext } from 'react';
+import { User } from '../../types';
 import { NetworkConfig, networkConfigs } from '../config';
+import { ProfileNftsDocument } from '../graphql';
 import { NftCollectionService } from '../helpers/NftCollection';
 import { useWeb3 } from './web3-provider';
 
@@ -10,8 +13,8 @@ export interface AppDataContextType {
     jsonRpcProvider: providers.Provider;
     currentAccount?: string;
     nftCollectionService: NftCollectionService;
-    //profileNfts: NFT[];
-    //marketplaceNfts: NFT[];
+    userData: User | undefined;
+    loadingUserData: boolean;
     //allowedCurrencies: string[];
 }
 
@@ -37,13 +40,23 @@ export const AppDataProvider: React.FC = ({ children }) => {
     const provider: providers.Provider = fallbackProvider ? new providers.FallbackProvider([jsonRpcProvider, fallbackProvider]) : jsonRpcProvider;
     const nftCollectionService = new NftCollectionService(provider, networkConfigs[chainId].collectionAddress)
 
+
+    const { data, loading } = useQuery(ProfileNftsDocument, {
+        variables: {
+            user: account ? account.toLowerCase() : ''
+        },
+    });
+    const userData = (data && data.user) ? data.user : undefined;
+
     return (
         <AppDataContext.Provider
             value={{
                 networkConfig: networkConfigs[chainId],
                 jsonRpcProvider: provider,
                 currentAccount: account,
-                nftCollectionService
+                nftCollectionService,
+                userData,
+                loadingUserData: loading,
             }}
         >
             {children}
