@@ -1,12 +1,15 @@
 import { PaymentToken } from "./lib/graphql";
 
 export enum Category {
+    graphics = 'Graphics & Design',
+    music = 'Music & Audio',
+    programming = 'Programming & Tech',
+    marketing = 'Digital Marketing',
+    data = 'Data',
+    writing = 'Writing & Translation',
     business = 'Business',
-    development = 'Development',
-    community = 'Community',
-    advertising = 'Advertising',
-    design = 'Design',
-    other = 'Other',
+    lessons = 'Lessons',
+    video = 'Video & Animation'
 }
 
 export interface HistoryItem {

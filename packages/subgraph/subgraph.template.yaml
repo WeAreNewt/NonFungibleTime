@@ -1,5 +1,5 @@
 specVersion: 0.0.1
-description: Non Fungible Time subgraph
+description: Busy AF subgraph
 repository: https://github.com/wearenewt/nonfungibletime
 schema:
   file: ./schema.graphql
