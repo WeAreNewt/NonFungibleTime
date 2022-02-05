@@ -5,41 +5,25 @@ fragment PaymentTokenFields on PaymentToken {
   symbol
 }
 
-fragment UserFields on User {
-  id
-}
-
 fragment NftFields on Nft {
   id
   tokenId
   tokenURI
-  contractAddress
   owner {
-    ...UserFields
+    id
   }
   creator {
-    ...UserFields
+    id
   }
-  royaltyReceiver {
-    ...UserFields
-  }
-
   name
   description
   work
-  availabilityTo
   availabilityFrom
-
-  creator {
-    ...UserFields
-  }
+  availabilityTo
   allowedBuyer
-
   duration
-
   forSale
   redeemed
-
   royaltyBasisPoints
   price
   currency {
@@ -47,4 +31,44 @@ fragment NftFields on Nft {
   }
   mintTimestamp
   lastPurchaseTimestamp
+  history {
+    txHash
+    timestamp
+    ... on Redeem {
+      redeemedBy {
+        id
+      }
+    }
+    ... on BuyingConditionChange {
+      price
+      currency {
+        symbol
+      }
+      forSale
+      allowedBuyer
+      owner {
+        id
+      }
+    }
+    ... on Sale {
+      to {
+        id
+      }
+      from {
+        id
+      }
+      price
+      currency {
+        symbol
+      }
+    }
+    ... on Transfer {
+      to {
+        id
+      }
+      from {
+        id
+      }
+    }
+  }
 }

@@ -32,3 +32,14 @@ query Sales(
     }
   }
 }
+
+query ProfileNfts($user: ID!) {
+  user(id: $user) {
+    createdNfts {
+      ...NftFields
+    }
+    ownedNfts {
+      ...NftFields
+    }
+  }
+}

@@ -1,74 +1,41 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatEthAddress } from '../../lib/helpers/format';
-import { NFTProps } from '../../types';
+import { NFT } from '../../types';
 import { CategoryDisplay } from '../Category';
 import { PriceDisplay } from '../PriceDisplay';
 import { UserDetail } from '../UserDetail';
 
-export default function NFTCard({
-  address,
-  name,
-  avatar,
-  category,
-  title,
-  description,
-  cost,
-  currency,
-  tokenId,
-  owner,
-  tokenURI,
-  creator,
-  availabilityTo,
-  availablilityFrom,
-  duration,
+interface NftCardProps {
+  nft: NFT;
+}
 
-  royaltyPercentage,
-  redeemed,
-  forSale,
-}: NFTProps) {
+export default function NFTCard({
+  nft
+}: NftCardProps) {
   const navigate = useNavigate();
   return (
     <div
       className="bg-white dark:bg-black rounded-lg shadow-lg p-5 cursor-pointer space-y-2"
       onClick={() =>
-        navigate('/details/' + tokenId, {
+        navigate('/details/' + nft.tokenId, {
           state: {
-            nft: {
-              address,
-              name,
-              avatar,
-              category,
-              title,
-              description,
-              cost,
-              currency,
-              tokenId,
-              owner,
-              tokenURI,
-              creator,
-              availabilityTo,
-              availablilityFrom,
-              duration,
-              royaltyPercentage,
-              redeemed,
-              forSale,
-            },
+            nft
           },
         })
       }
     >
-      {/* TODO: Add creation dateq */}
-      <UserDetail name={name || formatEthAddress(address)} caption={'Dec 16, 2021'} />
+
+      <UserDetail name={formatEthAddress(nft.creator.id)} caption={'Dec 16, 2021'} />
       {/** Tag */}
-      <CategoryDisplay>{category}</CategoryDisplay>
+      <CategoryDisplay>{nft.work}</CategoryDisplay>
       {/** NFT Description */}
-      <div className="text-xl leading-7 font-semibold  dark:text-white text-black "> {title}</div>
+      <div className="text-xl leading-7 font-semibold  dark:text-white text-black "> {nft.name}</div>
       <div className="text-base leading-6 text-gray-500 font-normal line-clamp-4 ">
-        {description}
+        {nft.description}
       </div>
       {/** Pricing */}
-      <PriceDisplay amount={cost} currency={currency} />
+      <PriceDisplay amount={nft.price} currency={nft.currency} />
     </div>
   );
 }

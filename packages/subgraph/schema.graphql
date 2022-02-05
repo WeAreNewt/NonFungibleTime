@@ -15,7 +15,7 @@ type Nft @entity {
   allowedBuyer: String!
   "number of hours"
   duration: BigInt!
-  history: [NftStatusChange!] @derivedFrom(field: "nft")
+  history: [NftStatusChange!]! @derivedFrom(field: "nft")
   forSale: Boolean!
   redeemed: Boolean!
   "out of 10000"
@@ -28,19 +28,19 @@ type Nft @entity {
 
 type User @entity {
   id: ID!
-  ownedNfts: [Nft!] @derivedFrom(field: "owner")
-  createdNfts: [Nft!] @derivedFrom(field: "creator")
+  ownedNfts: [Nft!]! @derivedFrom(field: "owner")
+  createdNfts: [Nft!]! @derivedFrom(field: "creator")
   "Nfts which this user has redeemed"
-  redemptions: [Redeem!] @derivedFrom(field: "redeemedBy")
+  redemptions: [Redeem!]! @derivedFrom(field: "redeemedBy")
   "Nfts which this user has created that have been redeemed"
-  creatorRedemptions: [Redeem!] @derivedFrom(field: "creator")
+  creatorRedemptions: [Redeem!]! @derivedFrom(field: "creator")
   "Sale option toggles for NFTs this user owns"
-  buyingConditionChanges: [BuyingConditionChange!] @derivedFrom(field: "owner")
-  sales: [Sale!] @derivedFrom(field: "from")
-  royaltiesAccrued: [Sale!] @derivedFrom(field: "royaltyReceiver")
-  purchases: [Sale!] @derivedFrom(field: "to")
-  incomingTransfers: [Transfer!] @derivedFrom(field: "to")
-  outgoingTransfers: [Transfer!] @derivedFrom(field: "from")
+  buyingConditionChanges: [BuyingConditionChange!]! @derivedFrom(field: "owner")
+  sales: [Sale!]! @derivedFrom(field: "from")
+  royaltiesAccrued: [Sale!]! @derivedFrom(field: "royaltyReceiver")
+  purchases: [Sale!]! @derivedFrom(field: "to")
+  incomingTransfers: [Transfer!]! @derivedFrom(field: "to")
+  outgoingTransfers: [Transfer!]! @derivedFrom(field: "from")
 }
 
 enum EventType {
