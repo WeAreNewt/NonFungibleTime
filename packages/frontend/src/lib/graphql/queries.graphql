@@ -2,9 +2,70 @@ fragment NftFields on Nft {
   id
   tokenId
   tokenURI
-  contractAddress
+  owner {
+    id
+  }
+  creator {
+    id
+  }
+  name
+  description
+  work
   availabilityFrom
   availabilityTo
+  allowedBuyer
+  duration
+  forSale
+  redeemed
+  royaltyBasisPoints
+  price
+  currency {
+    id
+    symbol
+    decimals
+  }
+  mintTimestamp
+  lastPurchaseTimestamp
+  history {
+    txHash
+    timestamp
+    ... on Redeem {
+      redeemedBy {
+        id
+      }
+    }
+    ... on BuyingConditionChange {
+      price
+      currency {
+        symbol
+      }
+      forSale
+      allowedBuyer
+      owner {
+        id
+      }
+    }
+    ... on Sale {
+      to {
+        id
+      }
+      from {
+        id
+      }
+      price
+      currency {
+        symbol
+      }
+    }
+    ... on Transfer {
+      to {
+        id
+      }
+      from {
+        id
+      }
+    }
+  }
 }
 
 query Nfts {
@@ -39,6 +100,17 @@ query Sales(
       acceptable
     }
     nft {
+      ...NftFields
+    }
+  }
+}
+
+query ProfileNfts($user: ID!) {
+  user(id: $user) {
+    createdNfts {
+      ...NftFields
+    }
+    ownedNfts {
       ...NftFields
     }
   }
