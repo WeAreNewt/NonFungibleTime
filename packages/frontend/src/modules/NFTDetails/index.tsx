@@ -338,7 +338,7 @@ export default function NFTDetails() {
               <div className="flex-start">
                 <div className="flex flex-col">
                   <div className="text-4xl leading-10 font-extrabold mb-2">{nft.name}</div>
-                  <CategoryDisplay>{nft.work}</CategoryDisplay>
+                  <CategoryDisplay>{nft.work ? nft.work : 'Other'}</CategoryDisplay>
                 </div>
               </div>
               {/** Share Profile */}

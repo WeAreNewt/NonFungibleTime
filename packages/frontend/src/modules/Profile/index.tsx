@@ -3,7 +3,7 @@ import { FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import { User } from '../../types';
+import { Category, User } from '../../types';
 import { Dialog } from '@headlessui/react';
 import { BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
@@ -242,15 +242,7 @@ export default function Profile() {
                                     setFormNft({ ...formNft, category: e.target.value })
                                   }
                                 >
-                                  <option>Graphics & Design</option>
-                                  <option>Music & Audio</option>
-                                  <option>Programming & Tech</option>
-                                  <option>Digital Marketing</option>
-                                  <option>Data</option>
-                                  <option>Writing & Translation</option>
-                                  <option>Business</option>
-                                  <option>Lessons</option>
-                                  <option>Video & Animation</option>
+                                  {Object.keys(Category).map(category => <option>{category}</option>)}
                                 </select>
                               </div>
                               <div>
