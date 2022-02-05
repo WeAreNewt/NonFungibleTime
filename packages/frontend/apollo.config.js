@@ -1,6 +1,6 @@
 module.exports = {
   client: {
-    includes: ['./src/graphql/**.graphql'],
+    includes: ['./src/lib/graphql/**.graphql'],
     service: {
       name: 'NonFungibleTime',
       // Needs to be set manually.

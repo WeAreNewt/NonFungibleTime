@@ -1,0 +1,50 @@
+fragment PaymentTokenFields on PaymentToken {
+  id
+  decimals
+  acceptable
+  symbol
+}
+
+fragment UserFields on User {
+  id
+}
+
+fragment NftFields on Nft {
+  id
+  tokenId
+  tokenURI
+  contractAddress
+  owner {
+    ...UserFields
+  }
+  creator {
+    ...UserFields
+  }
+  royaltyReceiver {
+    ...UserFields
+  }
+
+  name
+  description
+  work
+  availabilityTo
+  availabilityFrom
+
+  creator {
+    ...UserFields
+  }
+  allowedBuyer
+
+  duration
+
+  forSale
+  redeemed
+
+  royaltyBasisPoints
+  price
+  currency {
+    ...PaymentTokenFields
+  }
+  mintTimestamp
+  lastPurchaseTimestamp
+}

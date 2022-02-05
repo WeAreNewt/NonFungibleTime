@@ -18,7 +18,7 @@ const sampleNFTs: NFTProps[] = [
     category: Category.business,
     title: 'Test 1',
     description: "Here's a test NFT on my account",
-    cost: 10000000000000000000,
+    cost: 1000000000000000000,
     currency: {
       id: ZERO_ADDRESS,
       symbol: 'ETH',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NFTProps } from '../../types';
+import { PriceDisplay } from '../PriceDisplay';
 
 export default function NFTCard({
   address,
@@ -72,9 +73,7 @@ export default function NFTCard({
         {description}
       </div>
       {/** Pricing */}
-      <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
-        {cost.toString() + ' ' + currency.symbol}
-      </div>
+      <PriceDisplay amount={cost} currency={currency} />
     </div>
   );
 }
