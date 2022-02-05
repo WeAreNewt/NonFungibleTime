@@ -2,6 +2,7 @@ import React from 'react';
 import { formatUnits } from 'ethers/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { NFT } from '../../types';
+import { PriceDisplay } from '../PriceDisplay';
 
 interface NftCardProps {
   nft: NFT;
@@ -40,9 +41,7 @@ export default function NFTCard({
         {nft.description}
       </div>
       {/** Pricing */}
-      <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
-        {formatUnits(nft.price, nft.currency.decimals) + ' ' + nft.currency.symbol}
-      </div>
+      <PriceDisplay amount={nft.price} currency={nft.currency} />
     </div>
   );
 }

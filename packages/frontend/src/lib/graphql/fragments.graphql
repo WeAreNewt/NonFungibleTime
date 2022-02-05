@@ -1,0 +1,74 @@
+fragment PaymentTokenFields on PaymentToken {
+  id
+  decimals
+  acceptable
+  symbol
+}
+
+fragment NftFields on Nft {
+  id
+  tokenId
+  tokenURI
+  owner {
+    id
+  }
+  creator {
+    id
+  }
+  name
+  description
+  work
+  availabilityFrom
+  availabilityTo
+  allowedBuyer
+  duration
+  forSale
+  redeemed
+  royaltyBasisPoints
+  price
+  currency {
+    ...PaymentTokenFields
+  }
+  mintTimestamp
+  lastPurchaseTimestamp
+  history {
+    txHash
+    timestamp
+    ... on Redeem {
+      redeemedBy {
+        id
+      }
+    }
+    ... on BuyingConditionChange {
+      price
+      currency {
+        symbol
+      }
+      forSale
+      allowedBuyer
+      owner {
+        id
+      }
+    }
+    ... on Sale {
+      to {
+        id
+      }
+      from {
+        id
+      }
+      price
+      currency {
+        symbol
+      }
+    }
+    ... on Transfer {
+      to {
+        id
+      }
+      from {
+        id
+      }
+    }
+  }
+}

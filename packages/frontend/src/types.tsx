@@ -1,3 +1,5 @@
+import { PaymentToken } from "./lib/graphql";
+
 export enum Category {
     business = 'Business',
     development = 'Development',
@@ -51,11 +53,7 @@ export interface NFT {
     redeemed: boolean;
     royaltyBasisPoints: number;
     price: number;
-    currency: {
-        id: string;
-        symbol: string;
-        decimals: number
-    }
+    currency: PaymentToken;
     mintTimestamp: number;
     lastPurchaseTimestamp: number;
     history: HistoryItem[];
