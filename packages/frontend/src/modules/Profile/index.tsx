@@ -11,6 +11,7 @@ import { MintParamsType } from '../../lib/helpers/NftCollection';
 import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
 import { useQuery } from '@apollo/client';
+import makeBlockie from 'ethereum-blockies-base64';
 
 
 interface MintNftParams {
@@ -117,8 +118,8 @@ export default function Profile() {
             <div className="flex flex-row items-center gap-4">
               {/** Avatar/Blockie */}
               <img
-                alt="ens avatar"
-                src="https://lh3.googleusercontent.com/nbLoKXUB707PZ2iBQ6JBVE8Ytu6Wms5HwiM3_Ssvi0LuAKS-CYU1mcdjr6naiyiaSY_FyYZHAdJWQ3emrHcff_k6-ZKPIKyMpCZN=w600"
+                alt="blockie or ens avatar"
+                src={makeBlockie(path[2])}
                 className="rounded-full w-40"
               />
               {/** ENS Name/Address */}
