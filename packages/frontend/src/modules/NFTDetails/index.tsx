@@ -4,14 +4,13 @@ import { BigNumber } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { FaShareAlt, FaSpinner } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
 import { PriceDisplay } from '../../components/PriceDisplay';
 import { UserDetail } from '../../components/UserDetail';
 import { PaymentToken } from '../../lib/graphql';
 import { isEthAddress, ZERO_ADDRESS } from '../../lib/helpers/base-service';
-import { formatEthAddress } from '../../lib/helpers/format';
 import {
   BuyTokenParamsType,
   ChangeBuyingConditionsParamsType,
@@ -43,6 +42,7 @@ export default function NFTDetails() {
   const { currentAccount, nftCollectionService } = useAppDataProvider();
   const [owner, setOwner] = useState<Boolean>(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { library: provider } = useWeb3React();
   const state = location.state as NftState;
   const [nft, setNft] = useState<NFT>();
@@ -53,7 +53,6 @@ export default function NFTDetails() {
   );
   const [ownerSelectedMode, setOwnerSelectedMode] = useState<string>('update');
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
-  //const navigate = useNavigate();
   const path = location.pathname.split('/');
   const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
 
@@ -194,7 +193,7 @@ export default function NFTDetails() {
     return <FaSpinner />;
   } else {
     return (
-      <div className=" text-black dark:text-white p-10 bg-slate-100">
+      <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-black">
         {/* <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" /> */}
         <div className="flex flex-col sm:flex-row  gap-10 ">
           {/** Column 1: NFT Image + buy/sell/redeem options */}
@@ -434,14 +433,14 @@ export default function NFTDetails() {
             <div className="flex max-w-xl">
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Created By</FieldLabel>
-                <div className="flex">
-                  <UserDetail name={nft.creator.id} caption={'Dec 16, 2021'} />
+                <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.creator.id)}>
+                  <UserDetail address={nft.creator.id} caption={'Dec 16, 2021'} />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
-                <div className="flex">
-                  <UserDetail name={formatEthAddress(nft.owner.id)} caption={'Dec 16, 2021'} />
+                <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.owner.id)}>
+                  <UserDetail address={nft.owner.id} caption={'Dec 16, 2021'} />
                 </div>
               </div>
             </div>
@@ -449,7 +448,7 @@ export default function NFTDetails() {
             <div className="flex flex-col">
               <HeadingSeparator>Description</HeadingSeparator>
 
-              <div className="text-sm leading-5 text-gray-900">{nft.description}</div>
+              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500">{nft.description}</div>
             </div>
 
             <div className="flex flex-col">

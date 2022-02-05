@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatEthAddress } from '../../lib/helpers/format';
 import { NFT } from '../../types';
 import { CategoryDisplay } from '../Category';
 import { PriceDisplay } from '../PriceDisplay';
@@ -16,7 +15,7 @@ export default function NFTCard({
   const navigate = useNavigate();
   return (
     <div
-      className="bg-white dark:bg-black rounded-lg shadow-lg p-5 cursor-pointer space-y-2"
+      className="bg-white dark:bg-black rounded-lg shadow-lg p-5 cursor-pointer space-y-2 dark:border dark:border-slate-500"
       onClick={() =>
         navigate('/details/' + nft.tokenId, {
           state: {
@@ -26,7 +25,7 @@ export default function NFTCard({
       }
     >
 
-      <UserDetail name={formatEthAddress(nft.creator.id)} caption={'Dec 16, 2021'} />
+      <UserDetail address={nft.creator.id} caption={'Dec 16, 2021'} />
       {/** Tag */}
       <CategoryDisplay>{nft.work}</CategoryDisplay>
       {/** NFT Description */}
