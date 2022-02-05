@@ -244,7 +244,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex h-full flex-col max-w-7xl m-auto">
+    <div className="flex flex-col max-w-7xl m-auto">
       <div className="p-10">
         <div className="flex flex-row justify-between">
           {/** Profile Header */}

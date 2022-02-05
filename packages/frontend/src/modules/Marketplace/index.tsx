@@ -166,31 +166,29 @@ export default function Marketplace() {
   console.log('error', error);
 
   return (
-    <div className="flex h-full flex-col max-w-7xl m-auto">
-      <div className="p-10">
-        <div className="flex flex-row justify-between">
-          {/** Marketplace Header */}
-          <div className="w-1/2 justify-items-start">
-            <div className="items-center text-gray-900 text-4xl font-extrabold">
-              Explore marketplace
-            </div>
+    <div className="flex flex-col max-w-7xl m-auto p-10">
+      <div className="flex flex-row justify-between">
+        {/** Marketplace Header */}
+        <div className="w-1/2 justify-items-start">
+          <div className="items-center text-gray-900 text-4xl font-extrabold">
+            Explore marketplace
           </div>
+        </div>
 
-          {/** Filter, TODO: Selector instead of button*/}
-          <div className="w-1/4 p-5 justify-items-end">
-            <div className="items-center">
-              <div className="items-center justify-center px-6 py-1 border border-gray text-base font-semibold rounded-md text-black bg-white hover:bg-gray-400 md:py-2 md:text-lg md:px-8 cursor-pointer">
-                Show All
-              </div>
+        {/** Filter, TODO: Selector instead of button*/}
+        <div className="w-1/4 p-5 justify-items-end">
+          <div className="items-center">
+            <div className="items-center justify-center px-6 py-1 border border-gray text-base font-semibold rounded-md text-black bg-white hover:bg-gray-400 md:py-2 md:text-lg md:px-8 cursor-pointer">
+              Show All
             </div>
           </div>
         </div>
-        <NFTGrid>
-          {sampleNFTs.map((nft) => {
-            return <NFTCard {...nft} />;
-          })}
-        </NFTGrid>
       </div>
+      <NFTGrid>
+        {sampleNFTs.map((nft) => {
+          return <NFTCard {...nft} />;
+        })}
+      </NFTGrid>
 
       {/** NFT Display */}
     </div>

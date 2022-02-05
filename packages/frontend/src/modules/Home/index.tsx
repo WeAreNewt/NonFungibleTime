@@ -2,12 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import LandingPageClock from '../../images/LandingPageClock.jpg';
-console.log('LandingPageClock', LandingPageClock);
 
 export const Home = () => {
   const { currentAccount } = useAppDataProvider();
   return (
-    <div className="flex h-full">
+    <div className="flex">
       <div className="w-full md:w-1/2 2xl:w-2/3 flex flex-col p-5">
         <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
           <div className="text-center sm:text-left">
@@ -42,7 +41,7 @@ export const Home = () => {
         style={{
           backgroundImage: `url(${LandingPageClock})`,
           // To keep the clock in the center, subtract 80px (size of the navbar)
-          height: 'calc(100vh - 80px)',
+          height: 'calc(100vh - 81px)',
           backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
