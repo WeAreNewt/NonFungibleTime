@@ -3,7 +3,7 @@ import { FaShareAlt, FaChevronCircleLeft, FaSpinner } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDataProvider } from '../../lib/providers/app-data-provider'
 import { Dialog } from '@headlessui/react'
-import { NFTProps } from '../../types'
+import { NFT } from '../../types'
 import { PaymentToken } from '../../lib/graphql'
 import { ZERO_ADDRESS, isEthAddress } from '../../lib/helpers/base-service'
 import { BuyTokenParamsType, ChangeBuyingConditionsParamsType, RedeemParamsType } from '../../lib/helpers/NftCollection'
@@ -13,7 +13,7 @@ import { formatUnits, parseUnits } from 'ethers/lib/utils'
 
 
 interface NftState {
-    nft?: NFTProps
+    nft?: NFT
 }
 
 interface BuyingConditions {
@@ -29,7 +29,7 @@ export default function NFTDetails() {
     const location = useLocation();
     const { library: provider } = useWeb3React()
     const state = location.state as NftState;
-    const [nft, setNft] = useState<NFTProps>();
+    const [nft, setNft] = useState<NFT>();
     const [uri, setURI] = useState<string>();
     const [formError, setFormError] = useState<string | undefined>(undefined)
     const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({} as BuyingConditions);
@@ -39,18 +39,16 @@ export default function NFTDetails() {
     const path = location.pathname.split('/');
     const baseUrl = "https://elated-kalam-a67780.netlify.app"; // Preview Deploy
 
-    const fetchURI = async (nft: NFTProps) => {
+    const fetchURI = async (nft: NFT) => {
         const response = await fetch(nft.tokenURI);
         const data = await response.json();
         setURI(data.image);
     }
 
-
-
     // Trigger buy transaction (+ approval if required)
     const buy = async () => {
         if (nft && currentAccount) {
-            const input: BuyTokenParamsType = { userAddress: currentAccount, tokenId: nft.tokenId, currency: nft.currency.id, price: BigNumber.from(nft.cost) }
+            const input: BuyTokenParamsType = { userAddress: currentAccount, tokenId: nft.tokenId, currency: nft.currency.id, price: BigNumber.from(nft.price) }
             setFormError(undefined);
             const txs = await nftCollectionService.buyToken(input)
             const tx = txs[0]
@@ -117,28 +115,28 @@ export default function NFTDetails() {
     useEffect(() => {
         if (state && state.nft) {
             setNft(state.nft);
-            state.nft.owner === currentAccount ? setOwner(true) : setOwner(false);
+            state.nft.owner.id.toLowerCase() === currentAccount?.toLowerCase() ? setOwner(true) : setOwner(false);
         } else {
             // If no NFT is passed (not accessing from profile or marketplace link), fetch from GQl
             console.log("NO NFT PASSSED")
         }
     }, [path, currentAccount, state])
 
-    // Render token svg
+    // Render token svg and set initial buying conditions
     useEffect(() => {
         if (nft) {
             fetchURI(nft);
             // All of these fields will come from nft once fetching from subgraph
             setBuyingConditions({
                 forSale: nft.forSale,
-                price: nft.cost,
+                price: nft.price,
                 currency: {
                     acceptable: true,
-                    decimals: 18,
-                    id: ZERO_ADDRESS,
+                    decimals: nft.currency.decimals,
+                    id: nft.currency.id,
                     symbol: nft.currency.symbol,
                 },
-                whitelistedBuyer: "0x0000000000000000000000000000000000000000",
+                whitelistedBuyer: nft.allowedBuyer,
             })
         }
     }, [nft])
@@ -179,7 +177,7 @@ export default function NFTDetails() {
                                 nft.redeemed ? <div>This NFT has been redeemed</div> : !owner ?
                                     (nft.forSale ? <div>
                                         Price
-                                        <div >{formatUnits(nft.cost.toString(), 18)} {nft.currency.symbol}</div>
+                                        <div >{formatUnits(nft.price.toString(), 18)} {nft.currency.symbol}</div>
                                         <div className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer" onClick={() => buy()}>
                                             Buy Now
                                         </div>
@@ -248,8 +246,8 @@ export default function NFTDetails() {
                         <div className="flex flex-row justify-between p-5">
                             <div className="flex-start">
                                 <div className="flex flex-col">
-                                    <div >{nft.title}</div>
-                                    <div >{nft.category}</div>
+                                    <div >{nft.name}</div>
+                                    <div >{nft.work}</div>
                                 </div>
                             </div>
                             {/** Share Profile */}
@@ -306,13 +304,13 @@ export default function NFTDetails() {
                                 <div className="flex flex-col">
                                     <div >Created By</div>
                                     <div className="flex flex-row">
-                                        <div >{nft.creator}</div>
+                                        <div >{nft.creator.id}</div>
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
                                     <div >Owned By</div>
                                     <div className="flex flex-row">
-                                        <div>{nft.owner}</div>
+                                        <div>{nft.owner.id}</div>
                                     </div>
                                 </div>
                             </div>
@@ -329,7 +327,7 @@ export default function NFTDetails() {
                         <div className="flex flex-row p-5">
                             <div className="flex flex-col">
                                 <div >Availability From</div>
-                                <div >{nft.availablilityFrom}</div>
+                                <div >{nft.availabilityFrom}</div>
                             </div>
                             <div className="flex flex-col p-5">
                                 <div >Availability To</div>
@@ -338,7 +336,7 @@ export default function NFTDetails() {
                         </div>
                         <div className="flex flex-col p-5">
                             <div >Royalties</div>
-                            <div >{nft.royaltyPercentage.toString()} %</div>
+                            <div >{(nft.royaltyBasisPoints / 100).toString()} %</div>
                         </div>
                     </div >
                 </div>
