@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import React from 'react';
 import NFTCard from '../../components/NFTCard';
+import { NFTGrid } from '../../components/NFTGrid';
 import { SalesDocument } from '../../lib/graphql/index';
 import { ZERO_ADDRESS } from '../../lib/helpers/base-service';
 import { Category, NFTProps } from '../../types';
@@ -165,9 +166,9 @@ export default function Marketplace() {
   console.log('error', error);
 
   return (
-    <div className="flex h-full flex-col max-w-6xl m-auto">
-      <div className="">
-        <div className="p-10 flex flex-row justify-between">
+    <div className="flex h-full flex-col max-w-7xl m-auto">
+      <div className="p-10">
+        <div className="flex flex-row justify-between">
           {/** Marketplace Header */}
           <div className="w-1/2 justify-items-start">
             <div className="items-center text-gray-900 text-4xl font-extrabold">
@@ -184,13 +185,14 @@ export default function Marketplace() {
             </div>
           </div>
         </div>
+        <NFTGrid>
+          {sampleNFTs.map((nft) => {
+            return <NFTCard {...nft} />;
+          })}
+        </NFTGrid>
       </div>
+
       {/** NFT Display */}
-      <div className="grid grid-cols-3 gap-4 p-10">
-        {sampleNFTs.map((nft) => {
-          return <NFTCard {...nft} />;
-        })}
-      </div>
     </div>
   );
 }
