@@ -147,7 +147,7 @@ export default function NFTDetails() {
   useEffect(() => {
     if (state && state.nft) {
       setNft(state.nft);
-      state.nft.owner.id === currentAccount ? setOwner(true) : setOwner(false);
+      state.nft.owner.id.toLowerCase() === currentAccount?.toLowerCase() ? setOwner(true) : setOwner(false);
     } else {
       // If no NFT is passed (not accessing from profile or marketplace link), fetch from GQl
       console.log('NO NFT PASSSED');
