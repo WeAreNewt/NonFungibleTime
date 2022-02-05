@@ -305,7 +305,7 @@ export default function NFTDetails() {
                     </div>
                     {/** Whitelist buyer */}
                     <label className="relative flex justify-between items-center p-2 text-xl">
-                      Whitelist Buyer Address
+                      Whitelist Buyer Address (optional)
                       <input
                         className="text-black"
                         type="text"

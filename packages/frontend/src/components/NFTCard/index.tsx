@@ -33,8 +33,8 @@ export default function NFTCard({
       <div className="text-base leading-6 text-gray-500 font-normal line-clamp-4 ">
         {nft.description}
       </div>
-      {/** Pricing */}
-      <PriceDisplay amount={nft.price} currency={nft.currency} />
+      {/** Pricing / Status */}
+      {nft.redeemed ? <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">Redeemed</div> : !nft.forSale ? <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">Not for sale</div> : <PriceDisplay amount={nft.price} currency={nft.currency} />}
     </div>
   );
 }
