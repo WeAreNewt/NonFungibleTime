@@ -295,8 +295,15 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
                             Base64.encode(
                                 bytes(
                                     ISvgGenerator(svgGenerator).generateSvg(
+                                        tokenId,
+                                        token.minter,
+                                        token.category,
+                                        token.name,
+                                        token.availabilityFrom,
+                                        token.availabilityTo,
+                                        token.duration,
                                         token.redeemed,
-                                        token.category
+                                        token.forSale
                                     )
                                 )
                             ),
