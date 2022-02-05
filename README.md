@@ -2,11 +2,11 @@
     <img src="newt_mayan.svg" width="300" height="300" >
 <p>
 
-# Non-Fungible Time
+# Busy AF
 
 Mint and purchase NFTs representing time for performing gig work and other use cases. Time NFTs can represent an on-chain attestation of work for contributors, and a way for organizations to recruit talent for specialized needs.
 
-While work is the initial use case for Non-Fungible Time, we envision this primitive to be extended to other use cases, such as restaurant reservations, subleases, etc.
+While work is the initial use case for Busy AF, we envision this primitive to be extended to other use cases, such as restaurant reservations, subleases, etc.
 
 ## Contracts
 
