@@ -1,8 +1,10 @@
 import React from 'react';
-import { formatUnits } from 'ethers/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { formatEthAddress } from '../../lib/helpers/format';
 import { NFT } from '../../types';
+import { CategoryDisplay } from '../Category';
 import { PriceDisplay } from '../PriceDisplay';
+import { UserDetail } from '../UserDetail';
 
 interface NftCardProps {
   nft: NFT;
@@ -23,18 +25,10 @@ export default function NFTCard({
         })
       }
     >
-      <div className="flex gap-2 items-center">
-        <div className="rounded-full bg-slate-400 w-9 h-9"></div>
-        <div className="flex flex-col">
-          <div className="text-gray-800 leading-5 text-sm"> {nft.name}</div>
-          <div className="text-gray-500 leading-5 text-sm"> Some date</div>
-        </div>
-      </div>
 
+      <UserDetail name={formatEthAddress(nft.creator.id)} caption={'Dec 16, 2021'} />
       {/** Tag */}
-      <div className="bg-blue-100 text-blue-800 px-2 py-1  text-xs rounded-xl inline-block  dark:text-white">
-        {nft.work}
-      </div>
+      <CategoryDisplay>{nft.work}</CategoryDisplay>
       {/** NFT Description */}
       <div className="text-xl leading-7 font-semibold  dark:text-white text-black "> {nft.name}</div>
       <div className="text-base leading-6 text-gray-500 font-normal line-clamp-4 ">
