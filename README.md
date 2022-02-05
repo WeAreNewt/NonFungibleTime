@@ -33,16 +33,6 @@ Main features of the frontend are creating, discovering, purchasing, and redeemi
 
 Frontend is build with React + TailwindCSS
 
-### TODOS:
-
-- [ ] Contract query framework
-- [ ] GraphQL Client
-- [ ] Connect Metamask Wallet
-- [ ] Mint NFT Modal
-- [ ] Mint Contract Call
-- [ ] Single marketplace item page
-- [ ] Buy from marketplace
-
 [More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/frontend/README.md)
 
 <br />
