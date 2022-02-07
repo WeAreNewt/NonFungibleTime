@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: TimeCollection
-    network: { { network } }
+    network: {{network}}
     source:
       abi: TimeCollection
       address: '{{timeCollectionAddress}}'
-      startBlock: { { timeCollectionStartBlock } }
+      startBlock: {{timeCollectionStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

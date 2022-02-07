@@ -4,9 +4,15 @@
 
 # Non Fungible Time
 
-Mint and purchase NFTs representing time for performing gig work and other use cases. Time NFTs can represent an on-chain attestation of work for contributors, and a way for organizations to recruit talent for specialized needs.
+Mint and purchase NFTs representing time for performing freelance services and other use cases. Time NFTs can represent an on-chain attestation of contributions, and a way for organizations to recruit talent for specialized needs.
 
-While work is the initial use case for Non Fungible Time, we envision this primitive to be extended to other use cases, such as restaurant reservations, subleases, etc.
+While freelance services is the initial use case for Non Fungible Time, we envision this primitive to be extended to other use cases, such as reservations, asset ownership, and autonomous on-chain agreements.
+
+## The Circle Of Life
+
+<p align="center">
+    <img src="packages/frontend/circle_of_life.png" width="550" height="300" >
+<p>
 
 ## Contracts
 

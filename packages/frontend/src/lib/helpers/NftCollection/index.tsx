@@ -1,5 +1,5 @@
 import { NonFungibleTimeCollection } from './typechain/NonFungibleTimeCollection';
-import { NonFungibleTimeCollection__factory } from './typechain/NonFungibleTimeCollection__factory';
+import { NonFungibleTimeCollection__factory } from './typechain/factory/NonFungibleTimeCollection__factory';
 import { BigNumber, providers } from 'ethers';
 import BaseService, { ZERO_ADDRESS, SUPER_BIG_ALLOWANCE_NUMBER } from '../base-service';
 import {

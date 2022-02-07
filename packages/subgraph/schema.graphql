@@ -8,7 +8,7 @@ type Nft @entity {
   royaltyReceiver: User!
   name: String!
   description: String!
-  work: String!
+  category: String!
   availabilityTo: BigInt!
   availabilityFrom: BigInt!
   "nft creator can restrict buyer to a single address"
