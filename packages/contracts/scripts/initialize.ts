@@ -5,7 +5,7 @@ async function main() {
   const nftCollection = await NftCollectionFactory.attach('<NonFungibleTimeCollectionAddress>');
 
   await nftCollection.initialize(
-    'Non Fungible Time',
+    'NonFungibleTimeCollection',
     'NFTIME',
     true,
     '<SvgGeneratorAddress>',
