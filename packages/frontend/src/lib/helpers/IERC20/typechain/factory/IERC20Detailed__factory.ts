@@ -4,13 +4,10 @@
 import { Contract, Signer } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 
-import type { IERC20Detailed } from './IERC20Detailed';
+import type { IERC20Detailed } from '../IERC20Detailed';
 
 export class IERC20Detailed__factory {
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider,
-  ): IERC20Detailed {
+  static connect(address: string, signerOrProvider: Signer | Provider): IERC20Detailed {
     return new Contract(address, _abi, signerOrProvider) as IERC20Detailed;
   }
 }

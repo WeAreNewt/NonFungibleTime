@@ -40,7 +40,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "codegen:graphql": "graphql-codegen"
+    "subgraph:codegen": "graphql-codegen"
   },
   "husky": {
     "hooks": {

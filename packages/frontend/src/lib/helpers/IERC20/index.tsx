@@ -14,7 +14,7 @@ import {
 } from '../base-service';
 
 import { IERC20Detailed } from './typechain/IERC20Detailed';
-import { IERC20Detailed__factory } from './typechain/IERC20Detailed__factory';
+import { IERC20Detailed__factory } from './typechain/factory/IERC20Detailed__factory';
 
 export interface IERC20ServiceInterface {
     decimalsOf: (token: DecimalsOfType) => Promise<number>;
