@@ -17,6 +17,8 @@ export default function Navbar() {
   const location = useLocation();
   const activePage = location.pathname.split('/')[1];
 
+
+
   // Navbar Links
   const navigation: Navigation[] = [
     {
@@ -105,7 +107,7 @@ export default function Navbar() {
                           href={link.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-500 dark:text-white px-3 py-2 rounded-md text-lg font-semibold"
+                          className={"text-gray-500 dark:text-white px-3 py-2 hover:underline decoration-indigo-600 decoration-4 underline-offset-8 rounded-md text-lg font-semibold"}
                           aria-current={undefined}
                         >
                           {link.title}
@@ -116,8 +118,8 @@ export default function Navbar() {
                           title={link.title}
                           className={
                             activePage === link.title.toLowerCase()
-                              ? 'text-indigo-600 px-3 py-2 rounded-md text-lg font-semibold'
-                              : 'text-gray-500 dark:text-white px-3 py-2 rounded-md text-lg font-semibold'
+                              ? 'text-indigo-600 px-3 py-2 rounded-md text-lg font-semibold underline decoration-indigo-600 decoration-4 underline-offset-8'
+                              : 'text-gray-500 dark:text-white px-3 py-2 rounded-md text-lg hover:underline decoration-indigo-600 decoration-4 underline-offset-8 font-semibold'
                           }
                           aria-current={
                             activePage === link.title.toLowerCase() ? 'page' : undefined
