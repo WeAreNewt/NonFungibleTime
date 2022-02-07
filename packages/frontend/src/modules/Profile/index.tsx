@@ -12,9 +12,8 @@ import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
 import { useQuery } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface MintNftParams {
   name: string;
@@ -54,23 +53,27 @@ export default function Profile() {
     }
   }, [path, currentAccount]);
 
-
   // If user is the profile owner, use data from app provider
   // Otherwise fetch data from subgraph
   const { data, loading } = useQuery(ProfileNftsDocument, {
     variables: {
-      user: owner ? '' : path[2].toLowerCase()
+      user: owner ? '' : path[2].toLowerCase(),
     },
   });
-  const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
+  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
   const userLoading: boolean = owner ? loadingUserData : loading;
   const toggleClass = ' transform translate-x-5';
 
   const mintNft = async () => {
-    console.log(formNft)
+    console.log(formNft);
     if (currentAccount) {
       if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
-        if ((formNft.availabilityTo === 0 || formNft.availabilityFrom === 0) || (formNft.availabilityTo > formNft.availabilityFrom && formNft.duration * 3600 <= formNft.availabilityTo - formNft.availabilityFrom)) {
+        if (
+          formNft.availabilityTo === 0 ||
+          formNft.availabilityFrom === 0 ||
+          (formNft.availabilityTo > formNft.availabilityFrom &&
+            formNft.duration * 3600 <= formNft.availabilityTo - formNft.availabilityFrom)
+        ) {
           if (formNft.royalty <= 100) {
             const input: MintParamsType = {
               userAddress: currentAccount,
@@ -98,7 +101,7 @@ export default function Profile() {
             setFormError('Royalty must be between 1 and 100');
           }
         } else {
-          setFormError('availabilityTo must be greater than availablilityFrom + duration')
+          setFormError('availabilityTo must be greater than availablilityFrom + duration');
         }
       } else {
         setFormError('Name, Description, Category, and Duration are required fields');
@@ -196,7 +199,9 @@ export default function Profile() {
                                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                     placeholder="Name for your service..."
                                     value={formNft.name}
-                                    onChange={(e) => setFormNft({ ...formNft, name: e.target.value })}
+                                    onChange={(e) =>
+                                      setFormNft({ ...formNft, name: e.target.value })
+                                    }
                                   />
                                 </div>
                               </div>
@@ -242,14 +247,14 @@ export default function Profile() {
                                       setFormNft({ ...formNft, category: e.target.value })
                                     }
                                   >
-                                    <option key={""}>-</option>
-                                    {Object.values(Category).map((category, index) => <option key={index}>{category}</option>)}
+                                    <option key={''}>-</option>
+                                    {Object.values(Category).map((category, index) => (
+                                      <option key={index}>{category}</option>
+                                    ))}
                                   </select>
                                 </div>
                                 <div>
-                                  <label
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
+                                  <label className="block text-sm font-medium text-gray-700">
                                     Number Of Hours
                                   </label>
                                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -271,52 +276,88 @@ export default function Profile() {
 
                             <div className="mt-2">
                               <div>
-                                <label
-                                  className="block text-sm font-medium text-gray-700"
-                                >
+                                <label className="block text-sm font-medium text-gray-700">
                                   Beginning Of Availability (optional)
                                   <div
                                     className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
                                     onClick={() => {
-                                      setFormNft({ ...formNft, availabilityFrom: formNft.availabilityFrom === 0 ? Math.floor(Date.now() / 1000 - (Date.now() / 1000 % 3600)) : 0 });
+                                      setFormNft({
+                                        ...formNft,
+                                        availabilityFrom:
+                                          formNft.availabilityFrom === 0
+                                            ? Math.floor(
+                                                Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                              )
+                                            : 0,
+                                      });
                                     }}
                                   >
-
-
                                     <div
-                                      className={"bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform" + (formNft.availabilityFrom === 0 ? null : toggleClass)}
+                                      className={
+                                        'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
+                                        (formNft.availabilityFrom === 0 ? null : toggleClass)
+                                      }
                                     />
                                   </div>
                                 </label>
-                                {formNft.availabilityFrom !== 0 ? <DatePicker selected={new Date(formNft.availabilityFrom * 1000)} onChange={(date) => setFormNft({
-                                  ...formNft,
-                                  availabilityFrom: date ? Math.floor(date.getTime() / 1000) : 0,
-                                })} /> : <></>}
+                                {formNft.availabilityFrom !== 0 ? (
+                                  <DatePicker
+                                    selected={new Date(formNft.availabilityFrom * 1000)}
+                                    onChange={(date) =>
+                                      setFormNft({
+                                        ...formNft,
+                                        availabilityFrom: date
+                                          ? Math.floor(date.getTime() / 1000)
+                                          : 0,
+                                      })
+                                    }
+                                  />
+                                ) : (
+                                  <></>
+                                )}
                               </div>
                             </div>
                             <div className="mt-2">
                               <div>
-                                <label
-                                  className="block text-sm font-medium text-gray-700"
-                                >
+                                <label className="block text-sm font-medium text-gray-700">
                                   End Of Availablility (optional)
                                   <div
                                     className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
                                     onClick={() => {
-                                      setFormNft({ ...formNft, availabilityTo: formNft.availabilityTo === 0 ? Math.floor(Date.now() / 1000 - (Date.now() / 1000 % 3600)) : 0 });
+                                      setFormNft({
+                                        ...formNft,
+                                        availabilityTo:
+                                          formNft.availabilityTo === 0
+                                            ? Math.floor(
+                                                Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                              )
+                                            : 0,
+                                      });
                                     }}
                                   >
-
-
                                     <div
-                                      className={"bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform" + (formNft.availabilityTo === 0 ? null : toggleClass)}
+                                      className={
+                                        'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
+                                        (formNft.availabilityTo === 0 ? null : toggleClass)
+                                      }
                                     />
                                   </div>
                                 </label>
-                                {formNft.availabilityTo !== 0 ? <DatePicker selected={new Date(formNft.availabilityTo * 1000)} onChange={(date) => setFormNft({
-                                  ...formNft,
-                                  availabilityTo: date ? Math.floor(date.getTime() / 1000) : 0,
-                                })} /> : <></>}
+                                {formNft.availabilityTo !== 0 ? (
+                                  <DatePicker
+                                    selected={new Date(formNft.availabilityTo * 1000)}
+                                    onChange={(date) =>
+                                      setFormNft({
+                                        ...formNft,
+                                        availabilityTo: date
+                                          ? Math.floor(date.getTime() / 1000)
+                                          : 0,
+                                      })
+                                    }
+                                  />
+                                ) : (
+                                  <></>
+                                )}
                               </div>
                             </div>
 
@@ -446,11 +487,15 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          {userLoading || !user ? <FaSpinner /> : <NFTGrid>
-            {user.ownedNfts.map((nft, index) => {
-              return <NFTCard key={index} nft={nft} />;
-            })}
-          </NFTGrid>}
+          {userLoading || !user ? (
+            <FaSpinner />
+          ) : (
+            <NFTGrid>
+              {user.ownedNfts.map((nft, index) => {
+                return <NFTCard key={index} nft={nft} />;
+              })}
+            </NFTGrid>
+          )}
         </div>
       </div>
     </div>

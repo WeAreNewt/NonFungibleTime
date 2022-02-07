@@ -24,11 +24,11 @@ const PROTOCOL_CHAIN = ChainId.mumbai;
 
 export interface Web3DataContextType {
   chainId: number;
-  connect: (walletType: WalletType) => Promise<void>,
-  account: string | undefined,
-  isCorrectChain: boolean,
-  active: boolean,
-  requestToSwitchChain: () => Promise<void>,
+  connect: (walletType: WalletType) => Promise<void>;
+  account: string | undefined;
+  isCorrectChain: boolean;
+  active: boolean;
+  requestToSwitchChain: () => Promise<void>;
 }
 
 const Web3DataContext = React.createContext<Web3DataContextType>({} as Web3DataContextType);
@@ -93,11 +93,11 @@ export const Web3DataProvider: React.FC = ({ children }) => {
         active,
         requestToSwitchChain,
         chainId: PROTOCOL_CHAIN,
-      }}>
+      }}
+    >
       {children}
     </Web3DataContext.Provider>
-  )
+  );
 };
-
 
 export const useWeb3 = () => useContext(Web3DataContext);
