@@ -7,7 +7,7 @@ async function main() {
   await nftCollection.mint(
     'One hour of randomdeveloper.eth',
     'I would love to code Solidity for a DAO',
-    'Development',
+    'Programming & Tech',
     0,
     0,
     3600,
@@ -16,7 +16,7 @@ async function main() {
   await nftCollection.mint(
     'Two hours of design',
     'I have knowdlege about UI/UX and design',
-    'Design',
+    'Graphics & Design',
     0,
     0,
     7200,
@@ -25,24 +25,16 @@ async function main() {
   await nftCollection.mint(
     'Two hours of brainstorming',
     'I can help you to get ideas on how to growth your community',
-    'Community',
+    'Video & Animation',
     0,
     0,
     7200,
     100
   );
+  await nftCollection.mint('Music production', '', 'Music & Audio', 0, 0, 3600, 100);
   await nftCollection.mint(
-    'One hour of otherdev.eth',
-    'I would love to help with frontend :)',
-    'Development',
-    0,
-    0,
-    3600,
-    100
-  );
-  await nftCollection.mint(
-    'Three hours of Spanish lessons',
-    'I am a native Spanish speaker willing to teach',
+    'Spanish lessons',
+    'I am a native Spanish speaker willing to teach. Let me know if you need less than an hour.',
     'Lessons',
     0,
     0,
