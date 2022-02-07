@@ -226,7 +226,7 @@ export function handleTransfer(event: Transfer): void {
       nft.forSale = values.value10;
       nft.name = values.value11;
       nft.description = values.value12;
-      nft.work = values.value13;
+      nft.category = values.value13;
       nft.tokenId = event.params.tokenId;
       const uri = getTokenURI(event, event.params.tokenId);
       nft.tokenURI = uri;
