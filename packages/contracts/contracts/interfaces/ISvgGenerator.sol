@@ -3,15 +3,15 @@ pragma solidity ^0.8.4;
 
 interface ISvgGenerator {
     /// @dev Generates an SVG from the given data.
-    /// @param tokenId TODO
-    /// @param minter TODO
+    /// @param tokenId The ID of the token for which the SVG will be generated.
+    /// @param minter The minter of the token.
     /// @param category Type or category label that represents the activity for what the time was tokenized.
-    /// @param name TODO
-    /// @param availabilityFrom TODO
-    /// @param availabilityTo TODO
-    /// @param duration TODO
-    /// @param redeemed A boolean representing if the token is already redeemed or not.
-    /// @param forSale TODO
+    /// @param name Name of the NFT.
+    /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
+    /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
+    /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
+    /// @param redeemed A boolean representing if the token was already redeemed or not.
+    /// @param forSale A boolean representing if the token is for sale or not.
     /// @return A string representing the generated SVG.
     function generateSvg(
         uint256 tokenId,

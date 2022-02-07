@@ -1,24 +1,28 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.4;
 
-import './interfaces/ISvgGenerator.sol';
+import '../interfaces/ISvgGenerator.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 
 contract SvgGenerator is ISvgGenerator {
     uint256 immutable MAX_HUE = 360;
 
-    address public firstCirclesGenerator;
-    address public thirdCircleGenerator;
-    address public lastCirclesGenerator;
+    address public outerRingsSvgGenerator;
+    address public middleRingsSvgGenerator;
+    address public innerRingsSvgGenerator;
 
+    /// @dev Instantiate an SVG generator with the given secondary generators.
+    /// @param outerRingsSvgGeneratorContract Address of the SVG generator for the outer rings.
+    /// @param middleRingsSvgGeneratorContract Address of the SVG generator for the middle rings.
+    /// @param innerRingsSvgGeneratorContract Address of the SVG generator for the inner rings.
     constructor(
-        address firstCirclesGeneratorContract,
-        address thirdCircleGeneratorContract,
-        address lastCirclesGeneratorContract
+        address outerRingsSvgGeneratorContract,
+        address middleRingsSvgGeneratorContract,
+        address innerRingsSvgGeneratorContract
     ) {
-        firstCirclesGenerator = firstCirclesGeneratorContract;
-        thirdCircleGenerator = thirdCircleGeneratorContract;
-        lastCirclesGenerator = lastCirclesGeneratorContract;
+        outerRingsSvgGenerator = outerRingsSvgGeneratorContract;
+        middleRingsSvgGenerator = middleRingsSvgGeneratorContract;
+        innerRingsSvgGenerator = innerRingsSvgGeneratorContract;
     }
 
     /// @inheritdoc ISvgGenerator
@@ -61,7 +65,8 @@ contract SvgGenerator is ISvgGenerator {
     }
 
     /// @dev Generates the first part of the SVG.
-    /// @return A string representing the first part of the SVG.
+    /// @param rotateNewt A boolean indicating if the newt should be rotating or not.
+    /// @return Bytes representing the first part of the SVG.
     function _getInitialPart(bool rotateNewt) internal pure returns (bytes memory) {
         return
             abi.encodePacked(
@@ -73,7 +78,13 @@ contract SvgGenerator is ISvgGenerator {
     }
 
     /// @dev Generates the middle part of the SVG.
-    /// @return A string representing the middle part of the SVG.
+    /// @param tokenId The ID of the token for which the SVG will be generated.
+    /// @param minter The minter of the token.
+    /// @param category Type or category label that represents the activity for what the time was tokenized.
+    /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
+    /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
+    /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
+    /// @return Bytes representing the middle part of the SVG.
     function _getMiddlePart(
         uint256 tokenId,
         address minter,
@@ -85,7 +96,7 @@ contract SvgGenerator is ISvgGenerator {
         uint256 categoryAsInt = uint256(keccak256(bytes(category)));
         return
             abi.encodePacked(
-                _rotationClass('.rotation-1', availabilityFrom + tokenId, 6, 20),
+                _rotationClass('.rotation-1', availabilityFrom + tokenId, 8, 20),
                 _rotationClass('.rotation-2', uint160(minter) + tokenId, 6, 20),
                 _rotationClass('.rotation-3', categoryAsInt, 6, 20),
                 _rotationClass('.rotation-4', duration + tokenId, 3, 10),
@@ -98,7 +109,16 @@ contract SvgGenerator is ISvgGenerator {
     }
 
     /// @dev Generates the last part of the SVG.
-    /// @return A string representing the last part of the SVG.
+    /// @param tokenId The ID of the token for which the SVG will be generated.
+    /// @param minter The minter of the token.
+    /// @param category Type or category label that represents the activity for what the time was tokenized.
+    /// @param name Name of the NFT.
+    /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
+    /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
+    /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
+    /// @param redeemed A boolean representing if the token was already redeemed or not.
+    /// @param forSale A boolean representing if the token is for sale or not.
+    /// @return Bytes representing the last part of the SVG.
     function _getLastPart(
         uint256 tokenId,
         address minter,
@@ -112,7 +132,7 @@ contract SvgGenerator is ISvgGenerator {
     ) internal view returns (bytes memory) {
         return
             abi.encodePacked(
-                ISvgGenerator(firstCirclesGenerator).generateSvg(
+                ISvgGenerator(outerRingsSvgGenerator).generateSvg(
                     tokenId,
                     minter,
                     category,
@@ -123,7 +143,7 @@ contract SvgGenerator is ISvgGenerator {
                     redeemed,
                     forSale
                 ),
-                ISvgGenerator(thirdCircleGenerator).generateSvg(
+                ISvgGenerator(middleRingsSvgGenerator).generateSvg(
                     tokenId,
                     minter,
                     category,
@@ -134,7 +154,7 @@ contract SvgGenerator is ISvgGenerator {
                     redeemed,
                     forSale
                 ),
-                ISvgGenerator(lastCirclesGenerator).generateSvg(
+                ISvgGenerator(innerRingsSvgGenerator).generateSvg(
                     tokenId,
                     minter,
                     category,
@@ -148,6 +168,11 @@ contract SvgGenerator is ISvgGenerator {
             );
     }
 
+    /// @dev Maps the given integer into other inside a given interval.
+    /// @param value The integer to map.
+    /// @param start An integer representing the start of the output interval.
+    /// @param end An integer representing the end of the output interval.
+    /// @return An integer inside the given interval.
     function _intToInterval(
         uint256 value,
         uint256 start,
@@ -157,6 +182,12 @@ contract SvgGenerator is ISvgGenerator {
         return (value % intervalLength) + start;
     }
 
+    /// @dev Generates a rotation animation css class.
+    /// @param className The class name including the initial dot used in css syntax for class definitions.
+    /// @param value An integer value used to derive the rotation orientation.
+    /// @param slowestSpeed An integer representing the minimum rotation speed allowed, measured in seconds.
+    /// @param fastestSpeed An integer representing the maximum rotation speed allowed, measured in seconds.
+    /// @return Bytes representing the class css code.
     function _rotationClass(
         string memory className,
         uint256 value,
