@@ -243,7 +243,7 @@ export default function Profile() {
                                       setFormNft({ ...formNft, category: e.target.value })
                                     }
                                   >
-                                    {Object.values(Category).map(category => <option>{category}</option>)}
+                                    {Object.values(Category).map((category, index) => <option key={index}>{category}</option>)}
                                   </select>
                                 </div>
                                 <div>

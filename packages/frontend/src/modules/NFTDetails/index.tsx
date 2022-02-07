@@ -192,6 +192,15 @@ export default function NFTDetails() {
   if (!nft) {
     return <FaSpinner />;
   } else {
+    const mintDatetime = new Date(nft.mintTimestamp * 1000);
+    const mintDateString = mintDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
+    let lastPurchaseDateString = mintDateString;
+    if (nft.lastPurchaseTimestamp !== 0) {
+      const lastPurchaseDatetime = new Date(nft.lastPurchaseTimestamp * 1000);
+      lastPurchaseDateString = lastPurchaseDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
+
+    }
+
     return (
       <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-black">
         {/* <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" /> */}
@@ -434,13 +443,13 @@ export default function NFTDetails() {
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Created By</FieldLabel>
                 <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.creator.id)}>
-                  <UserDetail address={nft.creator.id} caption={'Dec 16, 2021'} />
+                  <UserDetail address={nft.creator.id} caption={mintDateString} />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
                 <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.owner.id)}>
-                  <UserDetail address={nft.owner.id} caption={'Dec 16, 2021'} />
+                  <UserDetail address={nft.owner.id} caption={lastPurchaseDateString} />
                 </div>
               </div>
             </div>

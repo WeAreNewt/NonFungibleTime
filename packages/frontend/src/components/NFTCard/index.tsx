@@ -13,6 +13,10 @@ export default function NFTCard({
   nft
 }: NftCardProps) {
   const navigate = useNavigate();
+  const mintDatetime = new Date(nft.mintTimestamp * 1000);
+  // Request a weekday along with a long date
+  const mintDateString = mintDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
+
   return (
     <div
       className="bg-white dark:bg-black rounded-lg shadow-lg p-5 cursor-pointer space-y-2 dark:border dark:border-slate-500"
@@ -25,7 +29,7 @@ export default function NFTCard({
       }
     >
 
-      <UserDetail address={nft.creator.id} caption={'Dec 16, 2021'} />
+      <UserDetail address={nft.creator.id} caption={mintDateString} />
       {/** Tag */}
       <CategoryDisplay>{nft.work ? nft.work : 'Other'}</CategoryDisplay>
       {/** NFT Description */}
