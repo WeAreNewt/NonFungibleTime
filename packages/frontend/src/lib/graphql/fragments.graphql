@@ -17,7 +17,7 @@ fragment NftFields on Nft {
   }
   name
   description
-  work
+  category
   availabilityFrom
   availabilityTo
   allowedBuyer

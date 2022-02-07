@@ -30,7 +30,7 @@ export default function NFTCard({
 
       <UserDetail address={nft.creator.id} caption={mintDateString} />
       {/** Tag */}
-      <CategoryDisplay>{nft.work ? nft.work : 'Other'}</CategoryDisplay>
+      <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
       {/** NFT Description */}
       <div className="text-xl leading-7 font-semibold  dark:text-white text-black "> {nft.name}</div>
       <div className="text-base leading-6 text-gray-500 font-normal line-clamp-4 ">

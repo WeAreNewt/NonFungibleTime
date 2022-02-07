@@ -7,7 +7,7 @@ import { Provider, TransactionRequest } from '@ethersproject/providers';
 import type {
   NonFungibleTimeCollection,
   NonFungibleTimeCollectionInterface,
-} from './NonFungibleTimeCollection';
+} from '../NonFungibleTimeCollection';
 
 const _abi = [
   {

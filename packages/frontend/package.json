@@ -25,6 +25,7 @@
     "ethers": "^5.5.3",
     "graphql": "^15.8.0",
     "react": "^17.0.2",
+    "react-datepicker": "^4.6.0",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "^6.2.1",
@@ -39,7 +40,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "codegen:graphql": "graphql-codegen"
+    "subgraph:codegen": "graphql-codegen"
   },
   "husky": {
     "hooks": {
@@ -80,6 +81,7 @@
     "@graphql-codegen/typescript": "^2.4.2",
     "@graphql-codegen/typescript-operations": "^2.2.3",
     "@graphql-codegen/typescript-react-query": "^3.5.0",
+    "@types/react-datepicker": "^4.3.4",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "autoprefixer": "^10.4.0",

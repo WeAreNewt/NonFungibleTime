@@ -198,6 +198,7 @@ export default function NFTDetails() {
   const unselected =
     'items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer';
 
+
   if (!nft) {
     return <FaSpinner />;
   } else {
@@ -358,7 +359,7 @@ export default function NFTDetails() {
               <div className="flex-start">
                 <div className="flex flex-col">
                   <div className="text-4xl leading-10 font-extrabold mb-2">{nft.name}</div>
-                  <CategoryDisplay>{nft.work ? nft.work : 'Other'}</CategoryDisplay>
+                  <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
                 </div>
               </div>
               {/** Share Profile */}
@@ -476,19 +477,21 @@ export default function NFTDetails() {
               <div className="space-y-5">
                 <div>
                   <FieldLabel className="mb-2">Duration</FieldLabel>
-                  <div>{nft.duration} hours</div>
+                  <div>{nft.duration / 3600} hours</div>
                 </div>
-                <div className="flex gap-5">
-                  <div>
-                    <FieldLabel className="mb-2">Availability From</FieldLabel>
-                    <div>{nft.availabilityFrom}</div>
-                  </div>
-                  <div>
-                    <FieldLabel className="mb-2">Availability To</FieldLabel>
-                    <div>{nft.availabilityTo}</div>
-                  </div>
-                </div>
-
+                {
+                  nft.availabilityTo !== 0 && nft.availabilityTo < Date.now() / 1000 ? <div>Out of availability range</div> :
+                    <div className="flex gap-5">
+                      <div>
+                        <FieldLabel className="mb-2">Availability From</FieldLabel>
+                        <div>{nft.availabilityFrom > Date.now() / 1000 ? new Date(nft.availabilityFrom * 1000).toLocaleString("en-us", { dateStyle: 'long' }) : 'Now'}</div>
+                      </div>
+                      <div>
+                        <FieldLabel className="mb-2">Availability To</FieldLabel>
+                        <div>{nft.availabilityTo === 0 ? 'No End Date' : new Date(nft.availabilityTo * 1000).toLocaleString("en-us", { dateStyle: 'long' })}</div>
+                      </div>
+                    </div>
+                }
                 <div>
                   <FieldLabel className="mb-2">Royalities</FieldLabel>
                   <div>{(nft.royaltyBasisPoints / 100).toString()} %</div>
