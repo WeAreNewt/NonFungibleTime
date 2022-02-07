@@ -1,7 +1,7 @@
 import { Dialog } from '@headlessui/react';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -49,12 +49,21 @@ export default function NFTDetails() {
   const [uri, setURI] = useState<string>();
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>(
-    {} as BuyingConditions
+    {
+      forSale: true,
+      price: 0,
+      currency: {
+        acceptable: true,
+        decimals: 18,
+        id: '0x0',
+        symbol: ''
+      },
+      whitelistedBuyer: '0x0',
+    }
   );
   const [ownerSelectedMode, setOwnerSelectedMode] = useState<string>('update');
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
   const path = location.pathname.split('/');
-  const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
 
   const fetchURI = async (nft: NFT) => {
     const response = await fetch(nft.tokenURI);
@@ -161,7 +170,7 @@ export default function NFTDetails() {
       // All of these fields will come from nft once fetching from subgraph
       setBuyingConditions({
         forSale: nft.forSale,
-        price: nft.price,
+        price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
         currency: {
           acceptable: true,
           decimals: 18,
@@ -287,6 +296,7 @@ export default function NFTDetails() {
                         <input
                           className="text-black"
                           type="number"
+                          value={buyingConditions.price}
                           onChange={(e) => {
                             setBuyingConditions({
                               ...buyingConditions,
@@ -318,6 +328,7 @@ export default function NFTDetails() {
                       <input
                         className="text-black"
                         type="text"
+                        value={buyingConditions.whitelistedBuyer}
                         onChange={(e) => {
                           setBuyingConditions({
                             ...buyingConditions,
@@ -406,7 +417,7 @@ export default function NFTDetails() {
                                       name="profile-link"
                                       id="price"
                                       className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                                      placeholder={baseUrl + location.pathname}
+                                      value={window.location.href}
                                     />
                                   </div>
                                 </div>
@@ -419,7 +430,7 @@ export default function NFTDetails() {
                             type="button"
                             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
                             onClick={() => {
-                              navigator.clipboard.writeText(baseUrl + location.pathname);
+                              navigator.clipboard.writeText(window.location.href);
                             }}
                           >
                             Copy URL

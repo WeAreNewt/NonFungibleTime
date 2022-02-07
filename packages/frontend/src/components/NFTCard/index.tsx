@@ -14,7 +14,6 @@ export default function NFTCard({
 }: NftCardProps) {
   const navigate = useNavigate();
   const mintDatetime = new Date(nft.mintTimestamp * 1000);
-  // Request a weekday along with a long date
   const mintDateString = mintDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
 
   return (
