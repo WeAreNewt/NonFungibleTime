@@ -13,7 +13,7 @@ npm start
 
 ## Subgraph Changes
 
-To update the subgraph schema run:
+To update the subgraph schema, in the `packages/frontend` directory run:
 
 ```
 npm run subgraph:codegen
@@ -23,7 +23,7 @@ And update queries in `src/lib/queries.graphql`
 
 ## Smart Contract Changes
 
-To generate new typechain facts, in contracts directory run:
+To generate new typechain facts, in the `packages/contracts` directory run:
 
 ```
 npm i

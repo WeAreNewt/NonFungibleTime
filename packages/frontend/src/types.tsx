@@ -47,7 +47,7 @@ export interface NFT {
     }
     name: string;
     description: string;
-    work: string;
+    category: string;
     availabilityFrom: number;
     availabilityTo: number;
     allowedBuyer: string;
