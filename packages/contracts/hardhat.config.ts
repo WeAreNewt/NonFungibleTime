@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
     },
   },
   dodoc: {
-    include: ['NonFungibleTimeCollection', 'ISvgGenerator', 'SvgGenerator'],
+    include: ['NonFungibleTimeCollection', 'ISvgGenerator'],
   },
 };
 
