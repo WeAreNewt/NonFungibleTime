@@ -1,4 +1,4 @@
-# Subgraph for Busy AF
+# Subgraph for Non Fungible Time
 
 ## Development
 

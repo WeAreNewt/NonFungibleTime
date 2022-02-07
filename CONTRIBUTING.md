@@ -12,7 +12,7 @@ Newt welcomes contributions in all areas: code, ideas, documentation, marketing,
 
 <br />
 
-# Busy AF Contributions
+# Non Fungible Time Contributions
 
 A list of tasks can be found on the [Newt homepage](https://wearenewt.xyz/) under the Task List section.
 
