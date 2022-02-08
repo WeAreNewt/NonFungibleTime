@@ -3,8 +3,8 @@ import { FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import { Category, User } from '../../types';
-import { Dialog } from '@headlessui/react';
+import { Category, NFT, User } from '../../types';
+import { Dialog, Tab } from '@headlessui/react';
 import { BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { MintParamsType } from '../../lib/helpers/NftCollection';
@@ -12,8 +12,10 @@ import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
 import { useQuery } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker from "react-datepicker";
+import classnames from 'classnames';
+import "react-datepicker/dist/react-datepicker.css";
+
 
 interface MintNftParams {
   name: string;
@@ -30,6 +32,7 @@ export default function Profile() {
   const { library: provider } = useWeb3React();
   const [owner, setOwner] = useState<Boolean>(true);
   const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [toggleIndex, setToggleIndex] = useState<number>(0)
   const [formNft, setFormNft] = useState<MintNftParams>({
     name: '',
     description: '',
@@ -60,12 +63,34 @@ export default function Profile() {
       user: owner ? '' : path[2].toLowerCase(),
     },
   });
-  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
+
+
+  const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
   const userLoading: boolean = owner ? loadingUserData : loading;
+  const categories = ["Minted", "Owned"]
+  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : [])
   const toggleClass = ' transform translate-x-5';
 
+  useEffect(() => {
+    if (user?.createdNfts && toggleIndex === 0) {
+      setNftsShown(user.createdNfts)
+    }
+    if (user?.ownedNfts && toggleIndex === 1) {
+      setNftsShown(user.ownedNfts)
+    }
+  }, [user, toggleIndex])
+
+
+  const onChangeTab = (index: number) => {
+    if (index === 0) {
+      setToggleIndex(0)
+    }
+    else {
+      setToggleIndex(1)
+    }
+  }
+
   const mintNft = async () => {
-    console.log(formNft);
     if (currentAccount) {
       if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
         if (
@@ -110,7 +135,6 @@ export default function Profile() {
       setFormError('No account connected');
     }
   };
-
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
@@ -286,8 +310,8 @@ export default function Profile() {
                                         availabilityFrom:
                                           formNft.availabilityFrom === 0
                                             ? Math.floor(
-                                                Date.now() / 1000 - ((Date.now() / 1000) % 3600)
-                                              )
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                            )
                                             : 0,
                                       });
                                     }}
@@ -329,8 +353,8 @@ export default function Profile() {
                                         availabilityTo:
                                           formNft.availabilityTo === 0
                                             ? Math.floor(
-                                                Date.now() / 1000 - ((Date.now() / 1000) % 3600)
-                                              )
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                            )
                                             : 0,
                                       });
                                     }}
@@ -487,15 +511,31 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          {userLoading || !user ? (
-            <FaSpinner />
-          ) : (
-            <NFTGrid>
-              {user.ownedNfts.map((nft, index) => {
-                return <NFTCard key={index} nft={nft} />;
+          <Tab.Group onChange={((index) => onChangeTab(index))}>
+            <Tab.List>
+              {categories.map((category) => {
+                return <Tab
+                  key={category}
+                  className={({ selected }) =>
+                    classnames(
+                      'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
+                      selected
+                        ? 'dark:text-white border-b-2 border-indigo-600 dark:text-white'
+                        : 'dark:text-white hover:bg-white/[0.12] hover:dark:text-white'
+                    )
+                  }
+                >
+                  {category}
+                </Tab>
               })}
-            </NFTGrid>
-          )}
+            </Tab.List>
+
+          </Tab.Group>
+          {userLoading || !user ? <FaSpinner /> : <NFTGrid>
+            {nftsShown.map((nft, index) => {
+              return <NFTCard key={index} nft={nft} />;
+            })}
+          </NFTGrid>}
         </div>
       </div>
     </div>
