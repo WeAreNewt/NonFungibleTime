@@ -6,13 +6,53 @@
 
 Mint and purchase NFTs representing time for performing freelance services and other use cases. Time NFTs can represent an on-chain attestation of contributions, and a way for organizations to recruit talent for specialized needs.
 
-While freelance services is the initial use case for Non Fungible Time, we envision this primitive to be extended to other use cases, such as reservations, asset ownership, and autonomous on-chain agreements.
+While freelance services is the initial use case for Non Fungible Time, this primitive can be extended to other use cases, such as reservations, asset ownership, and autonomous on-chain agreements.
 
-## The Circle Of Life
+## Contents
+
+1. [Project Details](#about)
+   - [About](#project-description)
+   - [Infrastructure](#infrastructure)
+   - [Buidling](#buidling)
+   - [Collection Ownership](#collection-ownership)
+2. [Smart Contracts](#smart-contracts)
+   - [NonFungibleTimeCollection](#NonFungibleTimeCollection)
+   - [SvgGenerator](#svgGenerator)
+3. [Frontend](#frontend)
+4. [Subgraph](#subgraph)
+
+## Project Details
+
+### About
+
+Time NFTs are a way for users to mint and own NFTs representing their time. Each NFT has customizable fields which are stored as on-chain metadata, and have a dynamic animated representation. Time NFTs allow uders to take ownership of their time through collecting, sharing, monetizing, or creating unique use cases.
+
+### Infrastructure
 
 <p align="center">
     <img src="circle_of_life.png" width="550" height="300" >
 <p>
+
+This diagram lays out the basic project structure. Smart contracts were developed using [hardhat](https://github.com/nomiclabs/hardhat). [Typechain](https://github.com/dethcrypto/TypeChain) is used to generate a typesafe ethers sdk for interacting with the smart contracts, and [Web3React](https://github.com/NoahZinsmeister/web3-react) is used to handle wallet connections and transaction signing.
+
+### Buidling
+
+Given the modular nature of smart contracts, Time NFTs can be integrated, enhanced, or forked by anyone. The sections below will cover the [smart contract](#smart-contract), [data](#subgraph), and [frontend](#frontend) components of the Time NFT project. See [contributing](CONTRIBUTING.md) for more info on joining the Newt community to build with Time NFTs.
+
+### Collection Ownership
+
+On launch the Time NFT collection contract will be launched as a proxy, owned be a multisig of the core team members. The contract owner has the ability to:
+
+- Approve or revoke tokens as accepted forms of payment
+- Set the address of the SvgGenerator contract
+- Update the implementation contract
+
+The collection owner does not have the ability to:
+
+- Coopt, affect or otherwise move funds from any user of the system
+- Burn user NFTs or prevent users from interacting with the collection contract
+
+<br />
 
 ## Smart Contracts
 
