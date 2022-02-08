@@ -8,7 +8,7 @@ interface ScreenWrapperProps {
 
 export default function ScreenWrapper({ children }: ScreenWrapperProps) {
   return (
-    <div className="relative h-full bg-slate-100 dark:bg-black">
+    <div className="relative h-full bg-slate-100 dark:bg-black flex flex-col">
       <Navbar />
       {children}
       <Footer />

@@ -4,6 +4,7 @@ import discord from '../../images/discord-logo.png';
 import twitter from '../../images/twitter-logo.png';
 import github from '../../images/github-logo.png';
 import etherscan from '../../images/etherscan-logo.png';
+import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 
 interface FooterLink {
   title: string;
@@ -35,35 +36,36 @@ const textLinks: FooterLink[] = [
   },
 ];
 
-const logoLinks: FooterLink[] = [
-  {
-    title: 'Discord',
-    to: 'https://discord.gg/newt',
-    icon: discord,
-    alt: 'Discord',
-  },
-  {
-    title: 'Twitter',
-    to: 'https://twitter.com/wearenewt',
-    icon: twitter,
-    alt: 'Twitter',
-  },
-  {
-    title: 'Github',
-    to: 'https://github.com/WeAreNewt/NonFungibleTime',
-    icon: github,
-    alt: 'Github',
-  },
-  {
-    title: 'Etherscan',
-    to: '', // TBA
-    icon: etherscan,
-    alt: 'Etherscan',
-  },
-];
-
 export default function Footer() {
   const { pathname } = useLocation();
+  const { networkConfig } = useAppDataProvider();
+  const logoLinks: FooterLink[] = [
+    {
+      title: 'Discord',
+      to: 'https://discord.gg/newt',
+      icon: discord,
+      alt: 'Discord',
+    },
+    {
+      title: 'Twitter',
+      to: 'https://twitter.com/wearenewt',
+      icon: twitter,
+      alt: 'Twitter',
+    },
+    {
+      title: 'Github',
+      to: 'https://github.com/WeAreNewt/NonFungibleTime',
+      icon: github,
+      alt: 'Github',
+    },
+    {
+      title: 'Etherscan',
+      to: networkConfig.blockExplorer + '/address/' + networkConfig.collectionAddress,
+      icon: etherscan,
+      alt: 'Etherscan',
+    },
+  ];
+
 
   if (!['/'].includes(pathname)) {
     return null;

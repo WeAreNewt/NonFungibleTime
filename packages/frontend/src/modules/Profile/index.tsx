@@ -18,6 +18,7 @@ import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
+import { Button, ButtonVariant } from '../../components/Button';
 
 interface MintNftParams {
   name: string;
@@ -34,35 +35,10 @@ interface TxStatus {
   confirmed: boolean;
   txHash?: string;
 }
-type ButtonProps = Pick<
-  React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
-  'onClick'
->;
-
-const ShareProfileButton = (props: ButtonProps) => {
-  return (
-    <button
-      className="bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 border border-gray-300 rounded flex items-center gap-2 cursor-pointer w-full min-w-fit"
-      {...props}
-    >
-      <FaShareAlt /> Share Profile
-    </button>
-  );
-};
-
-const MintNewButtton = (props: ButtonProps) => {
-  return (
-    <button
-      className="py-2 px-4 border border-transparent font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer w-full min-w-fit"
-      {...props}
-    >
-      Mint new
-    </button>
-  );
-};
 
 export default function Profile() {
-  const { currentAccount, nftCollectionService, userData, loadingUserData, networkConfig } = useAppDataProvider();
+  const { currentAccount, nftCollectionService, userData, loadingUserData, networkConfig } =
+    useAppDataProvider();
   const { library: provider } = useWeb3React();
   const [owner, setOwner] = useState<Boolean>(true);
   const [formError, setFormError] = useState<string | undefined>(undefined);
@@ -81,7 +57,7 @@ export default function Profile() {
   const [mintTxStatus, setMintTxStatus] = useState<TxStatus>({
     submitted: true,
     confirmed: true,
-  })
+  });
   const location = useLocation();
   const path = location.pathname.split('/');
   const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
@@ -101,48 +77,47 @@ export default function Profile() {
       user: owner ? '' : path[2].toLowerCase(),
     },
   });
-  const categories = ["Minted", "Owned"]
-  const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
+  const categories = ['Minted', 'Owned'];
+  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
   const userLoading: boolean = owner ? loadingUserData : loading;
-  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : [])
+  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
   const toggleClass = ' transform translate-x-5';
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
       setNftsShown(user.createdNfts);
     }
     if (user?.ownedNfts && toggleIndex === 1) {
-      setNftsShown(user.ownedNfts)
+      setNftsShown(user.ownedNfts);
     }
   }, [user, toggleIndex]);
 
   const onChangeTab = (index: number) => {
     if (index === 0) {
-      setToggleIndex(0)
-      setNftsShown(user?.createdNfts ? user?.createdNfts : [] as NFT[])
+      setToggleIndex(0);
+      setNftsShown(user?.createdNfts ? user?.createdNfts : ([] as NFT[]));
+    } else {
+      setToggleIndex(1);
+      setNftsShown(user?.ownedNfts ? user?.ownedNfts : ([] as NFT[]));
     }
-    else {
-      setToggleIndex(1)
-      setNftsShown(user?.ownedNfts ? user?.ownedNfts : [] as NFT[])
-    }
-  }
+  };
   const renderNFTs = () => {
-    const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`
+    const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`;
     return (
       //if no wallet
-      !currentAccount ? <ConnectButton /> :
-        //if no nfts 
-        !nftsShown.length ? <div
-          className='text-xl text-center font-medium text-blue-700 '
-        >
-          {copy}
-        </div> :
+      !currentAccount ? (
+        <ConnectButton />
+      ) : //if no nfts
+        !nftsShown.length ? (
+          <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
+        ) : (
           <NFTGrid>
             {nftsShown.map((nft, index) => {
               return <NFTCard key={index} nft={nft} />;
             })}
           </NFTGrid>
-    )
-  }
+        )
+    );
+  };
   const mintNft = async () => {
     if (currentAccount) {
       if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
@@ -173,9 +148,9 @@ export default function Profile() {
               ...txData,
               value: txData.value ? BigNumber.from(txData.value) : undefined,
             });
-            setMintTxStatus({ ...mintTxStatus, submitted: true })
+            setMintTxStatus({ ...mintTxStatus, submitted: true });
             const receipt = await txResponse.wait(1);
-            setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash })
+            setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
           } else {
             setFormError('Royalty must be between 1 and 100');
           }
@@ -189,7 +164,6 @@ export default function Profile() {
       setFormError('No account connected');
     }
   };
-  console.log(mintTxStatus);
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
@@ -211,9 +185,23 @@ export default function Profile() {
             {/** Share Profile */}
             <div className="flex md:px-5 w-full md:justify-end ">
               <div className="flex gap-4 flex-1 md:flex-initial  ">
-                <ShareProfileButton onClick={() => setShareProfileModalOpen(true)} />
+                <Button
+                  variant={ButtonVariant.SECONDARY}
+                  onClick={() => setShareProfileModalOpen(true)}
+                >
+                  <FaShareAlt /> Share Profile
+                </Button>
                 {/** Mint */}
-                {owner && <MintNewButtton onClick={() => { setMintModalOpen(true); setMintTxStatus({ submitted: false, confirmed: false, txHash: undefined }) }} />}
+                {owner && (
+                  <Button
+                    onClick={() => {
+                      setMintModalOpen(true);
+                      setMintTxStatus({ submitted: false, confirmed: false, txHash: undefined });
+                    }}
+                  >
+                    Mint new
+                  </Button>
+                )}
                 {/** Mint Modal */}
                 <Dialog
                   open={mintModalOpen}
@@ -236,18 +224,30 @@ export default function Profile() {
                       &#8203;
                     </span>
 
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ">
-                      <div className="bg-white px-10 pt-10 pb-4">
+                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                      <div className="bg-white p-10">
                         <div className="flex">
-                          <div className="mt-3 text-center sm:mt-0  sm:text-left w-full  space-y-5">
+                          <div className="w-full space-y-5">
                             <h3
                               className="text-lg leading-6 font-medium text-gray-900"
                               id="modal-title"
                             >
                               Mint Time NFT
                             </h3>
-                            {mintTxStatus.submitted ? <div className="text-center flex-col p-4"><div>Submitted</div><FaSpinner className="text-indigo-600" /></div> : mintTxStatus.confirmed ? <div className="text-center flex-col"><div>Confirmed</div><a href={networkConfig.blockExplorer + "/" + mintTxStatus.txHash}>View Transaction</a></div> :
-                              <div>
+                            {mintTxStatus.submitted ? (
+                              <div className="text-center flex-col p-4">
+                                <div>Submitted</div>
+                                <FaSpinner className="text-indigo-600" />
+                              </div>
+                            ) : mintTxStatus.confirmed ? (
+                              <div className="text-center flex-col">
+                                <div>Confirmed</div>
+                                <a href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
+                                  View Transaction
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="space-y-5">
                                 <div className="">
                                   <div>
                                     <Label htmlFor="name">Name</Label>
@@ -256,7 +256,9 @@ export default function Profile() {
                                       id="name"
                                       placeholder="Name for your service..."
                                       value={formNft.name}
-                                      onChange={(e) => setFormNft({ ...formNft, name: e.target.value })}
+                                      onChange={(e) =>
+                                        setFormNft({ ...formNft, name: e.target.value })
+                                      }
                                     />
                                   </div>
                                 </div>
@@ -292,9 +294,7 @@ export default function Profile() {
                                     </Select>
                                   </div>
                                   <div className="w-1/2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Number Of Hours
-                                    </label>
+                                    <Label>Number Of Hours</Label>
                                     <Input
                                       type="number"
                                       name="numhours"
@@ -312,7 +312,7 @@ export default function Profile() {
                                   <Label>Beginning Of Availability (optional)</Label>
 
                                   <div
-                                    className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
+                                    className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full cursor-pointer"
                                     onClick={() => {
                                       setFormNft({
                                         ...formNft,
@@ -378,7 +378,9 @@ export default function Profile() {
                                       onChange={(date) =>
                                         setFormNft({
                                           ...formNft,
-                                          availabilityTo: date ? Math.floor(date.getTime() / 1000) : 0,
+                                          availabilityTo: date
+                                            ? Math.floor(date.getTime() / 1000)
+                                            : 0,
                                         })
                                       }
                                     />
@@ -403,18 +405,22 @@ export default function Profile() {
                                   />
                                 </div>
                               </div>
-                            }
+                            )}
                           </div>
                         </div>
                         <div className="text-red-500 text-center">{formError}</div>
-                        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                          {!mintTxStatus.submitted && !mintTxStatus.confirmed ? <button
-                            type="button"
-                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
-                            onClick={() => mintNft()}
-                          >
-                            Mint
-                          </button> : <></>}
+                        <div className="bg-white sm:flex sm:flex-row-reverse pt-5">
+                          {!mintTxStatus.submitted && !mintTxStatus.confirmed ? (
+                            <button
+                              type="button"
+                              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
+                              onClick={() => mintNft()}
+                            >
+                              Mint
+                            </button>
+                          ) : (
+                            <></>
+                          )}
                           <button
                             type="button"
                             className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"

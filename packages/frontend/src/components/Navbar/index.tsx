@@ -33,7 +33,7 @@ export default function Navbar() {
     },
     {
       link: 'https://github.com/wearenewt/NonFungibleTime',
-      title: 'Code',
+      title: 'GitHub',
     },
   ];
 
