@@ -1,7 +1,7 @@
-import twitterLogo from '../../images/twitter_logo.png';
-import discordLogo from '../../images/discord_logo.png';
-import etherscanLogo from '../../images/etherscan_logo.png';
-import githubLogo from '../../images/github_logo.png';
+import twitterLogo from '../../images/twitter_logo.svg';
+import discordLogo from '../../images/discord_logo.svg';
+import etherscanLogo from '../../images/etherscan_logo.svg';
+import githubLogo from '../../images/github_logo.svg';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 
 const texts : Record<string, string>[] = [
@@ -22,12 +22,12 @@ export default function Footer() : JSX.Element {
   ]
 
   return( 
-    <footer className="px-14 py-14 bg-gray-800 flex flex-col md:flex-row">
+    <footer className="px-14 py-14 bg-gray-800 flex flex-col md:flex-row mt-auto">
         <div className="flex flex-col items-center gap-4 md:flex-row">
-          {texts.map(text => <a className="text-white" target="/blank" key={text.text} href={text.link} > {text.text} </a> )}
+          {texts.map(text => <a className="text-white hover:text-gray-400" target="/blank" key={text.text} href={text.link} > {text.text} </a> )}
         </div>
         <div className="mt-6 flex justify-center gap-4 flex-shrink-0 md:ml-auto md:mt-0">
-          {icons.map(icon => <a href={icon.link} target="/blank" key={icon.alt}><img src={icon.url} alt={icon.alt} ></img></a> )}
+          {icons.map(icon => <a href={icon.link} target="/blank" key={icon.alt}><img src={icon.url} alt={icon.alt}></img></a> )}
         </div>
     </footer>
   );
