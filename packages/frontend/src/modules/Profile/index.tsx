@@ -189,7 +189,6 @@ export default function Profile() {
       setFormError('No account connected');
     }
   };
-  console.log(mintTxStatus);
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
@@ -246,7 +245,7 @@ export default function Profile() {
                             >
                               Mint Time NFT
                             </h3>
-                            {mintTxStatus.submitted ? <div className="text-center flex-col p-4"><div>Submitted</div><FaSpinner className="text-indigo-600" /></div> : mintTxStatus.confirmed ? <div className="text-center flex-col"><div>Confirmed</div><a href={networkConfig.blockExplorer + "/" + mintTxStatus.txHash}>View Transaction</a></div> :
+                            {mintTxStatus.submitted ? <div className="text-center flex-col p-4"><div>Submitted</div><FaSpinner className="text-indigo-600" /></div> : mintTxStatus.confirmed ? <div className="text-center flex-col"><div>Confirmed</div><a href={networkConfig.blockExplorer + "/tx/" + mintTxStatus.txHash}>View Transaction</a></div> :
                               <div>
                                 <div className="">
                                   <div>
