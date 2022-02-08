@@ -14,6 +14,7 @@ import { useSubscription } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
 import DatePicker from 'react-datepicker';
 import classnames from 'classnames';
+import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -100,30 +101,48 @@ export default function Profile() {
       user: owner ? '' : path[2].toLowerCase(),
     },
   });
-
-  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
+  const categories = ["Minted", "Owned"]
+  const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
   const userLoading: boolean = owner ? loadingUserData : loading;
-  const categories = ['Minted', 'Owned'];
-  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
+  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : [])
   const toggleClass = ' transform translate-x-5';
-
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
       setNftsShown(user.createdNfts);
     }
     if (user?.ownedNfts && toggleIndex === 1) {
-      setNftsShown(user.ownedNfts);
+      setNftsShown(user.ownedNfts)
     }
   }, [user, toggleIndex]);
 
   const onChangeTab = (index: number) => {
     if (index === 0) {
-      setToggleIndex(0);
-    } else {
-      setToggleIndex(1);
+      setToggleIndex(0)
+      setNftsShown(user?.createdNfts ? user?.createdNfts : [] as NFT[])
     }
-  };
-
+    else {
+      setToggleIndex(1)
+      setNftsShown(user?.ownedNfts ? user?.ownedNfts : [] as NFT[])
+    }
+  }
+  const renderNFTs = () => {
+    const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`
+    return (
+      //if no wallet
+      !currentAccount ? <ConnectButton /> :
+        //if no nfts 
+        !nftsShown.length ? <div
+          className='text-xl text-center font-medium text-blue-700 '
+        >
+          {copy}
+        </div> :
+          <NFTGrid>
+            {nftsShown.map((nft, index) => {
+              return <NFTCard key={index} nft={nft} />;
+            })}
+          </NFTGrid>
+    )
+  }
   const mintNft = async () => {
     if (currentAccount) {
       if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
@@ -509,15 +528,7 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? (
-            <FaSpinner />
-          ) : (
-            <NFTGrid>
-              {nftsShown.map((nft, index) => {
-                return <NFTCard key={index} nft={nft} />;
-              })}
-            </NFTGrid>
-          )}
+          {userLoading ? <FaSpinner /> : renderNFTs()}
         </div>
       </div>
     </div>
