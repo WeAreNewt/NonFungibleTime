@@ -13,6 +13,7 @@ import { ProfileNftsDocument } from '../../lib/graphql';
 import { useQuery } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
 import DatePicker from "react-datepicker";
+import classnames from 'classnames';
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -26,16 +27,12 @@ interface MintNftParams {
   royalty: number;
 }
 
-//This combines classes together
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function Profile() {
   const { currentAccount, nftCollectionService, userData, loadingUserData } = useAppDataProvider();
   const { library: provider } = useWeb3React();
   const [owner, setOwner] = useState<Boolean>(true);
   const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [toggleIndex, setToggleIndex] = useState<number>(0)
   const [formNft, setFormNft] = useState<MintNftParams>({
     name: '',
     description: '',
@@ -50,9 +47,8 @@ export default function Profile() {
   const location = useLocation();
   const path = location.pathname.split('/');
   const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
-  
+
   useEffect(() => {
-   
     if (path[2] === currentAccount) {
       setOwner(true);
     } else {
@@ -66,28 +62,36 @@ export default function Profile() {
   const { data, loading } = useQuery(ProfileNftsDocument, {
     variables: {
       user: owner ? '' : path[2].toLowerCase()
-      
     },
   });
 
-  
+
   const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
   const userLoading: boolean = owner ? loadingUserData : loading;
-  const categories = ["Minted","Owned"]
-  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts as NFT[])
+  const categories = ["Minted", "Owned"]
+  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : [])
   const toggleClass = ' transform translate-x-5';
 
-  const onChangeTab = (index: number) =>  {
-    if(index === 0) {
-    setNftsShown(user?.createdNfts as NFT[])
+  useEffect(() => {
+    if (user?.createdNfts && toggleIndex === 0) {
+      setNftsShown(user.createdNfts)
+    }
+    if (user?.ownedNfts && toggleIndex === 1) {
+      setNftsShown(user.ownedNfts)
+    }
+  }, [user, toggleIndex])
+
+
+  const onChangeTab = (index: number) => {
+    if (index === 0) {
+      setToggleIndex(0)
     }
     else {
-    setNftsShown(user?.ownedNfts as NFT[])
+      setToggleIndex(1)
     }
   }
 
   const mintNft = async () => {
-    console.log(formNft)
     if (currentAccount) {
       if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
         if ((formNft.availabilityTo === 0 || formNft.availabilityFrom === 0) || (formNft.availabilityTo > formNft.availabilityFrom && formNft.duration * 3600 <= formNft.availabilityTo - formNft.availabilityFrom)) {
@@ -127,7 +131,6 @@ export default function Profile() {
       setFormError('No account connected');
     }
   };
-
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
@@ -466,25 +469,26 @@ export default function Profile() {
               </div>
             </div>
           </div>
-       <Tab.Group onChange={((index)=> onChangeTab(index))}>
-        <Tab.List>
-          {categories.map((category) => {
-           return <Tab
-              className={({ selected }) =>
-                classNames(
-                  'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 rounded-lg',
-                  selected
-                  ? 'dark:text-white border-b-2 border-indigo-600 text-white'
-                  : 'dark:text-white hover:bg-white/[0.12] hover:text-white'
-                )
-              }
-            >
-              {category}
-            </Tab>
-          })}
-        </Tab.List>
-       
-      </Tab.Group>
+          <Tab.Group onChange={((index) => onChangeTab(index))}>
+            <Tab.List>
+              {categories.map((category) => {
+                return <Tab
+                  key={category}
+                  className={({ selected }) =>
+                    classnames(
+                      'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
+                      selected
+                        ? 'dark:text-white border-b-2 border-indigo-600 text-white'
+                        : 'dark:text-white hover:bg-white/[0.12] hover:text-white'
+                    )
+                  }
+                >
+                  {category}
+                </Tab>
+              })}
+            </Tab.List>
+
+          </Tab.Group>
           {userLoading || !user ? <FaSpinner /> : <NFTGrid>
             {nftsShown.map((nft, index) => {
               return <NFTCard key={index} nft={nft} />;
