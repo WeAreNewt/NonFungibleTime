@@ -5,7 +5,7 @@ import { FaSpinner } from 'react-icons/fa';
 import CategoryFilter from '../../components/CategoryFilter';
 import NFTCard from '../../components/NFTCard';
 import { NFTGrid } from '../../components/NFTGrid';
-import { NftsDocument, Nft_Filter } from '../../lib/graphql/index';
+import { NftsDocument, Nft_Filter, Nft_OrderBy, OrderDirection } from '../../lib/graphql/index';
 import { NFT } from '../../types';
 
 const PAGE_SIZE = 4;
@@ -25,6 +25,8 @@ export default function Marketplace() {
     variables: {
       first: PAGE_SIZE,
       where: whereArg,
+      orderBy: Nft_OrderBy.MintTimestamp,
+      orderDirection: OrderDirection.Desc,
     },
   });
 
