@@ -10,7 +10,7 @@ import { useWeb3React } from '@web3-react/core';
 import { MintParamsType } from '../../lib/helpers/NftCollection';
 import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
-import { useQuery } from '@apollo/client';
+import { useSubscription } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
 import DatePicker from "react-datepicker";
 import classnames from 'classnames';
@@ -58,7 +58,7 @@ export default function Profile() {
 
   // If user is the profile owner, use data from app provider
   // Otherwise fetch data from subgraph
-  const { data, loading } = useQuery(ProfileNftsDocument, {
+  const { data, loading } = useSubscription(ProfileNftsDocument, {
     variables: {
       user: owner ? '' : path[2].toLowerCase(),
     },

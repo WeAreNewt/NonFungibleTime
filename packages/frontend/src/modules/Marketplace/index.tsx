@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useSubscription } from '@apollo/client';
 import React from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import NFTCard from '../../components/NFTCard';
@@ -7,7 +7,7 @@ import { NftsDocument } from '../../lib/graphql/index';
 import { NFT } from '../../types';
 
 export default function Marketplace() {
-  const { data, loading } = useQuery(NftsDocument);
+  const { data, loading } = useSubscription(NftsDocument);
   const nfts: NFT[] | undefined = data && data.nfts ? data.nfts : undefined;
 
   return (

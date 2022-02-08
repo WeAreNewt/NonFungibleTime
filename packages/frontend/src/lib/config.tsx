@@ -20,7 +20,8 @@ export interface AddEthereumChainParameter {
 }
 
 export interface NetworkConfig extends AddEthereumChainParameter {
-    subgraphApi: string;
+    subgraphHttpLink: string;
+    subgraphWsLink: string;
     collectionAddress: string;
 }
 
@@ -59,12 +60,14 @@ export const addChainParameters: Record<number, AddEthereumChainParameter> = {
 
 export const networkConfigs: Record<number, NetworkConfig> = {
     [ChainId.mumbai]: {
-        subgraphApi: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
+        subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
+        subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
         collectionAddress: '0x4ECe6a51321B9F1B9FEc33A98f0513A7B626BFB4',
         ...addChainParameters[ChainId.mumbai],
     },
     [ChainId.polygon]: {
-        subgraphApi: '',
+        subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
+        subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
         collectionAddress: '',
         ...addChainParameters[ChainId.polygon],
     },
