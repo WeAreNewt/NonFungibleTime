@@ -62,7 +62,7 @@ export const addChainParameters: Record<number, AddEthereumChainParameter> = {
 export const networkConfigs: Record<number, NetworkConfig> = {
     [ChainId.mumbai]: {
         subgraphApi: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
-        collectionAddress: '0xb1070faee6ea3cb630b4c46285783968527538c2',
+        collectionAddress: '0x4ECe6a51321B9F1B9FEc33A98f0513A7B626BFB4',
         ...addChainParameters[ChainId.mumbai],
     },
     [ChainId.polygon]: {
