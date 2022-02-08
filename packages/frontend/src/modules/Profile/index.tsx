@@ -33,6 +33,32 @@ interface TxStatus {
   confirmed: boolean;
   txHash?: string;
 }
+type ButtonProps = Pick<
+  React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
+  'onClick'
+>;
+
+const ShareProfileButton = (props: ButtonProps) => {
+  return (
+    <button
+      className="bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 border border-gray-300 rounded flex items-center gap-2 cursor-pointer w-full min-w-fit"
+      {...props}
+    >
+      <FaShareAlt /> Share Profile
+    </button>
+  );
+};
+
+const MintNewButtton = (props: ButtonProps) => {
+  return (
+    <button
+      className="py-2 px-4 border border-transparent font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer w-full min-w-fit"
+      {...props}
+    >
+      Mint new
+    </button>
+  );
+};
 
 export default function Profile() {
   const { currentAccount, nftCollectionService, userData, loadingUserData, networkConfig } = useAppDataProvider();
@@ -148,10 +174,10 @@ export default function Profile() {
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
-        <div className="p-10">
-          <div className="flex flex-row justify-between">
+        <div className="p-4 md:p-10">
+          <div className="flex flex-col gap-4 md:flex-row justify-between items-center">
             {/** Profile Header */}
-            <div className="w-1/4 justify-items-start mb-5">
+            <div className="w-full md:w-1/4  justify-items-start ">
               <div className="flex flex-row items-center gap-4">
                 {/** Avatar/Blockie */}
                 <img
@@ -163,28 +189,12 @@ export default function Profile() {
                 <div className="text-black dark:text-white">{path[2]}</div>
               </div>
             </div>
-
             {/** Share Profile */}
-            <div className="w-1/4 p-5 justify-items-end">
-              <div className="flex flex-row justify-evenly">
-                <div
-                  className="items-center justify-center px-6 py-1 border border-gray text-base font-semibold rounded-md text-black bg-white hover:bg-gray-400 md:py-2 md:text-lg md:px-8 cursor-pointer"
-                  onClick={() => setShareProfileModalOpen(true)}
-                >
-                  <FaShareAlt /> Share Profile
-                </div>
+            <div className="flex md:px-5 w-full md:justify-end ">
+              <div className="flex gap-4 flex-1 md:flex-initial  ">
+                <ShareProfileButton onClick={() => setShareProfileModalOpen(true)} />
                 {/** Mint */}
-                {owner ? (
-                  <div
-                    className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
-                    onClick={() => { setMintModalOpen(true); setMintTxStatus({ submitted: false, confirmed: false, txHash: undefined }) }}
-                  >
-                    Mint New
-                  </div>
-                ) : (
-                  <></>
-                )}
-
+                {owner && <MintNewButtton onClick={() => { setMintModalOpen(true); setMintTxStatus({ submitted: false, confirmed: false, txHash: undefined }) }} />}
                 {/** Mint Modal */}
                 <Dialog
                   open={mintModalOpen}
@@ -499,7 +509,7 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading || !user ? (
+          {userLoading ? (
             <FaSpinner />
           ) : (
             <NFTGrid>
