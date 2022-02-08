@@ -1,8 +1,8 @@
-import { Fragment, useEffect, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
-import { Category } from '../../types';
 import classNames from 'classnames';
+import { Fragment } from 'react';
+import { Category } from '../../types';
 
 const CategoryOptions = ['Show All', ...Object.values(Category)];
 
