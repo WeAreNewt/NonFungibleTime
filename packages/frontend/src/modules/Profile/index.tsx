@@ -520,8 +520,8 @@ export default function Profile() {
                     classnames(
                       'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
                       selected
-                        ? 'dark:text-white border-b-2 border-indigo-600 text-white'
-                        : 'dark:text-white hover:bg-white/[0.12] hover:text-white'
+                        ? 'dark:text-white border-b-2 border-indigo-600 dark:text-white'
+                        : 'dark:text-white hover:bg-white/[0.12] hover:dark:text-white'
                     )
                   }
                 >
