@@ -17,8 +17,6 @@ export default function Navbar() {
   const location = useLocation();
   const activePage = location.pathname.split('/')[1];
 
-
-
   // Navbar Links
   const navigation: Navigation[] = [
     {
@@ -107,7 +105,9 @@ export default function Navbar() {
                           href={link.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={"text-gray-500 dark:text-white px-3 py-2 hover:underline decoration-indigo-600 decoration-4 underline-offset-8 rounded-md text-lg font-semibold"}
+                          className={
+                            'text-gray-500 dark:text-white px-3 py-2 hover:underline decoration-indigo-600 decoration-4 underline-offset-8 rounded-md text-lg font-semibold'
+                          }
                           aria-current={undefined}
                         >
                           {link.title}

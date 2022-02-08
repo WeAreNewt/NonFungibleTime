@@ -1,5 +1,5 @@
-import makeBlockie from "ethereum-blockies-base64";
-import { formatEthAddress } from "../../lib/helpers/format";
+import makeBlockie from 'ethereum-blockies-base64';
+import { formatEthAddress } from '../../lib/helpers/format';
 
 export type UserDetailsProps = {
   avatarUrl?: string;
@@ -15,7 +15,10 @@ export function UserDetail({ address, ensName, caption }: UserDetailsProps) {
         <img src={makeBlockie(address)} className="rounded-full" alt="blockie or ens avatar" />
       </div>
       <div className="flex flex-col">
-        <div className="text-gray-800 dark:text-white leading-5 text-sm"> {ensName ? ensName : formatEthAddress(address)}</div>
+        <div className="text-gray-800 dark:text-white leading-5 text-sm">
+          {' '}
+          {ensName ? ensName : formatEthAddress(address)}
+        </div>
         <div className="text-gray-500 leading-5 text-sm">{caption}</div>
       </div>
     </div>

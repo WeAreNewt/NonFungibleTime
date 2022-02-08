@@ -7,21 +7,20 @@ export default function AddressInfo() {
   const { connect, account, isCorrectChain, active, requestToSwitchChain } = useWeb3();
   const navigate = useNavigate();
   const onClick = async () => {
-    console.log('clickd')
+    console.log('clickd');
     try {
       if (active) {
         if (!isCorrectChain) {
           requestToSwitchChain();
           return;
         } else {
-          console.log('actie')
-          navigate('/profile/' + account)
+          console.log('actie');
+          navigate('/profile/' + account);
         }
       } else {
         // For now, defaults to injected provider
         connect(WalletType.Values.injected);
       }
-
     } catch (err) {
       // TODO: Add error toaster
       alert('Error on connecting wallet: ' + (err as Error).message);
