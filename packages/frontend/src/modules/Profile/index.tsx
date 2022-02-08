@@ -12,10 +12,10 @@ import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
 import { useSubscription } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
-import DatePicker from "react-datepicker";
+import DatePicker from 'react-datepicker';
 import classnames from 'classnames';
-import "react-datepicker/dist/react-datepicker.css";
-
+import 'react-datepicker/dist/react-datepicker.css';
+import { Input, Label, Select } from '../../components/Forms';
 
 interface MintNftParams {
   name: string;
@@ -32,7 +32,7 @@ export default function Profile() {
   const { library: provider } = useWeb3React();
   const [owner, setOwner] = useState<Boolean>(true);
   const [formError, setFormError] = useState<string | undefined>(undefined);
-  const [toggleIndex, setToggleIndex] = useState<number>(0)
+  const [toggleIndex, setToggleIndex] = useState<number>(0);
   const [formNft, setFormNft] = useState<MintNftParams>({
     name: '',
     description: '',
@@ -64,31 +64,28 @@ export default function Profile() {
     },
   });
 
-
-  const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
+  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
   const userLoading: boolean = owner ? loadingUserData : loading;
-  const categories = ["Minted", "Owned"]
-  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : [])
+  const categories = ['Minted', 'Owned'];
+  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
   const toggleClass = ' transform translate-x-5';
 
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
-      setNftsShown(user.createdNfts)
+      setNftsShown(user.createdNfts);
     }
     if (user?.ownedNfts && toggleIndex === 1) {
-      setNftsShown(user.ownedNfts)
+      setNftsShown(user.ownedNfts);
     }
-  }, [user, toggleIndex])
-
+  }, [user, toggleIndex]);
 
   const onChangeTab = (index: number) => {
     if (index === 0) {
-      setToggleIndex(0)
+      setToggleIndex(0);
+    } else {
+      setToggleIndex(1);
     }
-    else {
-      setToggleIndex(1)
-    }
-  }
+  };
 
   const mintNft = async () => {
     if (currentAccount) {
@@ -197,216 +194,169 @@ export default function Profile() {
                       &#8203;
                     </span>
 
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                      <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div className="sm:flex sm:items-start">
-                          <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ">
+                      <div className="bg-white px-10 pt-10 pb-4">
+                        <div className="flex">
+                          <div className="mt-3 text-center sm:mt-0  sm:text-left w-full  space-y-5">
                             <h3
                               className="text-lg leading-6 font-medium text-gray-900"
                               id="modal-title"
                             >
                               Mint Time NFT
                             </h3>
-                            <div className="mt-2">
+                            <div className="">
                               <div>
-                                <label
-                                  htmlFor="name"
-                                  className="block text-sm font-medium text-gray-700"
-                                >
-                                  Name
-                                </label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                  <input
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="Name for your service..."
-                                    value={formNft.name}
-                                    onChange={(e) =>
-                                      setFormNft({ ...formNft, name: e.target.value })
-                                    }
-                                  />
-                                </div>
+                                <Label htmlFor="name">Name</Label>
+                                <Input
+                                  name="name"
+                                  id="name"
+                                  placeholder="Name for your service..."
+                                  value={formNft.name}
+                                  onChange={(e) => setFormNft({ ...formNft, name: e.target.value })}
+                                />
                               </div>
                             </div>
-                            <div className="mt-2">
-                              <div>
-                                <label
-                                  htmlFor="description"
-                                  className="block text-sm font-medium text-gray-700"
-                                >
-                                  Description
-                                </label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                  <input
-                                    type="text"
-                                    name="description"
-                                    id="description"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 h-5 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="Describe your service..."
-                                    value={formNft.description}
-                                    onChange={(e) =>
-                                      setFormNft({ ...formNft, description: e.target.value })
-                                    }
-                                  />
-                                </div>
-                              </div>
+                            <div>
+                              <Label htmlFor="description">Description</Label>
+                              <Input
+                                type="text"
+                                name="description"
+                                id="description"
+                                placeholder="Describe your service..."
+                                value={formNft.description}
+                                onChange={(e) =>
+                                  setFormNft({ ...formNft, description: e.target.value })
+                                }
+                              />
                             </div>
-                            <div className="mt-2">
-                              <div className="flex">
-                                <div>
-                                  <label
-                                    htmlFor="category"
-                                    className="block text-sm font-medium text-gray-700"
-                                  >
-                                    Category
-                                  </label>
-                                  <select
-                                    id="category"
-                                    name="category"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
-                                    value={formNft.category}
-                                    onChange={(e) =>
-                                      setFormNft({ ...formNft, category: e.target.value })
-                                    }
-                                  >
-                                    <option key={''}>-</option>
-                                    {Object.values(Category).map((category, index) => (
-                                      <option key={index}>{category}</option>
-                                    ))}
-                                  </select>
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Number Of Hours
-                                  </label>
-                                  <div className="mt-1 relative rounded-md shadow-sm">
-                                    <input
-                                      type="number"
-                                      name="numhours"
-                                      id="numhours"
-                                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 h-5 sm:text-sm border-gray-300 rounded-md"
-                                      placeholder="Add time..."
-                                      value={formNft.duration}
-                                      onChange={(e) =>
-                                        setFormNft({ ...formNft, duration: Number(e.target.value) })
-                                      }
-                                    />
-                                  </div>
-                                </div>
+                            <div className="flex gap-4">
+                              <div className="w-1/2">
+                                <Label htmlFor="category">Category</Label>
+                                <Select
+                                  id="category"
+                                  name="category"
+                                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 placeholder-gray-400 border-gray-300 rounded-md"
+                                  value={formNft.category}
+                                  onChange={(e) =>
+                                    setFormNft({ ...formNft, category: e.target.value })
+                                  }
+                                >
+                                  <option key={''}>-</option>
+                                  {Object.values(Category).map((category, index) => (
+                                    <option key={index}>{category}</option>
+                                  ))}
+                                </Select>
+                              </div>
+                              <div className="w-1/2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Number Of Hours
+                                </label>
+                                <Input
+                                  type="number"
+                                  name="numhours"
+                                  id="numhours"
+                                  placeholder="Add time..."
+                                  value={formNft.duration}
+                                  onChange={(e) =>
+                                    setFormNft({ ...formNft, duration: Number(e.target.value) })
+                                  }
+                                />
                               </div>
                             </div>
 
-                            <div className="mt-2">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                  Beginning Of Availability (optional)
-                                  <div
-                                    className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
-                                    onClick={() => {
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityFrom:
-                                          formNft.availabilityFrom === 0
-                                            ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
-                                            )
-                                            : 0,
-                                      });
-                                    }}
-                                  >
-                                    <div
-                                      className={
-                                        'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
-                                        (formNft.availabilityFrom === 0 ? null : toggleClass)
-                                      }
-                                    />
-                                  </div>
-                                </label>
-                                {formNft.availabilityFrom !== 0 ? (
-                                  <DatePicker
-                                    selected={new Date(formNft.availabilityFrom * 1000)}
-                                    onChange={(date) =>
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityFrom: date
-                                          ? Math.floor(date.getTime() / 1000)
-                                          : 0,
-                                      })
-                                    }
-                                  />
-                                ) : (
-                                  <></>
-                                )}
+                            <div>
+                              <Label>Beginning Of Availability (optional)</Label>
+
+                              <div
+                                className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
+                                onClick={() => {
+                                  setFormNft({
+                                    ...formNft,
+                                    availabilityFrom:
+                                      formNft.availabilityFrom === 0
+                                        ? Math.floor(
+                                            Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                          )
+                                        : 0,
+                                  });
+                                }}
+                              >
+                                <div
+                                  className={
+                                    'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
+                                    (formNft.availabilityFrom === 0 ? null : toggleClass)
+                                  }
+                                />
                               </div>
+                              {formNft.availabilityFrom !== 0 ? (
+                                <DatePicker
+                                  selected={new Date(formNft.availabilityFrom * 1000)}
+                                  onChange={(date) =>
+                                    setFormNft({
+                                      ...formNft,
+                                      availabilityFrom: date
+                                        ? Math.floor(date.getTime() / 1000)
+                                        : 0,
+                                    })
+                                  }
+                                />
+                              ) : (
+                                <></>
+                              )}
                             </div>
-                            <div className="mt-2">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                  End Of Availablility (optional)
-                                  <div
-                                    className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
-                                    onClick={() => {
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityTo:
-                                          formNft.availabilityTo === 0
-                                            ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
-                                            )
-                                            : 0,
-                                      });
-                                    }}
-                                  >
-                                    <div
-                                      className={
-                                        'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
-                                        (formNft.availabilityTo === 0 ? null : toggleClass)
-                                      }
-                                    />
-                                  </div>
-                                </label>
-                                {formNft.availabilityTo !== 0 ? (
-                                  <DatePicker
-                                    selected={new Date(formNft.availabilityTo * 1000)}
-                                    onChange={(date) =>
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityTo: date
-                                          ? Math.floor(date.getTime() / 1000)
-                                          : 0,
-                                      })
-                                    }
-                                  />
-                                ) : (
-                                  <></>
-                                )}
+                            <div>
+                              <Label>End Of Availablility (optional)</Label>
+                              <div
+                                className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
+                                onClick={() => {
+                                  setFormNft({
+                                    ...formNft,
+                                    availabilityTo:
+                                      formNft.availabilityTo === 0
+                                        ? Math.floor(
+                                            Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                          )
+                                        : 0,
+                                  });
+                                }}
+                              >
+                                <div
+                                  className={
+                                    'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
+                                    (formNft.availabilityTo === 0 ? null : toggleClass)
+                                  }
+                                />
                               </div>
+
+                              {formNft.availabilityTo !== 0 ? (
+                                <DatePicker
+                                  selected={new Date(formNft.availabilityTo * 1000)}
+                                  onChange={(date) =>
+                                    setFormNft({
+                                      ...formNft,
+                                      availabilityTo: date ? Math.floor(date.getTime() / 1000) : 0,
+                                    })
+                                  }
+                                />
+                              ) : (
+                                <></>
+                              )}
                             </div>
 
-                            <div className="mt-2">
-                              <div>
-                                <label
-                                  htmlFor="royalty"
-                                  className="block text-sm font-medium text-gray-700"
-                                >
-                                  Royalties (%)
-                                </label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                  <input
-                                    type="number"
-                                    name="royalty"
-                                    id="royalty"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 h-5 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="Your share of secondary sales (%)"
-                                    value={formNft.royalty}
-                                    onChange={(e) =>
-                                      setFormNft({ ...formNft, royalty: Number(e.target.value) })
-                                    }
-                                  />
-                                </div>
-                              </div>
+                            <div>
+                              <Label className="block text-sm font-medium text-gray-700">
+                                Royalties (%)
+                              </Label>
+                              <Input
+                                type="number"
+                                name="royalty"
+                                id="royalty"
+                                placeholder="Your share of secondary sales (%)"
+                                value={formNft.royalty}
+                                onChange={(e) =>
+                                  setFormNft({ ...formNft, royalty: Number(e.target.value) })
+                                }
+                              />
                             </div>
                           </div>
                         </div>
@@ -511,31 +461,36 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          <Tab.Group onChange={((index) => onChangeTab(index))}>
+          <Tab.Group onChange={(index) => onChangeTab(index)}>
             <Tab.List>
               {categories.map((category) => {
-                return <Tab
-                  key={category}
-                  className={({ selected }) =>
-                    classnames(
-                      'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
-                      selected
-                        ? 'dark:text-white border-b-2 border-indigo-600 dark:text-white'
-                        : 'dark:text-white hover:bg-white/[0.12] hover:dark:text-white'
-                    )
-                  }
-                >
-                  {category}
-                </Tab>
+                return (
+                  <Tab
+                    key={category}
+                    className={({ selected }) =>
+                      classnames(
+                        'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
+                        selected
+                          ? 'dark:text-white border-b-2 border-indigo-600 dark:text-white'
+                          : 'dark:text-white hover:bg-white/[0.12] hover:dark:text-white'
+                      )
+                    }
+                  >
+                    {category}
+                  </Tab>
+                );
               })}
             </Tab.List>
-
           </Tab.Group>
-          {userLoading || !user ? <FaSpinner /> : <NFTGrid>
-            {nftsShown.map((nft, index) => {
-              return <NFTCard key={index} nft={nft} />;
-            })}
-          </NFTGrid>}
+          {userLoading || !user ? (
+            <FaSpinner />
+          ) : (
+            <NFTGrid>
+              {nftsShown.map((nft, index) => {
+                return <NFTCard key={index} nft={nft} />;
+              })}
+            </NFTGrid>
+          )}
         </div>
       </div>
     </div>
