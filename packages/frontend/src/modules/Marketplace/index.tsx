@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useInView from 'react-cool-inview';
 import { FaSpinner } from 'react-icons/fa';
 import CategoryFilter from '../../components/CategoryFilter';
@@ -27,6 +27,12 @@ export default function Marketplace() {
       where: whereArg,
     },
   });
+
+  // When category is reset, change this to true,
+  // so it can recalculate if should paginate or not
+  useEffect(() => {
+    setCanLoadMore(true);
+  }, [category]);
 
   const nfts: NFT[] | undefined = data && data.nfts ? data.nfts : [];
 

@@ -5,7 +5,7 @@ export const cache = new InMemoryCache({
   typePolicies: {
     Query: {
       fields: {
-        nfts: skipLimitPagination(),
+        nfts: skipLimitPagination(['where', ['category']]),
       },
     },
   },
