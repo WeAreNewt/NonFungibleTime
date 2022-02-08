@@ -5,12 +5,6 @@ npm install
 npm start
 ```
 
-## The Circle Of Life
-
-<p align="center">
-    <img src="circle_of_life.png" width="550" height="300" >
-<p>
-
 ## Subgraph Changes
 
 To update the subgraph schema, in the `packages/frontend` directory run:
