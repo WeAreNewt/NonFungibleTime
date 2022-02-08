@@ -1,5 +1,6 @@
-import { useSubscription } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import React, { useMemo, useState } from 'react';
+import useInView from 'react-cool-inview';
 import { FaSpinner } from 'react-icons/fa';
 import CategoryFilter from '../../components/CategoryFilter';
 import NFTCard from '../../components/NFTCard';
@@ -7,7 +8,10 @@ import { NFTGrid } from '../../components/NFTGrid';
 import { NftsDocument, Nft_Filter } from '../../lib/graphql/index';
 import { NFT } from '../../types';
 
+const PAGE_SIZE = 4;
+
 export default function Marketplace() {
+  const [canLoadMore, setCanLoadMore] = useState(true);
   const [category, setCategory] = useState('Show All');
   const whereArg = useMemo<Nft_Filter | undefined>(() => {
     if (category === 'Show All') return undefined;
@@ -17,13 +21,39 @@ export default function Marketplace() {
     };
   }, [category]);
 
-  const { data, loading } = useSubscription(NftsDocument, {
+  const { data, loading, fetchMore } = useQuery(NftsDocument, {
     variables: {
-      first: 100,
+      first: PAGE_SIZE,
       where: whereArg,
     },
   });
-  const nfts: NFT[] | undefined = data && data.nfts ? data.nfts : undefined;
+
+  const nfts: NFT[] | undefined = data && data.nfts ? data.nfts : [];
+
+  const { observe } = useInView({
+    // For better UX, we can grow the root margin so the data will be loaded earlier
+    rootMargin: '40px 0px',
+    // When the last item comes to the viewport
+    onEnter: async ({ unobserve, observe }) => {
+      // Pause observe when loading data
+      unobserve();
+      const result = await fetchMore({
+        variables: {
+          first: PAGE_SIZE,
+          skip: nfts.length || 0,
+        },
+      });
+
+      // If the results are not matching the page size,
+      // it means we reached the end of the pagination.
+      const nextItemsCount = result.data.nfts.length;
+      if (nextItemsCount !== PAGE_SIZE) {
+        setCanLoadMore(false);
+      }
+
+      observe();
+    },
+  });
 
   return (
     <div className="bg-slate-100 dark:bg-black p-10">
@@ -43,14 +73,22 @@ export default function Marketplace() {
         {loading || !nfts ? (
           <FaSpinner />
         ) : (
-          <NFTGrid>
-            {nfts.map((nft, index) => {
-              return <NFTCard key={index} nft={nft} />;
-            })}
-          </NFTGrid>
+          <>
+            <NFTGrid>
+              {nfts.map((nft, index) => {
+                return <NFTCard key={index} nft={nft} />;
+              })}
+            </NFTGrid>
+            {canLoadMore && (
+              <div
+                style={{ marginTop: 20, width: '100%', padding: 20, backgroundColor: 'cyan' }}
+                ref={observe}
+              >
+                Loader...
+              </div>
+            )}
+          </>
         )}
-
-        {/** NFT Display */}
       </div>
     </div>
   );

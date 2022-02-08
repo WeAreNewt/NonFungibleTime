@@ -1,4 +1,4 @@
-subscription Nfts(
+query Nfts(
   $where: Nft_filter
   $orderBy: Nft_orderBy
   $orderDirection: OrderDirection

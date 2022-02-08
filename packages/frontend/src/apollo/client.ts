@@ -1,6 +1,7 @@
+import { ApolloClient, HttpLink, split } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import { ApolloClient, HttpLink, InMemoryCache, split } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { cache } from './cache';
 
 export type ApolloClientConfig = {
   httpUri: string;
@@ -35,7 +36,7 @@ export const createApolloClient = (config: ApolloClientConfig) => {
 
   const client = new ApolloClient({
     link: splitLink,
-    cache: new InMemoryCache(),
+    cache,
   });
 
   return client;
