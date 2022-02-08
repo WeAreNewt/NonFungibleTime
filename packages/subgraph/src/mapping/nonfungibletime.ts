@@ -125,7 +125,6 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
       const uri = getTokenURI(event, event.params.tokenId);
       nft.tokenURI = uri;
       nft.redeemed = true;
-      nft.forSale = false;
       nft.save();
     } else {
       log.warning('Token redeem for nft unregistered to subgraph {}', [
