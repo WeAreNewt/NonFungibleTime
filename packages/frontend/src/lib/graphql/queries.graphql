@@ -1,10 +1,10 @@
-query Nfts {
+subscription Nfts {
   nfts(first: 100) {
     ...NftFields
   }
 }
 
-query Sales(
+subscription Sales(
   $first: Int
   $skip: Int
   $orderBy: Sale_orderBy
@@ -33,7 +33,7 @@ query Sales(
   }
 }
 
-query ProfileNfts($user: ID!) {
+subscription ProfileNfts($user: ID!) {
   user(id: $user) {
     createdNfts {
       ...NftFields

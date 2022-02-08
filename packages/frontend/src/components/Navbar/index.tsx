@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ConnectButton from '../ConnectButton';
-import { FaClock } from 'react-icons/fa';
+import icon from '../../images/icon.png';
 import { useLocation } from 'react-router-dom';
 import Toggle from '../../ThemeToggle';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -89,7 +89,7 @@ export default function Navbar() {
             {/** Clock Icon */}
             <div className="flex-shrink-0 flex items-center">
               <Link to="/">
-                <FaClock className="block h-8 w-auto text-indigo-600" />
+                <img src={icon} alt="clock icon" width="50" height="50" />
               </Link>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useSubscription } from '@apollo/client';
 import { ethers, providers } from 'ethers';
 import React, { useContext } from 'react';
 import { User } from '../../types';
@@ -40,7 +40,7 @@ export const AppDataProvider: React.FC = ({ children }) => {
     networkConfigs[chainId].collectionAddress
   );
 
-  const { data, loading } = useQuery(ProfileNftsDocument, {
+  const { data, loading } = useSubscription(ProfileNftsDocument, {
     variables: {
       user: account ? account.toLowerCase() : '',
     },
