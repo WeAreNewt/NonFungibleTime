@@ -2,6 +2,7 @@ import twitterLogo from '../../images/twitter_logo.png';
 import discordLogo from '../../images/discord_logo.png';
 import etherscanLogo from '../../images/etherscan_logo.png';
 import githubLogo from '../../images/github_logo.png';
+import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 
 const texts : Record<string, string>[] = [
   { text: 'About', link: 'https://wearenewt.xyz/roadmap/non-fungible-time' },
@@ -11,21 +12,22 @@ const texts : Record<string, string>[] = [
   { text: 'Request features', link: 'https://discord.com/channels/909763209056112651/913088754418348072' }
 ]
 
-const icons : Record<string, string>[] = [
-  { url: discordLogo, link: 'https://discord.gg/newt', alt: 'discord' },
-  { url: twitterLogo, link: 'https://twitter.com/wearenewt', alt: 'twitter' },
-  { url: githubLogo, link: 'https://github.com/wearenewt/NonFungibleTime', alt: 'github' },
-  { url: etherscanLogo, link: 'https://etherscan.io/address/0x0000000000000000000000000000000000000000', alt: 'etherscan' }
-]
-
 export default function Footer() : JSX.Element {
+  const { networkConfig } = useAppDataProvider();
+  const icons : Record<string, string>[] = [
+    { url: discordLogo, link: 'https://discord.gg/newt', alt: 'discord' },
+    { url: twitterLogo, link: 'https://twitter.com/wearenewt', alt: 'twitter' },
+    { url: githubLogo, link: 'https://github.com/wearenewt/NonFungibleTime', alt: 'github' },
+    { url: etherscanLogo, link: networkConfig.blockExplorer + '/address/' + networkConfig.collectionAddress, alt: 'etherscan' }
+  ]
+
   return( 
     <footer className="px-14 py-14 bg-gray-800 flex flex-col md:flex-row">
         <div className="flex flex-col items-center gap-4 md:flex-row">
-          {texts.map(text => <a className="text-white" target="/blank" href={text.link} > {text.text} </a> )}
+          {texts.map(text => <a className="text-white" target="/blank" key={text.text} href={text.link} > {text.text} </a> )}
         </div>
         <div className="mt-6 flex justify-center gap-4 flex-shrink-0 md:ml-auto md:mt-0">
-          {icons.map(icon => <a href={icon.link} target="/blank"><img src={icon.url} alt={icon.alt} ></img></a> )}
+          {icons.map(icon => <a href={icon.link} target="/blank" key={icon.alt}><img src={icon.url} alt={icon.alt} ></img></a> )}
         </div>
     </footer>
   );
