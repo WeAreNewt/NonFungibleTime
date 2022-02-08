@@ -1,6 +1,5 @@
 import { utils } from 'ethers';
 
-
 export enum ChainId {
     mumbai = 80001,
     polygon = 137,
@@ -24,7 +23,6 @@ export interface NetworkConfig extends AddEthereumChainParameter {
     subgraphApi: string;
     collectionAddress: string;
 }
-
 
 export class Matic {
     readonly name = 'Matic' as const;
@@ -57,7 +55,7 @@ export const addChainParameters: Record<number, AddEthereumChainParameter> = {
             decimals: matic.decimals,
         },
     },
-}
+};
 
 export const networkConfigs: Record<number, NetworkConfig> = {
     [ChainId.mumbai]: {

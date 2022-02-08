@@ -48,19 +48,17 @@ export default function NFTDetails() {
   const [nft, setNft] = useState<NFT>();
   const [uri, setURI] = useState<string>();
   const [formError, setFormError] = useState<string | undefined>(undefined);
-  const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>(
-    {
-      forSale: true,
-      price: 0,
-      currency: {
-        acceptable: true,
-        decimals: 18,
-        id: '0x0',
-        symbol: ''
-      },
-      whitelistedBuyer: '0x0',
-    }
-  );
+  const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({
+    forSale: true,
+    price: 0,
+    currency: {
+      acceptable: true,
+      decimals: 18,
+      id: '0x0',
+      symbol: '',
+    },
+    whitelistedBuyer: '0x0',
+  });
   const [ownerSelectedMode, setOwnerSelectedMode] = useState<string>('update');
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
   const path = location.pathname.split('/');
@@ -156,7 +154,9 @@ export default function NFTDetails() {
   useEffect(() => {
     if (state && state.nft) {
       setNft(state.nft);
-      state.nft.owner.id.toLowerCase() === currentAccount?.toLowerCase() ? setOwner(true) : setOwner(false);
+      state.nft.owner.id.toLowerCase() === currentAccount?.toLowerCase()
+        ? setOwner(true)
+        : setOwner(false);
     } else {
       // If no NFT is passed (not accessing from profile or marketplace link), fetch from GQl
       console.log('NO NFT PASSSED');
@@ -198,17 +198,17 @@ export default function NFTDetails() {
   const unselected =
     'items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer';
 
-
   if (!nft) {
     return <FaSpinner />;
   } else {
     const mintDatetime = new Date(nft.mintTimestamp * 1000);
-    const mintDateString = mintDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
+    const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
     let lastPurchaseDateString = mintDateString;
     if (nft.lastPurchaseTimestamp !== 0) {
       const lastPurchaseDatetime = new Date(nft.lastPurchaseTimestamp * 1000);
-      lastPurchaseDateString = lastPurchaseDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
-
+      lastPurchaseDateString = lastPurchaseDatetime.toLocaleString('en-us', {
+        dateStyle: 'medium',
+      });
     }
 
     return (
@@ -454,13 +454,19 @@ export default function NFTDetails() {
             <div className="flex max-w-xl">
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Created By</FieldLabel>
-                <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.creator.id)}>
+                <div
+                  className="flex cursor-pointer"
+                  onClick={() => navigate('/profile/' + nft.creator.id)}
+                >
                   <UserDetail address={nft.creator.id} caption={mintDateString} />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
-                <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.owner.id)}>
+                <div
+                  className="flex cursor-pointer"
+                  onClick={() => navigate('/profile/' + nft.owner.id)}
+                >
                   <UserDetail address={nft.owner.id} caption={lastPurchaseDateString} />
                 </div>
               </div>
@@ -469,7 +475,9 @@ export default function NFTDetails() {
             <div className="flex flex-col">
               <HeadingSeparator>Description</HeadingSeparator>
 
-              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500">{nft.description}</div>
+              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500">
+                {nft.description}
+              </div>
             </div>
 
             <div className="flex flex-col">
@@ -479,19 +487,32 @@ export default function NFTDetails() {
                   <FieldLabel className="mb-2">Duration</FieldLabel>
                   <div>{nft.duration / 3600} hours</div>
                 </div>
-                {
-                  nft.availabilityTo !== 0 && nft.availabilityTo < Date.now() / 1000 ? <div>Out of availability range</div> :
-                    <div className="flex gap-5">
+                {nft.availabilityTo !== 0 && nft.availabilityTo < Date.now() / 1000 ? (
+                  <div>Out of availability range</div>
+                ) : (
+                  <div className="flex gap-5">
+                    <div>
+                      <FieldLabel className="mb-2">Availability From</FieldLabel>
                       <div>
-                        <FieldLabel className="mb-2">Availability From</FieldLabel>
-                        <div>{nft.availabilityFrom > Date.now() / 1000 ? new Date(nft.availabilityFrom * 1000).toLocaleString("en-us", { dateStyle: 'long' }) : 'Now'}</div>
-                      </div>
-                      <div>
-                        <FieldLabel className="mb-2">Availability To</FieldLabel>
-                        <div>{nft.availabilityTo === 0 ? 'No End Date' : new Date(nft.availabilityTo * 1000).toLocaleString("en-us", { dateStyle: 'long' })}</div>
+                        {nft.availabilityFrom > Date.now() / 1000
+                          ? new Date(nft.availabilityFrom * 1000).toLocaleString('en-us', {
+                              dateStyle: 'long',
+                            })
+                          : 'Now'}
                       </div>
                     </div>
-                }
+                    <div>
+                      <FieldLabel className="mb-2">Availability To</FieldLabel>
+                      <div>
+                        {nft.availabilityTo === 0
+                          ? 'No End Date'
+                          : new Date(nft.availabilityTo * 1000).toLocaleString('en-us', {
+                              dateStyle: 'long',
+                            })}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div>
                   <FieldLabel className="mb-2">Royalities</FieldLabel>
                   <div>{(nft.royaltyBasisPoints / 100).toString()} %</div>

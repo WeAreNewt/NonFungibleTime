@@ -7,9 +7,8 @@ import { NftsDocument } from '../../lib/graphql/index';
 import { NFT } from '../../types';
 
 export default function Marketplace() {
-  const { data, loading } = useQuery(NftsDocument
-  );
-  const nfts: NFT[] | undefined = (data && data.nfts) ? data.nfts : undefined
+  const { data, loading } = useQuery(NftsDocument);
+  const nfts: NFT[] | undefined = data && data.nfts ? data.nfts : undefined;
 
   return (
     <div className="bg-slate-100 dark:bg-black">
@@ -31,14 +30,15 @@ export default function Marketplace() {
             </div>
           </div>
         </div>
-        {
-          loading || !nfts ? <FaSpinner /> :
-            <NFTGrid>
-              {nfts.map((nft, index) => {
-                return <NFTCard key={index} nft={nft} />;
-              })}
-            </NFTGrid>
-        }
+        {loading || !nfts ? (
+          <FaSpinner />
+        ) : (
+          <NFTGrid>
+            {nfts.map((nft, index) => {
+              return <NFTCard key={index} nft={nft} />;
+            })}
+          </NFTGrid>
+        )}
 
         {/** NFT Display */}
       </div>
