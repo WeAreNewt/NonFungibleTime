@@ -3,8 +3,8 @@ import { FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import { Category, User } from '../../types';
-import { Dialog } from '@headlessui/react';
+import { Category, NFT, User } from '../../types';
+import { Dialog, Tab } from '@headlessui/react';
 import { BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { MintParamsType } from '../../lib/helpers/NftCollection';
@@ -26,6 +26,11 @@ interface MintNftParams {
   royalty: number;
 }
 
+//This combines classes together
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
+}
+
 export default function Profile() {
   const { currentAccount, nftCollectionService, userData, loadingUserData } = useAppDataProvider();
   const { library: provider } = useWeb3React();
@@ -45,8 +50,9 @@ export default function Profile() {
   const location = useLocation();
   const path = location.pathname.split('/');
   const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
-
+  
   useEffect(() => {
+   
     if (path[2] === currentAccount) {
       setOwner(true);
     } else {
@@ -60,11 +66,25 @@ export default function Profile() {
   const { data, loading } = useQuery(ProfileNftsDocument, {
     variables: {
       user: owner ? '' : path[2].toLowerCase()
+      
     },
   });
+
+  
   const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
   const userLoading: boolean = owner ? loadingUserData : loading;
+  const categories = ["Minted","Owned"]
+  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts as NFT[])
   const toggleClass = ' transform translate-x-5';
+
+  const onChangeTab = (index: number) =>  {
+    if(index === 0) {
+    setNftsShown(user?.createdNfts as NFT[])
+    }
+    else {
+    setNftsShown(user?.ownedNfts as NFT[])
+    }
+  }
 
   const mintNft = async () => {
     console.log(formNft)
@@ -446,8 +466,27 @@ export default function Profile() {
               </div>
             </div>
           </div>
+       <Tab.Group onChange={((index)=> onChangeTab(index))}>
+        <Tab.List>
+          {categories.map((category) => {
+           return <Tab
+              className={({ selected }) =>
+                classNames(
+                  'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 rounded-lg',
+                  selected
+                  ? 'dark:text-white border-b-2 border-indigo-600 text-white'
+                  : 'dark:text-white hover:bg-white/[0.12] hover:text-white'
+                )
+              }
+            >
+              {category}
+            </Tab>
+          })}
+        </Tab.List>
+       
+      </Tab.Group>
           {userLoading || !user ? <FaSpinner /> : <NFTGrid>
-            {user.ownedNfts.map((nft, index) => {
+            {nftsShown.map((nft, index) => {
               return <NFTCard key={index} nft={nft} />;
             })}
           </NFTGrid>}
