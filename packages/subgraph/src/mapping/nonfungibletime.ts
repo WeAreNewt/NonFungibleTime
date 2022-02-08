@@ -68,6 +68,8 @@ export function handleTokenBought(event: TokenBought): void {
     purchase.royaltyReceiver = nftParams.value6.toHexString();
     purchase.save();
     nft.forSale = false;
+    const uri = getTokenURI(event, event.params.tokenId);
+    nft.tokenURI = uri;
     nft.owner = to;
     nft.lastPurchaseTimestamp = event.block.timestamp.toI32();
     nft.save();
@@ -90,8 +92,12 @@ export function handleTokenBuyingConditionsChanged(event: TokenBuyingConditionsC
   if (nft) {
     nft.price = event.params.price;
     nft.currency = event.params.currency.toHexString();
-    nft.forSale = event.params.forSale;
     nft.allowedBuyer = event.params.allowedBuyer.toHexString();
+    if (nft.forSale != event.params.forSale) {
+      const uri = getTokenURI(event, event.params.tokenId);
+      nft.tokenURI = uri;
+      nft.forSale = event.params.forSale;
+    }
     nft.save();
   } else {
     log.warning(`Buying condition update for non-existant tokenId {}`, [
