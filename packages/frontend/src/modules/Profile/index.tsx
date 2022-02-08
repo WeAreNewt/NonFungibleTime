@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaShareAlt, FaSpinner } from 'react-icons/fa';
-import { useLocation, } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { Category, NFT, User } from '../../types';
@@ -99,7 +99,7 @@ export default function Profile() {
     const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`
     return (
     //if no wallet
-    !account ? <ConnectButton/> : 
+    account ? <ConnectButton/> : 
     //if no nfts 
     !nftsShown.length ? <div
     className='text-xl text-center font-medium text-blue-700 '
