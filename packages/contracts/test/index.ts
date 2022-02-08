@@ -4,9 +4,15 @@ import { NonFungibleTimeCollection } from '../typechain/NonFungibleTimeCollectio
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { SvgGenerator, TestToken } from 'contracts/typechain';
 import { BigNumber } from 'ethers';
+import { InnerRingsSvgGenerator } from 'contracts/typechain/InnerRingsSvgGenerator';
+import { OuterRingsSvgGenerator } from 'contracts/typechain/OuterRingsSvgGenerator';
+import { MiddleRingsSvgGenerator } from 'contracts/typechain/MiddleRingsSvgGenerator';
 
 describe('Tokenized time collection', () => {
   let nftCollection: NonFungibleTimeCollection;
+  let outerRingsSvgGenerator: OuterRingsSvgGenerator;
+  let middleRingsSvgGenerator: MiddleRingsSvgGenerator;
+  let innerRingsSvgGenerator: InnerRingsSvgGenerator;
   let svgGenerator: SvgGenerator;
   let owner: SignerWithAddress;
   let minter: SignerWithAddress;
@@ -16,11 +22,23 @@ describe('Tokenized time collection', () => {
 
   beforeEach(async () => {
     const NftCollectionFactory = await ethers.getContractFactory('NonFungibleTimeCollection');
+    const OuterRingsSvgGeneratorFactory = await ethers.getContractFactory('OuterRingsSvgGenerator');
+    const MiddleRingsSvgGeneratorFactory = await ethers.getContractFactory(
+      'MiddleRingsSvgGenerator'
+    );
+    const InnerRingsSvgGeneratorFactory = await ethers.getContractFactory('InnerRingsSvgGenerator');
     const SvgGeneratorFactory = await ethers.getContractFactory('SvgGenerator');
     const TestTokenFactory = await ethers.getContractFactory('TestToken');
     [owner, otherAccount, buyer] = await ethers.getSigners();
     minter = owner;
-    svgGenerator = await SvgGeneratorFactory.deploy();
+    outerRingsSvgGenerator = await OuterRingsSvgGeneratorFactory.deploy();
+    middleRingsSvgGenerator = await MiddleRingsSvgGeneratorFactory.deploy();
+    innerRingsSvgGenerator = await InnerRingsSvgGeneratorFactory.deploy();
+    svgGenerator = await SvgGeneratorFactory.deploy(
+      outerRingsSvgGenerator.address,
+      middleRingsSvgGenerator.address,
+      innerRingsSvgGenerator.address
+    );
     nftCollection = await NftCollectionFactory.deploy();
     nftCollection.initialize(
       'Non Fungible Time',

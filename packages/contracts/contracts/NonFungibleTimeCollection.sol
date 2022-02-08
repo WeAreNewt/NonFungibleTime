@@ -10,10 +10,10 @@ import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 
-/// @title Non-Fungible Time collection
-/// @author The Newt team
-/// @notice A primitive to mint time, our most valuable asset, on-chain
-/// @dev An ERC-721 contract with mint, buy, and transfer functions
+/// @title Non-Fungible Time collection.
+/// @author The Newt team.
+/// @notice A primitive to mint time, our most valuable asset, on-chain.
+/// @dev An ERC-721 contract with mint, buy, and transferFrom functions.
 contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -295,8 +295,15 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
                             Base64.encode(
                                 bytes(
                                     ISvgGenerator(svgGenerator).generateSvg(
+                                        tokenId,
+                                        token.minter,
+                                        token.category,
+                                        token.name,
+                                        token.availabilityFrom,
+                                        token.availabilityTo,
+                                        token.duration,
                                         token.redeemed,
-                                        token.category
+                                        token.forSale
                                     )
                                 )
                             ),
@@ -340,7 +347,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
     /// @param availabilityFrom Unix timestamp indicating start of availability. Zero if does not have lower bound.
     /// @param availabilityTo Unix timestamp indicating end of availability. Zero if does not have upper bound.
     /// @param duration The actual quantity of time you are tokenizing inside availability range. Measured in seconds.
-    /// @param redeemed A boolean representing if the token is redeemed or not.
+    /// @param redeemed A boolean representing if the token was redeemed or not.
     /// @return Bytes representing with the final part of the token URI.
     function _getTokenURIAfterImage(
         string memory category,
@@ -360,7 +367,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
                 Strings.toString(availabilityFrom),
                 '"},{"display_type":"date","trait_type":"Availability To","value":"',
                 Strings.toString(availabilityTo),
-                '"},{"trait_type":"Duration","value":"',
+                '"},{"trait_type":"Duration in seconds","value":"',
                 Strings.toString(duration),
                 '"},{"trait_type":"Redeemed","value":"',
                 _boolToString(redeemed),
