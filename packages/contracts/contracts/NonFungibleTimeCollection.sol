@@ -8,13 +8,13 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
+import './utils/ERC721PermittableUpgradeable.sol';
 
 /// @title Non-Fungible Time collection.
 /// @author The Newt team.
 /// @notice A primitive to mint time, our most valuable asset, on-chain.
 /// @dev An ERC-721 contract with mint, buy, and transferFrom functions.
-contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgradeable {
+contract NonFungibleTimeCollection is IERC2981, ERC721PermittableUpgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     event TokenBought(uint256 indexed tokenId, address seller, address buyer);
@@ -94,7 +94,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         address svgGeneratorContract,
         address owner
     ) public initializer {
-        __ERC721_init(name, symbol);
+        __ERC721PermittableUpgradeable_init(name, symbol);
         _transferOwnership(owner);
         if (useNativeCurrency) {
             isCurrencyAllowed[address(0)] = true;

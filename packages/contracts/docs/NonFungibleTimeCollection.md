@@ -10,6 +10,40 @@ A primitive to mint time, our most valuable asset, on-chain.
 
 ## Methods
 
+### DOMAIN_SEPARATOR
+
+```solidity
+function DOMAIN_SEPARATOR() external view returns (bytes32 seperator)
+```
+
+The domain separator used in the encoding of the signature for `permit`, as defined by `EIP712`.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| seperator | bytes32 | The domain seperator for `permit`.
+
+### PERMIT_TYPEHASH
+
+```solidity
+function PERMIT_TYPEHASH() external pure returns (bytes32 typehash)
+```
+
+The permit typehash used in the `permit` signature.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| typehash | bytes32 | The typehash for the `permit`.
+
 ### approve
 
 ```solidity
@@ -250,6 +284,28 @@ function name() external view returns (string)
 |---|---|---|
 | _0 | string | undefined
 
+### nonces
+
+```solidity
+function nonces(uint256 tokenID) external view returns (uint256 nonce)
+```
+
+Returns the current nonce for `tokenID`. This value must be included whenever a signature is generated for `permit`. Every successful call to `permit` increases ``tokenID``&#39;s nonce by one. This prevents a signature from being used multiple times.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenID | uint256 | ID of the token to request nonce.
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| nonce | uint256 | Nonce of the token.
+
 ### owner
 
 ```solidity
@@ -288,6 +344,27 @@ function ownerOf(uint256 tokenId) external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined
+
+### permit
+
+```solidity
+function permit(address spender, uint256 tokenID, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Approve of a specific `tokenID` for spending by `spender` via signature.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| spender | address | The account that is being approved.
+| tokenID | uint256 | The ID of the token that is being approved for spending.
+| deadline | uint256 | The deadline timestamp by which the call must be mined for the approve to work.
+| v | uint8 | Must produce valid secp256k1 signature from the holder along with `r` and `s`.
+| r | bytes32 | Must produce valid secp256k1 signature from the holder along with `v` and `s`.
+| s | bytes32 | Must produce valid secp256k1 signature from the holder along with `r` and `v`.
 
 ### redeem
 
@@ -339,6 +416,23 @@ function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (
 |---|---|---|
 | _0 | address | The address who will receive the royalties and the royalty amount for the given price.
 | _1 | uint256 | undefined
+
+### safeTransfer
+
+```solidity
+function safeTransfer(address to, uint256 tokenID) external nonpayable
+```
+
+Safely transfers `tokenID` from `msg.sender` to `to`.
+
+*This was excluded from the official `ERC721` standard in favor of `safeTransferFrom(address from, address to, uint256 tokenID)`. We elect to include it.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | The receipient of the token.
+| tokenID | uint256 | The token to transfer.
 
 ### safeTransferFrom
 
@@ -554,6 +648,23 @@ function totalSupply() external view returns (uint256)
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined
+
+### transfer
+
+```solidity
+function transfer(address to, uint256 tokenID) external nonpayable
+```
+
+Transfers `tokenID` from `msg.sender` to `to`.
+
+*This was excluded from the official `ERC721` standard in favor of `transferFrom(address from, address to, uint256 tokenID)`. We elect to include it.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | The receipient of the token.
+| tokenID | uint256 | The token to transfer.
 
 ### transferFrom
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
+import { waffle, ethers } from 'hardhat';
 import { NonFungibleTimeCollection } from '../typechain/NonFungibleTimeCollection.d';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { SvgGenerator, TestToken } from 'contracts/typechain';
@@ -7,6 +7,7 @@ import { BigNumber } from 'ethers';
 import { InnerRingsSvgGenerator } from 'contracts/typechain/InnerRingsSvgGenerator';
 import { OuterRingsSvgGenerator } from 'contracts/typechain/OuterRingsSvgGenerator';
 import { MiddleRingsSvgGenerator } from 'contracts/typechain/MiddleRingsSvgGenerator';
+import { getDomainSeparator, getErc721PermitSignature } from './utilities/getErc721PermitSignature';
 
 describe('Tokenized time collection', () => {
   let nftCollection: NonFungibleTimeCollection;
@@ -611,5 +612,125 @@ describe('Tokenized time collection', () => {
     expect(await testToken.balanceOf(minter.address)).to.equal(ethers.BigNumber.from(10));
     expect(await testToken.balanceOf(otherAccount.address)).to.equal(ethers.BigNumber.from(90));
     expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
+  });
+
+  describe('transfer', () => {
+    it('Should revert transfer of nonexistent token', async () => {
+      await expect(nftCollection.connect(minter).transfer(buyer.address, 999)).to.be.revertedWith("ERC721: operator query for nonexistent token");
+      await expect(nftCollection.connect(minter).safeTransfer(buyer.address, 999)).to.be.revertedWith("ERC721: operator query for nonexistent token");
+    });
+    it('Should revert transfer of not your token', async () => {
+      await nftCollection
+        .connect(minter)
+        .mint(
+          'One dev hour v1',
+          'One development hour to be used for any dao',
+          'Development',
+          1641342727,
+          1651342727,
+          10000000,
+          1000
+        );
+      await expect(nftCollection.connect(buyer).transfer(buyer.address, 0)).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
+      await expect(nftCollection.connect(buyer).safeTransfer(buyer.address, 0)).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
+    });
+    it('Should transfer tokens', async () => {
+      await nftCollection
+        .connect(minter)
+        .mint(
+          'One dev hour v1',
+          'One development hour to be used for any dao',
+          'Development',
+          1641342727,
+          1651342727,
+          10000000,
+          1000
+        );
+      expect(await nftCollection.ownerOf(0)).eq(minter.address);
+      await nftCollection.connect(minter).transfer(buyer.address, 0);
+      expect(await nftCollection.ownerOf(0)).eq(buyer.address);
+      await nftCollection.connect(buyer).safeTransfer(minter.address, 0);
+      expect(await nftCollection.ownerOf(0)).eq(minter.address);
+    });
+  });
+
+  describe('permit', () => {
+    let tokenID = 0;
+    const chainId = 31337;
+    const provider = waffle.provider;
+    const deadline = ethers.constants.MaxUint256;
+
+    beforeEach(async () => {
+      await nftCollection.connect(minter).mint('One dev hour v1','One development hour to be used for any dao','Development',1641342727,1651342727,10000000,1000);
+      await nftCollection.connect(minter).mint('One dev hour v1','One development hour to be used for any dao','Development',1641342727,1651342727,10000000,1000);
+    });
+    it("has a permit typehash", async function () {
+      // constant across deployments
+      let typehash = await nftCollection.PERMIT_TYPEHASH();
+      expect(typehash).to.eq("0x137406564cdcf9b40b1700502a9241e87476728da7ae3d0edfcf0541e5b49b3e");
+    });
+    it("has a domain seperator", async function () {
+      // changes across deployments
+      let seperator1 = await nftCollection.DOMAIN_SEPARATOR();
+      let seperator2 = getDomainSeparator('Non Fungible Time', nftCollection.address, chainId);
+      expect(seperator1).to.eq(seperator2);
+    });
+    it("has a nonce", async function () {
+      expect(await nftCollection.nonces(tokenID)).to.equal(0);
+    });
+    it("cannot permit non existant token", async function () {
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection, buyer.address, 999);
+      await expect(nftCollection.permit(buyer.address, 999, deadline, v, r, s)).to.be.revertedWith("query for nonexistent token");
+    });
+    it("cannot permit past deadline", async function () {
+      // get current timestamp
+      await provider.send("evm_mine", []);
+      let timestamp = (await provider.getBlock("latest")).timestamp;
+      // next block timestamp = prev block timestamp + 1
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection, buyer.address, tokenID, timestamp);
+      await expect(nftCollection.permit(buyer.address, tokenID, timestamp, v, r, s)).to.be.revertedWith("permit expired");
+    });
+    it("cannot permit to self", async function () {
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection, minter.address, tokenID);
+      await expect(nftCollection.permit(minter.address, tokenID, deadline, v, r, s)).to.be.revertedWith("cannot permit to self");
+    });
+    it("cannot permit not your token", async function () {
+      const { v, r, s } = await getErc721PermitSignature(buyer, nftCollection, buyer.address, tokenID);
+      await expect(nftCollection.connect(buyer).permit(buyer.address, tokenID, deadline, v, r, s)).to.be.revertedWith("unauthorized");
+    });
+    it("cannot use signature for another contract", async function () {
+      // new contract and nft
+      const NftCollectionFactory = await ethers.getContractFactory('NonFungibleTimeCollection');
+      let nftCollection2 = await NftCollectionFactory.deploy();
+      await nftCollection2.initialize('Non Fungible Time','NFTIME',false,svgGenerator.address,owner.address);
+      await nftCollection2.connect(minter).mint('One dev hour v1','One development hour to be used for any dao','Development',1641342727,1651342727,10000000,1000);
+      // permit
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection2, buyer.address, tokenID);
+      await expect(nftCollection.permit(buyer.address, tokenID, deadline, v, r, s)).to.be.revertedWith("unauthorized");
+    });
+    it("should reject forged signatures", async function () {
+      await expect(nftCollection.permit(buyer.address, tokenID, deadline, 27, "0x1234567890123456789012345678901234567890123456789012345678901234", "0x1234567890123456789012345678901234567890123456789012345678901234")).to.be.revertedWith("invalid signature");
+    });
+    it("should reject modified parameters", async function () {
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection, buyer.address, tokenID, deadline);
+      await expect(nftCollection.permit(otherAccount.address, tokenID, deadline, v, r, s)).to.be.revertedWith("unauthorized");
+      await expect(nftCollection.permit(buyer.address, 1, deadline, v, r, s)).to.be.revertedWith("unauthorized");
+      await expect(nftCollection.permit(buyer.address, tokenID, deadline.sub(1), v, r, s)).to.be.revertedWith("unauthorized");
+    });
+    it("should permit EOA signatures", async function () {
+      // permit
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection, buyer.address, tokenID);
+      let tx = await nftCollection.permit(buyer.address, tokenID, deadline, v, r, s);
+      await expect(tx).to.emit(nftCollection, "Approval").withArgs(minter.address, buyer.address, tokenID);
+      // effects
+      expect(await nftCollection.getApproved(tokenID)).to.equal(buyer.address);
+      await nftCollection.connect(buyer).transferFrom(minter.address, buyer.address, tokenID);
+      expect(await nftCollection.ownerOf(tokenID)).to.equal(buyer.address);
+      expect(await nftCollection.nonces(tokenID)).to.equal(1);
+    });
+    it("should revert incorrect nonce", async function () {
+      const { v, r, s } = await getErc721PermitSignature(minter, nftCollection, buyer.address, tokenID, deadline, 2);
+      await expect(nftCollection.permit(buyer.address, tokenID, deadline, v, r, s)).to.be.revertedWith("unauthorized");
+    });
   });
 });
