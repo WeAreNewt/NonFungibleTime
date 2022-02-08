@@ -14,7 +14,6 @@ While freelance services is the initial use case for Non Fungible Time, this pri
    - [About](#project-description)
    - [Infrastructure](#infrastructure)
    - [Buidling](#buidling)
-   - [Collection Ownership](#collection-ownership)
 2. [Smart Contracts](#smart-contracts)
    - [NonFungibleTimeCollection](#NonFungibleTimeCollection)
    - [SvgGenerator](#svgGenerator)
@@ -25,7 +24,7 @@ While freelance services is the initial use case for Non Fungible Time, this pri
 
 ### About
 
-Time NFTs are a way for users to mint and own NFTs representing their time. Each NFT has customizable fields which are stored as on-chain metadata, and have a dynamic animated representation. Time NFTs allow uders to take ownership of their time through collecting, sharing, monetizing, or creating unique use cases.
+Time NFTs are a way for users to mint and own NFTs representing their time. Each NFT has customizable fields which are stored as on-chain metadata, and have a dynamic animated representation. Time NFTs allow users to take ownership of their time through collecting, sharing, monetizing, or creating other unique use cases.
 
 ### Infrastructure
 
@@ -38,19 +37,6 @@ This diagram lays out the basic project structure. Smart contracts were develope
 ### Buidling
 
 Given the modular nature of smart contracts, Time NFTs can be integrated, enhanced, or forked by anyone. The sections below will cover the [smart contract](#smart-contract), [data](#subgraph), and [frontend](#frontend) components of the Time NFT project. See [contributing](CONTRIBUTING.md) for more info on joining the Newt community to build with Time NFTs.
-
-### Collection Ownership
-
-On launch the Time NFT collection contract will be launched as a proxy, owned be a multisig of the core team members. The contract owner has the ability to:
-
-- Approve or revoke tokens as accepted forms of payment
-- Set the address of the SvgGenerator contract
-- Update the implementation contract
-
-The collection owner does not have the ability to:
-
-- Coopt, affect or otherwise move funds from any user of the system
-- Burn user NFTs or prevent users from interacting with the collection contract
 
 <br />
 
