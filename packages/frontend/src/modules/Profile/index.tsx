@@ -99,7 +99,7 @@ export default function Profile() {
     const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`
     return (
     //if no wallet
-    account ? <ConnectButton/> : 
+    !account ? <ConnectButton/> : 
     //if no nfts 
     !nftsShown.length ? <div
     className='text-xl text-center font-medium text-blue-700 '
