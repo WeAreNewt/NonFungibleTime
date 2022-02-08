@@ -1,5 +1,17 @@
-subscription Nfts {
-  nfts(first: 100) {
+query Nfts(
+  $where: Nft_filter
+  $orderBy: Nft_orderBy
+  $orderDirection: OrderDirection
+  $first: Int!
+  $skip: Int
+) {
+  nfts(
+    where: $where
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+    first: $first
+    skip: $skip
+  ) {
     ...NftFields
   }
 }
