@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaShareAlt, FaSpinner } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom';
+import { useLocation, } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { Category, NFT, User } from '../../types';
@@ -15,6 +15,7 @@ import makeBlockie from 'ethereum-blockies-base64';
 import DatePicker from "react-datepicker";
 import classnames from 'classnames';
 import "react-datepicker/dist/react-datepicker.css";
+import ConnectButton from '../../components/ConnectButton';
 
 
 interface MintNftParams {
@@ -27,9 +28,14 @@ interface MintNftParams {
   royalty: number;
 }
 
+
+
+
 export default function Profile() {
+ 
   const { currentAccount, nftCollectionService, userData, loadingUserData } = useAppDataProvider();
-  const { library: provider } = useWeb3React();
+  const { library: provider, account } = useWeb3React();
+
   const [owner, setOwner] = useState<Boolean>(true);
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [toggleIndex, setToggleIndex] = useState<number>(0)
@@ -47,7 +53,7 @@ export default function Profile() {
   const location = useLocation();
   const path = location.pathname.split('/');
   const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
-
+ 
   useEffect(() => {
     if (path[2] === currentAccount) {
       setOwner(true);
@@ -63,20 +69,18 @@ export default function Profile() {
       user: owner ? '' : path[2].toLowerCase(),
     },
   });
-
-
+  const categories = ["Minted", "Owned"]
   const user: User | undefined = owner ? userData : (data && data.user) ? data.user : undefined
   const userLoading: boolean = owner ? loadingUserData : loading;
-  const categories = ["Minted", "Owned"]
   const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : [])
   const toggleClass = ' transform translate-x-5';
-
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
       setNftsShown(user.createdNfts)
     }
     if (user?.ownedNfts && toggleIndex === 1) {
       setNftsShown(user.ownedNfts)
+
     }
   }, [user, toggleIndex])
 
@@ -84,12 +88,31 @@ export default function Profile() {
   const onChangeTab = (index: number) => {
     if (index === 0) {
       setToggleIndex(0)
+      setNftsShown(user?.createdNfts ? user?.createdNfts : [] as NFT[])
     }
     else {
       setToggleIndex(1)
+      setNftsShown(user?.ownedNfts? user?.ownedNfts : [] as NFT[])
     }
   }
-
+  const renderNFTs = () => {
+    const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`
+    return (
+    //if no wallet
+    !account ? <ConnectButton/> : 
+    //if no nfts 
+    !nftsShown.length ? <div
+    className='text-xl text-center font-medium text-blue-700 '
+  >
+    {copy}
+  </div> :
+     <NFTGrid>
+            {nftsShown.map((nft, index) => {
+              return <NFTCard key={index} nft={nft} />;
+            })}
+          </NFTGrid>
+    )
+  }
   const mintNft = async () => {
     if (currentAccount) {
       if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
@@ -531,11 +554,7 @@ export default function Profile() {
             </Tab.List>
 
           </Tab.Group>
-          {userLoading || !user ? <FaSpinner /> : <NFTGrid>
-            {nftsShown.map((nft, index) => {
-              return <NFTCard key={index} nft={nft} />;
-            })}
-          </NFTGrid>}
+          {userLoading ? <FaSpinner /> : renderNFTs()}
         </div>
       </div>
     </div>
