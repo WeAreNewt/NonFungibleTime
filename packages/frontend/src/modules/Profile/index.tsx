@@ -18,6 +18,7 @@ import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
+import { Button, ButtonVariant } from '../../components/Button';
 
 interface MintNftParams {
   name: string;
@@ -34,32 +35,6 @@ interface TxStatus {
   confirmed: boolean;
   txHash?: string;
 }
-type ButtonProps = Pick<
-  React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
-  'onClick'
->;
-
-const ShareProfileButton = (props: ButtonProps) => {
-  return (
-    <button
-      className="bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 border border-gray-300 rounded flex items-center gap-2 cursor-pointer w-full min-w-fit"
-      {...props}
-    >
-      <FaShareAlt /> Share Profile
-    </button>
-  );
-};
-
-const MintNewButtton = (props: ButtonProps) => {
-  return (
-    <button
-      className="py-2 px-4 border border-transparent font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer w-full min-w-fit"
-      {...props}
-    >
-      Mint new
-    </button>
-  );
-};
 
 export default function Profile() {
   const { currentAccount, nftCollectionService, userData, loadingUserData, networkConfig } =
@@ -211,15 +186,22 @@ export default function Profile() {
             {/** Share Profile */}
             <div className="flex md:px-5 w-full md:justify-end ">
               <div className="flex gap-4 flex-1 md:flex-initial  ">
-                <ShareProfileButton onClick={() => setShareProfileModalOpen(true)} />
+                <Button
+                  variant={ButtonVariant.SECONDARY}
+                  onClick={() => setShareProfileModalOpen(true)}
+                >
+                  <FaShareAlt /> Share Profile
+                </Button>
                 {/** Mint */}
                 {owner && (
-                  <MintNewButtton
+                  <Button
                     onClick={() => {
                       setMintModalOpen(true);
                       setMintTxStatus({ submitted: false, confirmed: false, txHash: undefined });
                     }}
-                  />
+                  >
+                    Mint new
+                  </Button>
                 )}
                 {/** Mint Modal */}
                 <Dialog

@@ -5,6 +5,7 @@ import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
 import { PriceDisplay } from '../../components/PriceDisplay';
@@ -365,12 +366,12 @@ export default function NFTDetails() {
               {/** Share Profile */}
               <div className="flex-end">
                 <div className="flex flex-row justify-evenly">
-                  <div
-                    className="items-center justify-center px-6 py-1 border border-gray text-base font-semibold rounded-md text-black bg-white hover:bg-gray-400 md:py-2 md:text-lg md:px-8 cursor-pointer"
+                  <Button
+                    variant={ButtonVariant.SECONDARY}
                     onClick={() => setShareProfileModalOpen(true)}
                   >
                     <FaShareAlt /> Share
-                  </div>
+                  </Button>
                   {/** Share Profile Modal */}
                   <Dialog
                     open={shareProfileModalOpen}
