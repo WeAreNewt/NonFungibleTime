@@ -8,7 +8,7 @@ import { NFTGrid } from '../../components/NFTGrid';
 import { NftsDocument, Nft_Filter, Nft_OrderBy, OrderDirection } from '../../lib/graphql/index';
 import { NFT } from '../../types';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 12;
 
 export default function Marketplace() {
   const [canLoadMore, setCanLoadMore] = useState(true);
