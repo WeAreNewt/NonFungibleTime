@@ -23,6 +23,7 @@ export interface NetworkConfig extends AddEthereumChainParameter {
     subgraphHttpLink: string;
     subgraphWsLink: string;
     collectionAddress: string;
+    blockExplorer: string;
 }
 
 export class Matic {
@@ -63,12 +64,14 @@ export const networkConfigs: Record<number, NetworkConfig> = {
         subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
         subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
         collectionAddress: '0x4ECe6a51321B9F1B9FEc33A98f0513A7B626BFB4',
+        blockExplorer: 'https://explorer-mumbai.maticvigil.com',
         ...addChainParameters[ChainId.mumbai],
     },
     [ChainId.polygon]: {
         subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
         subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
         collectionAddress: '',
+        blockExplorer: 'https://polygon-rpc.com/',
         ...addChainParameters[ChainId.polygon],
     },
 };
