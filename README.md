@@ -39,10 +39,10 @@ Non Fungible Time is a WorkFi primitive. The functions are stripped down to thei
 > _Smart contracts that allocate time efficiently and maximize its value._
 
 {% hint style="info" %}
-Newt developed the base contracts for minting and exchanging protocols, and is supporting efforts to build on top of them.
+Newt developed the base contracts for minting and exchanging, and is supporting efforts to build on top of them.
 {% endhint %}
 
-### ****[**Guide: Getting Started**](broken-reference)
+### ****[**Guide: Getting Started**](broken-reference)****
 
 {% content-ref url="primitive/minting.md" %}
 [minting.md](primitive/minting.md)
