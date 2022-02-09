@@ -612,4 +612,56 @@ describe('Tokenized time collection', () => {
     expect(await testToken.balanceOf(otherAccount.address)).to.equal(ethers.BigNumber.from(90));
     expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
   });
+
+  it('Should turn forSale false after being buyed', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(testToken.address);
+    await nftCollection.changeBuyingConditions(
+      ethers.constants.Zero,
+      testToken.address,
+      ethers.constants.One,
+      ethers.constants.AddressZero,
+      true
+    );
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.true;
+    await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
+    await testToken
+      .connect(buyer)
+      .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
+    await nftCollection.connect(buyer).buy(ethers.constants.Zero);
+    expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.false;
+  });
+
+  it('Should turn forSale false after being tranferred through transferFrom', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(testToken.address);
+    await nftCollection.changeBuyingConditions(
+      ethers.constants.Zero,
+      testToken.address,
+      ethers.constants.One,
+      ethers.constants.AddressZero,
+      true
+    );
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.true;
+    await nftCollection.transferFrom(minter.address, otherAccount.address, ethers.constants.Zero);
+    expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(otherAccount.address);
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.false;
+  });
 });

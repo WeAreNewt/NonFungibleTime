@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { formatEthAddress } from '../../lib/helpers/format';
 import { useWeb3, WalletType } from '../../lib/providers/web3-provider';
 
 export default function AddressInfo() {
   const { connect, account, isCorrectChain, active, requestToSwitchChain, disconnect } = useWeb3();
   const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // If user connects wallet while on disconnected profile screen, redirect to their profile
+  useEffect(() => {
+    if (account) {
+      if (location.pathname === '/profile/') {
+        navigate('/profile/' + account)
+      } else if (location.pathname === '/profile/mint/') {
+        navigate('/profile/' + account + '/mint/')
+      }
+    }
+  }, [account, location.pathname, navigate])
+
   const onClick = async () => {
     try {
       if (active) {

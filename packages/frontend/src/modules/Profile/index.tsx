@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaShareAlt, FaSpinner } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { NFT, User } from '../../types';
@@ -14,35 +14,46 @@ import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Button, ButtonVariant } from '../../components/Button';
 import MintModal from '../../components/MintModal';
+import { isAddress } from 'ethers/lib/utils';
 
 export default function Profile() {
   const { currentAccount, userData, loadingUserData, } =
     useAppDataProvider();
+  const navigate = useNavigate();
   const [owner, setOwner] = useState<Boolean>(true);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
   const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
   const location = useLocation();
   const path = location.pathname.split('/');
-  const baseUrl = 'https://elated-kalam-a67780.netlify.app'; // Preview Deploy
+  const accountName = path[2] ? path[2] : '';
 
   useEffect(() => {
-    if (path[2] === currentAccount) {
+    if (accountName.toLowerCase() === currentAccount?.toLowerCase()) {
       setOwner(true);
     } else {
       setOwner(false);
     }
-  }, [path, currentAccount]);
+    if (path[3] === 'mint') {
+      navigate('/profile/' + (currentAccount ? currentAccount : ''))
+      setMintModalOpen(true)
+    }
+  }, [path, currentAccount, navigate, accountName]);
 
   // If user is the profile owner, use data from app provider
   // Otherwise fetch data from subgraph
-  const { data, loading } = useSubscription(ProfileNftsDocument, {
+  let sanitizedUser = ''
+  if (!owner && isAddress(accountName)) {
+    sanitizedUser = accountName.toLowerCase();
+  }
+  const { data, loading, error } = useSubscription(ProfileNftsDocument, {
     variables: {
-      user: owner ? '' : path[2].toLowerCase(),
+      user: sanitizedUser,
     },
   });
   const categories = ['Minted', 'Owned'];
-  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
+  // Use app-data-provider for pre-loaded data if user if profile owner, otherwise use separate subscription
+  const user: User | undefined = owner ? userData : (data && data.user ? data.user : undefined);
   const userLoading: boolean = owner ? loadingUserData : loading;
   const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
   useEffect(() => {
@@ -57,30 +68,68 @@ export default function Profile() {
   const onChangeTab = (index: number) => {
     if (index === 0) {
       setToggleIndex(0);
-      setNftsShown(user?.createdNfts ? user?.createdNfts : ([] as NFT[]));
+      setNftsShown(user?.createdNfts ? user?.createdNfts : []);
     } else {
       setToggleIndex(1);
-      setNftsShown(user?.ownedNfts ? user?.ownedNfts : ([] as NFT[]));
+      setNftsShown(user?.ownedNfts ? user?.ownedNfts : []);
     }
   };
   const renderNFTs = () => {
     const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`;
     return (
-      //if no wallet
-      !currentAccount ? (
-        <ConnectButton />
-      ) : //if no nfts
-        !nftsShown.length ? (
-          <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
-        ) : (
-          <NFTGrid>
-            {nftsShown.map((nft, index) => {
-              return <NFTCard key={index} nft={nft} />;
-            })}
-          </NFTGrid>
-        )
+      !nftsShown.length ? (
+        <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
+      ) : (
+        <NFTGrid>
+          {nftsShown.map((nft, index) => {
+            return <NFTCard key={index} nft={nft} />;
+          })}
+        </NFTGrid>
+      )
     );
   };
+
+  // If user does not have a wallet connected and is not viewing another profile, only display wallet connect button
+  // Any other pathname is treated as a profile address
+  if (location.pathname === '/profile/') {
+    return (
+      <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-black dark:text-white font-bold text-xl p-20">
+            No Wallet Connected
+          </div>
+          <div className="w-1/3 mx-auto">
+            <ConnectButton />
+          </div>
+        </div>
+      </div>)
+  }
+
+  // If there is no user, data is either errored, loading, or no data
+  // If there is no data and the pathname is a valid address, ithis block is skipped and the profile is displayed as empty
+  if (!user) {
+    if (error) {
+      return <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-red font-bold text-xl p-20">
+            An Error occured: {error.toString()}
+          </div>
+        </div>
+      </div>
+    } else if (loadingUserData) {
+      return <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />;
+    } else if (!accountName || !isAddress(accountName)) {
+      return (<div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-black dark:text-white font-bold text-xl p-20">
+            Invalid ETH Address
+          </div>
+        </div>
+      </div>)
+    }
+  }
+
+  // If the path contains a valid ethereum address, display profile data
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
@@ -92,11 +141,11 @@ export default function Profile() {
                 {/** Avatar/Blockie */}
                 <img
                   alt="blockie or ens avatar"
-                  src={makeBlockie(path[2])}
+                  src={makeBlockie(accountName)}
                   className="rounded-full w-40"
                 />
                 {/** ENS Name/Address */}
-                <div className="text-black dark:text-white">{path[2]}</div>
+                <div className="text-black dark:text-white">{accountName}</div>
               </div>
             </div>
             {/** Share Profile */}
@@ -167,7 +216,7 @@ export default function Profile() {
                                     name="profile-link"
                                     id="price"
                                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder={baseUrl + location.pathname}
+                                    placeholder={window.location.href}
                                   />
                                 </div>
                               </div>
@@ -180,7 +229,7 @@ export default function Profile() {
                           type="button"
                           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
                           onClick={() => {
-                            navigator.clipboard.writeText(baseUrl + location.pathname);
+                            navigator.clipboard.writeText(window.location.href);
                           }}
                         >
                           Copy URL
