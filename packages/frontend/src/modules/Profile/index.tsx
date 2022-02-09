@@ -308,7 +308,7 @@ export default function Profile() {
                                       }
                                     >
                                       <option key={''}>-</option>
-                                      {Object.values(Category).map((category, index) => (
+                                      {Object.values(Category).sort().map((category, index) => (
                                         <option key={index}>{category}</option>
                                       ))}
                                     </Select>
