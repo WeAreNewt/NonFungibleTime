@@ -161,7 +161,7 @@ npm install
 npx hardhat compile
 ```
 
-[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/README.md)
+[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/docs/NonFungibleTimeCollection.md)
 
 <br />
 
