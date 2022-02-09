@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaExternalLinkAlt, FaExternalLinkSquareAlt, FaRegWindowClose, FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -20,7 +20,6 @@ import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Button, ButtonVariant } from '../../components/Button';
 import classNames from 'classnames';
-import { isEthAddress } from '../../lib/helpers/base-service';
 
 interface MintNftParams {
   name: string;
@@ -329,7 +328,7 @@ export default function Profile() {
                                         availabilityFrom:
                                           formNft.availabilityFrom === 0
                                             ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
                                             )
                                             : 0,
                                       });
@@ -368,7 +367,7 @@ export default function Profile() {
                                         availabilityTo:
                                           formNft.availabilityTo === 0
                                             ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
                                             )
                                             : 0,
                                       });
@@ -524,7 +523,7 @@ export default function Profile() {
                       classnames(
                         'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
                         selected
-                          ? 'dark:text-white border-b-2 border-indigo-600 dark:text-white'
+                          ? 'dark:text-white border-b-2 border-indigo-600'
                           : 'dark:text-white hover:bg-white/[0.12] hover:dark:text-white'
                       )
                     }
@@ -535,7 +534,7 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? <FaSpinner /> : renderNFTs()}
+          {userLoading ? <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" /> : renderNFTs()}
         </div>
       </div >
     </div >
