@@ -20,7 +20,7 @@ export default function Navbar() {
   // Navbar Links
   const navigation: Navigation[] = [
     {
-      link: '/profile/' + currentAccount,
+      link: '/profile/' + (currentAccount ? currentAccount : ''),
       title: 'Profile',
     },
     {
