@@ -20,6 +20,7 @@ import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Button, ButtonVariant } from '../../components/Button';
 import classNames from 'classnames';
+import { isAddress } from 'ethers/lib/utils';
 
 interface MintNftParams {
   name: string;
@@ -103,19 +104,15 @@ export default function Profile() {
   const renderNFTs = () => {
     const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`;
     return (
-      //if no wallet
-      !currentAccount ? (
-        <ConnectButton />
-      ) : //if no nfts
-        !nftsShown.length ? (
-          <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
-        ) : (
-          <NFTGrid>
-            {nftsShown.map((nft, index) => {
-              return <NFTCard key={index} nft={nft} />;
-            })}
-          </NFTGrid>
-        )
+      !nftsShown.length ? (
+        <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
+      ) : (
+        <NFTGrid>
+          {nftsShown.map((nft, index) => {
+            return <NFTCard key={index} nft={nft} />;
+          })}
+        </NFTGrid>
+      )
     );
   };
   const mintNft = async () => {
@@ -164,6 +161,21 @@ export default function Profile() {
       setFormError('No account connected');
     }
   };
+
+  // If user does not have a wallet connected and is not viewing another profile, only display wallet connect button
+  if (!currentAccount && !isAddress(path[2])) {
+    return <div className="h-screen">
+      <div className="w-1/3 text-center mx-auto align-middle">
+        <div className="text-black dark:text-white font-bold text-xl p-20">
+          No Wallet Connected
+        </div>
+        <div className="w-1/3 mx-auto">
+          <ConnectButton />
+        </div>
+      </div>
+    </div>
+  }
+
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
