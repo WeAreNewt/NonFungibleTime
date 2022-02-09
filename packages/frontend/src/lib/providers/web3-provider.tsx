@@ -65,7 +65,7 @@ export const Web3DataProvider: React.FC = ({ children }) => {
        console.log("error when deactivating wallet")
      }
     },
-    [activate]
+    [deactivate]
   );
 
 

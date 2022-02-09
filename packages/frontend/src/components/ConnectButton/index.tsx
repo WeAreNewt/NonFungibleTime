@@ -6,7 +6,6 @@ import { useWeb3, WalletType } from '../../lib/providers/web3-provider';
 
 export default function AddressInfo() {
   const { connect, account, isCorrectChain, active, requestToSwitchChain, disconnect } = useWeb3();
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false)
   const onClick = async () => {
     console.log('clickd');
@@ -47,7 +46,6 @@ export default function AddressInfo() {
       >
         &#8203;
       </span>
-     
         <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
           <Dialog.Title
             as="h3"
