@@ -1,10 +1,22 @@
 import { baseInputClassNames } from './common';
 
+
+
+interface InputProps {
+  error?: string
+}
+
+type Props = InputProps & React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
+
 export const Input = ({
   type = 'text',
+  error,
   ...props
-}: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>) => {
+}: Props) => {
   return (
-    <input type={type} className={baseInputClassNames} placeholder={props.placeholder} {...props} />
+    <>
+      <input type={type} className={baseInputClassNames} placeholder={props.placeholder} {...props} />
+      {error && <span className="absolute text-xs text-red-500 pt-1">{error}</span>}
+    </>
   );
 };
