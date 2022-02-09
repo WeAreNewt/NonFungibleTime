@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt, FaSpinner } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -19,6 +19,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Button, ButtonVariant } from '../../components/Button';
+import classNames from 'classnames';
 
 interface MintNftParams {
   name: string;
@@ -55,8 +56,8 @@ export default function Profile() {
   const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
   const [mintTxStatus, setMintTxStatus] = useState<TxStatus>({
-    submitted: true,
-    confirmed: true,
+    submitted: false,
+    confirmed: false,
   });
   const location = useLocation();
   const path = location.pathname.split('/');
@@ -81,7 +82,6 @@ export default function Profile() {
   const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
   const userLoading: boolean = owner ? loadingUserData : loading;
   const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
-  const toggleClass = ' transform translate-x-5';
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
       setNftsShown(user.createdNfts);
@@ -228,23 +228,31 @@ export default function Profile() {
                       <div className="bg-white p-10">
                         <div className="flex">
                           <div className="w-full space-y-5">
-                            <h3
-                              className="text-lg leading-6 font-medium text-gray-900"
-                              id="modal-title"
-                            >
-                              Mint Time NFT
-                            </h3>
+                            <div className="flex flex-row justify-between">
+                              <h3
+                                className="text-lg leading-6 font-semibold text-gray-900"
+                                id="modal-title"
+                              >
+                                Mint Time NFT
+                              </h3>
+                              <div className="cursor-pointer text-xl" onClick={() => setMintModalOpen(false)}>
+                                <FaRegWindowClose className="hover:text-red-500" />
+                              </div>
+                            </div>
+
                             {mintTxStatus.submitted ? (
                               <div className="text-center flex-col p-4">
-                                <div>Submitted</div>
-                                <FaSpinner className="text-indigo-600" />
+                                <div className="font-semibold">Transaction Submitted</div>
+                                <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
                               </div>
                             ) : mintTxStatus.confirmed ? (
                               <div className="text-center flex-col">
-                                <div>Confirmed</div>
-                                <a href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
-                                  View Transaction
-                                </a>
+                                <div className="font-semibold">Transaction Confirmed</div>
+                                <div className="pt-4">
+                                  <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
+                                    View Transaction <FaExternalLinkAlt className="inline-block" />
+                                  </a>
+                                </div>
                               </div>
                             ) : (
                               <div className="space-y-5">
@@ -312,14 +320,14 @@ export default function Profile() {
                                   <Label>Beginning Of Availability (optional)</Label>
 
                                   <div
-                                    className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full cursor-pointer"
+                                    className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": formNft.availabilityFrom === 0 }, { "bg-green-300": formNft.availabilityFrom !== 0 })}
                                     onClick={() => {
                                       setFormNft({
                                         ...formNft,
                                         availabilityFrom:
                                           formNft.availabilityFrom === 0
                                             ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
                                             )
                                             : 0,
                                       });
@@ -327,38 +335,38 @@ export default function Profile() {
                                   >
                                     <div
                                       className={
-                                        'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
-                                        (formNft.availabilityFrom === 0 ? null : toggleClass)
+                                        classNames('bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform', { 'transform translate-x-6': formNft.availabilityFrom !== 0 })
                                       }
                                     />
                                   </div>
-                                  {formNft.availabilityFrom !== 0 ? (
-                                    <DatePicker
-                                      selected={new Date(formNft.availabilityFrom * 1000)}
-                                      onChange={(date) =>
-                                        setFormNft({
-                                          ...formNft,
-                                          availabilityFrom: date
-                                            ? Math.floor(date.getTime() / 1000)
-                                            : 0,
-                                        })
-                                      }
-                                    />
-                                  ) : (
-                                    <></>
-                                  )}
+
+                                  <DatePicker
+                                    className={classNames('my-2', { 'cursor-pointer': formNft.availabilityFrom !== 0 })}
+                                    selected={formNft.availabilityFrom !== 0 ? new Date(formNft.availabilityFrom * 1000) : undefined}
+                                    placeholderText='ANY'
+                                    onChange={(date) =>
+                                      setFormNft({
+                                        ...formNft,
+                                        availabilityFrom: date
+                                          ? Math.floor(date.getTime() / 1000)
+                                          : 0,
+                                      })
+                                    }
+                                    disabled={formNft.availabilityFrom === 0}
+                                  />
+
                                 </div>
                                 <div>
                                   <Label>End Of Availablility (optional)</Label>
                                   <div
-                                    className="md:w-14 md:h-7 w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
+                                    className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": formNft.availabilityTo === 0 }, { "bg-green-300": formNft.availabilityTo !== 0 })}
                                     onClick={() => {
                                       setFormNft({
                                         ...formNft,
                                         availabilityTo:
                                           formNft.availabilityTo === 0
                                             ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
                                             )
                                             : 0,
                                       });
@@ -366,27 +374,27 @@ export default function Profile() {
                                   >
                                     <div
                                       className={
-                                        'bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform' +
-                                        (formNft.availabilityTo === 0 ? null : toggleClass)
+                                        classNames('bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform', { 'transform translate-x-6': formNft.availabilityTo !== 0 })
                                       }
                                     />
                                   </div>
 
-                                  {formNft.availabilityTo !== 0 ? (
-                                    <DatePicker
-                                      selected={new Date(formNft.availabilityTo * 1000)}
-                                      onChange={(date) =>
-                                        setFormNft({
-                                          ...formNft,
-                                          availabilityTo: date
-                                            ? Math.floor(date.getTime() / 1000)
-                                            : 0,
-                                        })
-                                      }
-                                    />
-                                  ) : (
-                                    <></>
-                                  )}
+
+                                  <DatePicker
+                                    className={classNames('my-2', { 'cursor-pointer': formNft.availabilityTo !== 0 })}
+                                    selected={formNft.availabilityTo !== 0 ? new Date(formNft.availabilityTo * 1000) : undefined}
+                                    placeholderText='ANY'
+                                    onChange={(date) =>
+                                      setFormNft({
+                                        ...formNft,
+                                        availabilityTo: date
+                                          ? Math.floor(date.getTime() / 1000)
+                                          : 0,
+                                      })
+                                    }
+                                    disabled={formNft.availabilityTo === 0}
+                                  />
+
                                 </div>
 
                                 <div>
@@ -410,7 +418,7 @@ export default function Profile() {
                         </div>
                         <div className="text-red-500 text-center">{formError}</div>
                         <div className="bg-white sm:flex sm:flex-row-reverse pt-5">
-                          {!mintTxStatus.submitted && !mintTxStatus.confirmed ? (
+                          {!mintTxStatus.submitted && !mintTxStatus.confirmed && (
                             <button
                               type="button"
                               className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
@@ -418,16 +426,7 @@ export default function Profile() {
                             >
                               Mint
                             </button>
-                          ) : (
-                            <></>
                           )}
-                          <button
-                            type="button"
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            onClick={() => setMintModalOpen(false)}
-                          >
-                            Cancel
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -523,7 +522,7 @@ export default function Profile() {
                       classnames(
                         'w-4/12  py-5 text-sm leading-2 font-medium text-blue-700 mb-10',
                         selected
-                          ? 'dark:text-white border-b-2 border-indigo-600 dark:text-white'
+                          ? 'dark:text-white border-b-2 border-indigo-600'
                           : 'dark:text-white hover:bg-white/[0.12] hover:dark:text-white'
                       )
                     }
@@ -534,9 +533,9 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? <FaSpinner /> : renderNFTs()}
+          {userLoading ? <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" /> : renderNFTs()}
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
