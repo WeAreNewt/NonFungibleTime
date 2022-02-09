@@ -11,8 +11,12 @@ export default function AddressInfo() {
 
   // If user connects wallet while on disconnected profile screen, redirect to their profile
   useEffect(() => {
-    if (location.pathname === '/profile/undefined') {
-      navigate('/profile/' + account)
+    if (account) {
+      if (location.pathname === '/profile/') {
+        navigate('/profile/' + account)
+      } else if (location.pathname === '/profile/mint/') {
+        navigate('/profile/' + account + '/mint/')
+      }
     }
   }, [account, location.pathname, navigate])
 
