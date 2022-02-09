@@ -152,7 +152,7 @@ Returns token object for a specified
 
 </details>
 
-The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/SvgGenerator.sol) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
+The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/svg-generators) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
 
 To generate contract abis and typechain artifacts:
 
