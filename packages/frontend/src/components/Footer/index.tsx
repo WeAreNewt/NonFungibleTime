@@ -91,7 +91,7 @@ export default function Footer() {
         <section className="flex flex-row items-center justify-center lg:justify-end space-x-10 w-full lg:w-1/4 h-full">
           {logoLinks.map((logo) => {
             return (
-              <a href={logo.to} target="_blank" rel="noopener noreferrer">
+              <a href={logo.to} key={logo.to} target="_blank" rel="noopener noreferrer">
                 <img
                   className="min-w-[30px] w-[30px]"
                   key={logo.alt}
