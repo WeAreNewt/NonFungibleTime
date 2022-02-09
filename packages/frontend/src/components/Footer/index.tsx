@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import discord from '../../images/discord-logo.png';
 import twitter from '../../images/twitter-logo.png';
 import github from '../../images/github-logo.png';
@@ -37,7 +36,6 @@ const textLinks: FooterLink[] = [
 ];
 
 export default function Footer() {
-  const { pathname } = useLocation();
   const { networkConfig } = useAppDataProvider();
   const logoLinks: FooterLink[] = [
     {
@@ -65,11 +63,6 @@ export default function Footer() {
       alt: 'Etherscan',
     },
   ];
-
-
-  if (!['/'].includes(pathname)) {
-    return null;
-  }
 
   return (
     <footer
