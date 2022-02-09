@@ -17,7 +17,7 @@ import {
   Transfer as TransferEvent,
   User,
 } from '../../generated/schema';
-import { ethereum, log, BigInt, dataSource } from '@graphprotocol/graph-ts';
+import { ethereum, log, BigInt, dataSource, Address } from '@graphprotocol/graph-ts';
 import { ERC721 } from '../../generated/TimeCollection/ERC721';
 import { ERC20 } from '../../generated/TimeCollection/ERC20';
 
@@ -148,14 +148,28 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
 export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled): void {
   const paymentToken = PaymentToken.load(event.params.currency.toHexString());
   if (paymentToken) {
-    paymentToken.acceptable = false;
+    paymentToken.acceptable = !paymentToken.acceptable;
     paymentToken.save();
+  } else if (event.params.currency == Address.zero()) {
+    const network = dataSource.network();
+    // === does not work for string comparison
+    // eslint-disable-next-line eqeqeq
+    if (network == 'mumbai' || network == 'polygon') {
+      const nativeCurrency = new PaymentToken(event.params.currency.toHexString());
+      nativeCurrency.symbol = 'MATIC';
+      nativeCurrency.decimals = 18;
+      nativeCurrency.acceptable = true;
+      nativeCurrency.save();
+    } else {
+      log.warning(`Event from unexpected network {}`, [network]);
+    }
   } else {
-    const token = new PaymentToken(event.params.currency.toHexString());
+    const newPaymentToken = new PaymentToken(event.params.currency.toHexString());
+    newPaymentToken.acceptable = true;
     const contract = ERC20.bind(event.address);
     const decimals = contract.try_decimals();
     if (!decimals.reverted) {
-      token.decimals = decimals.value;
+      newPaymentToken.decimals = decimals.value;
     } else {
       log.warning(`Failed to fetch decimals for payment currency {}`, [
         event.params.currency.toHexString(),
@@ -163,13 +177,13 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
     }
     const symbol = contract.try_symbol();
     if (!symbol.reverted) {
-      token.symbol = symbol.value;
+      newPaymentToken.symbol = symbol.value;
     } else {
       log.warning(`Failed to fetch symbol for payment currency {}`, [
         event.params.currency.toHexString(),
       ]);
     }
-    token.save();
+    newPaymentToken.save();
   }
 }
 
@@ -209,22 +223,6 @@ export function handleTransfer(event: Transfer): void {
       nft.royaltyBasisPoints = values.value4;
       nft.creator = values.value5.toHexString();
       nft.royaltyReceiver = values.value6.toHexString();
-
-      // Network base token is supported by default but must be manually added since it's non-ERC20
-      const currency = PaymentToken.load(values.value7.toHexString());
-      if (!currency) {
-        const network = dataSource.network();
-        // === does not work for string comparison
-        // eslint-disable-next-line eqeqeq
-        if (network == 'mumbai' || network == 'polygon') {
-          const baseToken = new PaymentToken(values.value7.toHexString());
-          baseToken.symbol = 'MATIC';
-          baseToken.decimals = 18;
-          baseToken.acceptable = true;
-          baseToken.save();
-        }
-      }
-
       nft.currency = values.value7.toHexString();
       nft.allowedBuyer = values.value8.toHexString();
       nft.redeemed = values.value9;
@@ -271,6 +269,7 @@ export function handleTokenRoyaltyReceiverChanged(event: TokenRoyaltyReceiverCha
   const nft = Nft.load(tokenId);
   if (nft) {
     nft.royaltyReceiver = event.params.royaltyReceiver.toHexString();
+    nft.save();
   } else {
     log.warning(`Token royalty receiver changed event for non-existant tokenId {}`, [
       event.params.tokenId.toString(),
