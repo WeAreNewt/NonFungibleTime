@@ -11,12 +11,12 @@ While freelance services is the initial use case for Non Fungible Time, this pri
 ## Contents
 
 1. [Project Details](#about)
-   - [About](#project-description)
+   - [About](#about)
    - [Infrastructure](#infrastructure)
    - [Buidling](#buidling)
 2. [Smart Contracts](#smart-contracts)
    - [NonFungibleTimeCollection](#NonFungibleTimeCollection)
-   - [SvgGenerator](#svgGenerator)
+   - [SvgGenerator](#SvgGenerator)
 3. [Frontend](#frontend)
 4. [Subgraph](#subgraph)
 
@@ -43,6 +43,8 @@ Given the modular nature of smart contracts, Time NFTs can be integrated, enhanc
 ## Smart Contracts
 
 The smart contracts store the NFT collection (ERC-721) on the blockchain - with the reference implementation being deployed to the Polygon network. This package uses the hardhat framework for contract development and deployment.
+    
+### NonFungibleTimeCollection
 
 The [NonFungibleTimeCollection.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/NonFungibleTimeCollection.sol) contract defines the Time NFT collection
 
@@ -151,8 +153,10 @@ Returns token object for a specified
 |   13    | string  |                           Category label, defines the type of service being tokenized.                            |
 
 </details>
+    
+### SvgGenerator
 
-The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/SvgGenerator.sol) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
+The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/svg-generators) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
 
 To generate contract abis and typechain artifacts:
 
@@ -161,7 +165,7 @@ npm install
 npx hardhat compile
 ```
 
-[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/README.md)
+[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/docs/NonFungibleTimeCollection.md)
 
 <br />
 
