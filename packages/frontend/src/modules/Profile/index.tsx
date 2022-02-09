@@ -248,7 +248,6 @@ export default function Profile() {
                             ) : mintTxStatus.confirmed ? (
                               <div className="text-center flex-col">
                                 <div className="font-semibold">Transaction Confirmed</div>
-
                                 <div className="pt-4">
                                   <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
                                     View Transaction <FaExternalLinkAlt className="inline-block" />
