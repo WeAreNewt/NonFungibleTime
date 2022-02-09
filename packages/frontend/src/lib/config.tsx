@@ -36,7 +36,7 @@ export const matic = new Matic();
 
 export const addChainParameters: Record<number, AddEthereumChainParameter> = {
     [ChainId.mumbai]: {
-        rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+        rpcUrls: ['https://polygon-mumbai.g.alchemy.com/v2/demo', 'https://matic-mumbai.chainstacklabs.com', 'https://rpc-mumbai.maticvigil.com'],
         chainId: utils.hexValue(ChainId.mumbai),
         blockExplorerUrls: ['https://explorer-mumbai.maticvigil.com'],
         chainName: 'Polygon Mainnet',
