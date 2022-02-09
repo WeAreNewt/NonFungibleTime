@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Fragment } from 'react';
 import { Category } from '../../types';
 
-const CategoryOptions = ['Show All', ...Object.values(Category)];
+const CategoryOptions = ['Show All', ...Object.values(Category).sort()];
 
 type ListOptionProps = {
   label: string;
