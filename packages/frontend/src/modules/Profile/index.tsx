@@ -107,15 +107,15 @@ export default function Profile() {
       !currentAccount ? (
         <ConnectButton />
       ) : //if no nfts
-      !nftsShown.length ? (
-        <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
-      ) : (
-        <NFTGrid>
-          {nftsShown.map((nft, index) => {
-            return <NFTCard key={index} nft={nft} />;
-          })}
-        </NFTGrid>
-      )
+        !nftsShown.length ? (
+          <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
+        ) : (
+          <NFTGrid>
+            {nftsShown.map((nft, index) => {
+              return <NFTCard key={index} nft={nft} />;
+            })}
+          </NFTGrid>
+        )
     );
   };
   const mintNft = async () => {
@@ -164,7 +164,6 @@ export default function Profile() {
       setFormError('No account connected');
     }
   };
-  console.log(mintTxStatus);
   return (
     <div className="bg-slate-100 dark:bg-black">
       <div className="flex flex-col max-w-7xl m-auto">
@@ -243,7 +242,7 @@ export default function Profile() {
                             ) : mintTxStatus.confirmed ? (
                               <div className="text-center flex-col">
                                 <div>Confirmed</div>
-                                <a href={networkConfig.blockExplorer + '/' + mintTxStatus.txHash}>
+                                <a href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
                                   View Transaction
                                 </a>
                               </div>
@@ -320,8 +319,8 @@ export default function Profile() {
                                         availabilityFrom:
                                           formNft.availabilityFrom === 0
                                             ? Math.floor(
-                                                Date.now() / 1000 - ((Date.now() / 1000) % 3600)
-                                              )
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                            )
                                             : 0,
                                       });
                                     }}
@@ -359,8 +358,8 @@ export default function Profile() {
                                         availabilityTo:
                                           formNft.availabilityTo === 0
                                             ? Math.floor(
-                                                Date.now() / 1000 - ((Date.now() / 1000) % 3600)
-                                              )
+                                              Date.now() / 1000 - ((Date.now() / 1000) % 3600)
+                                            )
                                             : 0,
                                       });
                                     }}
