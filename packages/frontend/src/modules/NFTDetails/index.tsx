@@ -1,3 +1,4 @@
+import { useSubscription } from '@apollo/client';
 import { Dialog } from '@headlessui/react';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from 'ethers';
@@ -10,8 +11,9 @@ import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
 import { PriceDisplay } from '../../components/PriceDisplay';
 import { UserDetail } from '../../components/UserDetail';
-import { PaymentToken } from '../../lib/graphql';
+import { NftDocument, PaymentToken } from '../../lib/graphql';
 import { isEthAddress, ZERO_ADDRESS } from '../../lib/helpers/base-service';
+import { MaxUint256 } from '../../lib/helpers/constants';
 import {
   BuyTokenParamsType,
   ChangeBuyingConditionsParamsType,
@@ -19,6 +21,7 @@ import {
 } from '../../lib/helpers/NftCollection';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { NFT } from '../../types';
+
 
 interface NftState {
   nft?: NFT;
@@ -46,8 +49,7 @@ export default function NFTDetails() {
   const navigate = useNavigate();
   const { library: provider } = useWeb3React();
   const state = location.state as NftState;
-  const [nft, setNft] = useState<NFT>();
-  const [uri, setURI] = useState<string>();
+  const [uri, setURI] = useState<string>('');
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({
     forSale: true,
@@ -63,6 +65,21 @@ export default function NFTDetails() {
   const [ownerSelectedMode, setOwnerSelectedMode] = useState<string>('update');
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
   const path = location.pathname.split('/');
+  const tokenId: string | undefined = path[2];
+  let tokenIdSanitized = '';
+  // Ensure we are querying for an nft that could actually exist
+  if (tokenId && Number(tokenId) >= 0 && Number(tokenId) < MaxUint256) {
+    tokenIdSanitized = Number(tokenId).toString();
+  }
+  const { data, loading, error } = useSubscription(NftDocument, {
+    variables: {
+      nft: tokenIdSanitized
+    },
+  });
+
+  // Use subscription data, or fallback to nft passed through useLocation state, or undefined
+  const nft: NFT | undefined = data && data.nft ? data.nft : (state && state.nft ? state.nft : undefined);
+
 
   const fetchURI = async (nft: NFT) => {
     const response = await fetch(nft.tokenURI);
@@ -151,37 +168,24 @@ export default function NFTDetails() {
     }
   };
 
-  // Get NFT data from state parameters or subgraph query
-  useEffect(() => {
-    if (state && state.nft) {
-      setNft(state.nft);
-      state.nft.owner.id.toLowerCase() === currentAccount?.toLowerCase()
-        ? setOwner(true)
-        : setOwner(false);
-    } else {
-      // If no NFT is passed (not accessing from profile or marketplace link), fetch from GQl
-      console.log('NO NFT PASSSED');
-    }
-  }, [path, currentAccount, state]);
-
-  // Render token svg
+  // Update nft ownership, svg, and buying conditions 
   useEffect(() => {
     if (nft) {
+      nft.owner.id.toLowerCase() === currentAccount?.toLowerCase()
+        ? setOwner(true)
+        : setOwner(false);
       fetchURI(nft);
       // All of these fields will come from nft once fetching from subgraph
       setBuyingConditions({
         forSale: nft.forSale,
         price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
         currency: {
-          acceptable: true,
-          decimals: 18,
-          id: ZERO_ADDRESS,
-          symbol: nft.currency.symbol,
+          ...nft.currency
         },
-        whitelistedBuyer: '0x0000000000000000000000000000000000000000',
+        whitelistedBuyer: nft.allowedBuyer,
       });
     }
-  }, [nft]);
+  }, [nft, currentAccount]);
 
   // Hard-coded for now, will come from app-data-provider
   const availableCurrencies: Record<string, PaymentToken> = {
@@ -200,7 +204,25 @@ export default function NFTDetails() {
     'items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer';
 
   if (!nft) {
-    return <FaSpinner />;
+    if (error) {
+      return <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-red font-bold text-xl p-20">
+            An Error occured: {error}
+          </div>
+        </div>
+      </div>
+    } else if (loading) {
+      return <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />;
+    } else {
+      return <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-black dark:text-white font-bold text-xl p-20">
+            No NFT found with TokenId {tokenIdSanitized}
+          </div>
+        </div>
+      </div>
+    }
   } else {
     const mintDatetime = new Date(nft.mintTimestamp * 1000);
     const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
@@ -499,8 +521,8 @@ export default function NFTDetails() {
                       <div>
                         {nft.availabilityFrom > Date.now() / 1000
                           ? new Date(nft.availabilityFrom * 1000).toLocaleString('en-us', {
-                              dateStyle: 'long',
-                            })
+                            dateStyle: 'long',
+                          })
                           : 'Now'}
                       </div>
                     </div>
@@ -510,8 +532,8 @@ export default function NFTDetails() {
                         {nft.availabilityTo === 0
                           ? 'No End Date'
                           : new Date(nft.availabilityTo * 1000).toLocaleString('en-us', {
-                              dateStyle: 'long',
-                            })}
+                            dateStyle: 'long',
+                          })}
                       </div>
                     </div>
                   </div>

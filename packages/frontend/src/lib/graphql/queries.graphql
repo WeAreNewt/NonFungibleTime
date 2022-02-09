@@ -16,6 +16,12 @@ query Nfts(
   }
 }
 
+subscription Nft($nft: ID!) {
+  nft(id: $nft) {
+    ...NftFields
+  }
+}
+
 subscription Sales(
   $first: Int
   $skip: Int
