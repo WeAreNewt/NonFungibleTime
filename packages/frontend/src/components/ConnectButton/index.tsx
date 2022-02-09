@@ -1,6 +1,5 @@
 import { Dialog } from '@headlessui/react';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { formatEthAddress } from '../../lib/helpers/format';
 import { useWeb3, WalletType } from '../../lib/providers/web3-provider';
 
