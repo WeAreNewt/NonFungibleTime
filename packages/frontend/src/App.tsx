@@ -39,7 +39,7 @@ function App() {
                       <Route path="/" element={<Home />} key="home" />
                       <Route path="/profile/*" element={<Profile />} key="profile" />
                       <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
-                      <Route path="/details/*" element={<Details />} key="details" />
+                      <Route path="/nft/*" element={<Details />} key="details" />
                     </Routes>
                   </ScreenWrapper>
                 </BrowserRouter>
