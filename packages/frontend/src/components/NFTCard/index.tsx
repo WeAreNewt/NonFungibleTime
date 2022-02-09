@@ -18,7 +18,7 @@ export default function NFTCard({ nft }: NftCardProps) {
     <div
       className="bg-white dark:bg-black rounded-lg shadow-lg p-5 cursor-pointer space-y-2 dark:border dark:border-slate-500"
       onClick={() =>
-        navigate('/details/' + nft.tokenId, {
+        navigate('/nft/' + nft.tokenId, {
           state: {
             nft,
           },
