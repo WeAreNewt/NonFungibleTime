@@ -148,14 +148,15 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
 export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled): void {
   const paymentToken = PaymentToken.load(event.params.currency.toHexString());
   if (paymentToken) {
-    paymentToken.acceptable = false;
+    paymentToken.acceptable = !paymentToken.acceptable;
     paymentToken.save();
   } else {
-    const token = new PaymentToken(event.params.currency.toHexString());
+    const newPaymentToken = new PaymentToken(event.params.currency.toHexString());
+    newPaymentToken.acceptable = true;
     const contract = ERC20.bind(event.address);
     const decimals = contract.try_decimals();
     if (!decimals.reverted) {
-      token.decimals = decimals.value;
+      newPaymentToken.decimals = decimals.value;
     } else {
       log.warning(`Failed to fetch decimals for payment currency {}`, [
         event.params.currency.toHexString(),
@@ -163,13 +164,13 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
     }
     const symbol = contract.try_symbol();
     if (!symbol.reverted) {
-      token.symbol = symbol.value;
+      newPaymentToken.symbol = symbol.value;
     } else {
       log.warning(`Failed to fetch symbol for payment currency {}`, [
         event.params.currency.toHexString(),
       ]);
     }
-    token.save();
+    newPaymentToken.save();
   }
 }
 
