@@ -14,7 +14,7 @@ export default function AddressInfo() {
     if (location.pathname === '/profile/undefined') {
       navigate('/profile/' + account)
     }
-  }, [account])
+  }, [account, location.pathname, navigate])
 
   const onClick = async () => {
     try {

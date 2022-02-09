@@ -20,7 +20,6 @@ import { Input, Label, Select } from '../../components/Forms';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Button, ButtonVariant } from '../../components/Button';
 import classNames from 'classnames';
-import { isEthAddress } from '../../lib/helpers/base-service';
 import { isAddress } from 'ethers/lib/utils';
 
 interface MintNftParams {
