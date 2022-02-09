@@ -271,6 +271,7 @@ export function handleTokenRoyaltyReceiverChanged(event: TokenRoyaltyReceiverCha
   const nft = Nft.load(tokenId);
   if (nft) {
     nft.royaltyReceiver = event.params.royaltyReceiver.toHexString();
+    nft.save();
   } else {
     log.warning(`Token royalty receiver changed event for non-existant tokenId {}`, [
       event.params.tokenId.toString(),
