@@ -1,83 +1,94 @@
+---
+description: What is it and why should we tokenize our time?
+---
+
 # Non Fungible Time
 
-
-
 {% hint style="info" %}
-**Primitive:** Universal collateral for services in the format of a non fungible token.
+Non Fungible Time is a Proof Of Concept
 {% endhint %}
 
-**Minting** platforms that workers use to represent their time as a Non Fungible Token.
+### Web3 Is Empowering
+
+In Web 2, reputations are limited to the platforms they are built on. Employment history is owned by the employer. The collateral you can demand against your future production is subject to bias.
+
+By tokenizing your time, you hold the title to your work history. It is immutably recorded. Your reputation is dictated by the amount and quality of your work and no single intermediary can prevent your promotion or financing.&#x20;
+
+Delivering top quality work and high levels of production is a virtuous cycle with Non Fungible Time and _only you can define your own limitations_.
+
+### The 3 Primary Branches Of The WorkFi Economy
+
+Non Fungible Time is a WorkFi primitive. The functions are stripped down to their most basic attributes. They are a universal format for exchanging human collateral on a decentralized network. Developers can build applications on top of the primitive to mint and exchange time in dynamic ways that serves any unique use case, while workers can move their minted time
+
+**1) Minting** platforms that workers use to represent their time as a Non Fungible Token.
 
 > Examples: DAO Contributors, Consultants,  Engineers, Designers, Professionals.
 >
-> A non fungible token that secures your service&#x20;
+> _Produce a non fungible token that secures your service._
 
-**Markets** to connect buyers with service providers that mint their time.
+**2) Markets** that connect buyers with minters of time
 
 > Examples: DAO Services Market, Rideshare/Delivery Apps, Professional Scheduling &#x20;
 >
-> Deliver the best experience to customers with immutable reputations verified on chain.
+> _Deliver the best matching experience to customers with while optimizing labor utility_
 
-**Collateral** solutions for producers of time and yield opportunities for liquidity providers.
+**3) Collateral** solutions for producers of time and yield opportunities for liquidity providers.
 
 > Examples: Lending and Borrowing, Insurance Products, Aggregated Labor &#x20;
 >
-> Use smart contracts to maximize the value of the non fungible tokens that represent your time.
+> _Smart contracts that allocate time efficiently and maximize its value._
 
-## The Primitive by Newt
+{% hint style="info" %}
+Newt developed the base contracts for minting and exchanging protocols, and is supporting efforts to build on top of them.
+{% endhint %}
 
-### Mint Your Time
+### ****[**Guide: Getting Started**](broken-reference)
 
-**Provide services?** Start by minting it with the attributes that represent your offering.
-
-![](.gitbook/assets/image.png)
-
-### Marketplace
-
-**Need services?** Search the marketplace to fill your requirements.
-
-![](<.gitbook/assets/image (1).png>)
-
-### Collateral
-
-**Financing work????**
-
-
-
-### **Guide**
-
-{% content-ref url="primitive/non-fungible-time/tokens.md" %}
-[tokens.md](primitive/non-fungible-time/tokens.md)
+{% content-ref url="primitive/minting.md" %}
+[minting.md](primitive/minting.md)
 {% endcontent-ref %}
 
-{% content-ref url="primitive/use-case-examples.md" %}
-[use-case-examples.md](primitive/use-case-examples.md)
+{% content-ref url="primitive/selling.md" %}
+[selling.md](primitive/selling.md)
 {% endcontent-ref %}
 
-{% content-ref url="markets/market-poc-by-newt.md" %}
-[market-poc-by-newt.md](markets/market-poc-by-newt.md)
+{% content-ref url="primitive/market.md" %}
+[market.md](primitive/market.md)
 {% endcontent-ref %}
 
-{% content-ref url="minting/minting-poc-by-newt.md" %}
-[minting-poc-by-newt.md](minting/minting-poc-by-newt.md)
+{% content-ref url="primitive/redeem.md" %}
+[redeem.md](primitive/redeem.md)
 {% endcontent-ref %}
 
-### Building: Incentives For Early Adopters
+### [Use Case: Examples ](broken-reference)
 
-Build new protocols, integrate existing solutions, and mint your time for early participation incentives.
-
-{% content-ref url="minting/minting-layer-2.md" %}
-[minting-layer-2.md](minting/minting-layer-2.md)
+{% content-ref url="use-case/markets.md" %}
+[markets.md](use-case/markets.md)
 {% endcontent-ref %}
 
-{% content-ref url="markets/markets-layer-2.md" %}
-[markets-layer-2.md](markets/markets-layer-2.md)
+{% content-ref url="use-case/reputations.md" %}
+[reputations.md](use-case/reputations.md)
 {% endcontent-ref %}
 
-{% content-ref url="markets/builders-reward.md" %}
-[builders-reward.md](markets/builders-reward.md)
+{% content-ref url="use-case/collateral.md" %}
+[collateral.md](use-case/collateral.md)
 {% endcontent-ref %}
 
-{% content-ref url="minting/workers-reward.md" %}
-[workers-reward.md](minting/workers-reward.md)
+{% content-ref url="use-case/guilds.md" %}
+[guilds.md](use-case/guilds.md)
 {% endcontent-ref %}
+
+### [Building: Incentives and New Constructs](broken-reference)
+
+{% content-ref url="building/workfi.md" %}
+[workfi.md](building/workfi.md)
+{% endcontent-ref %}
+
+{% content-ref url="building/team.md" %}
+[team.md](building/team.md)
+{% endcontent-ref %}
+
+{% content-ref url="building/rewards.md" %}
+[rewards.md](building/rewards.md)
+{% endcontent-ref %}
+

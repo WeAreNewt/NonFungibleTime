@@ -1,31 +1,25 @@
 # Table of contents
 
-## Primitive
+## About
 
 * [Non Fungible Time](README.md)
-  * [Tokens](primitive/non-fungible-time/tokens.md)
-* [Use Case Examples](primitive/use-case-examples.md)
-* [Methods](primitive/methods.md)
 
-## Minting
+## Primitive
 
-* [Minting PoC by Newt](minting/minting-poc-by-newt.md)
-* [Minting Layer 2](minting/minting-layer-2.md)
-* [Workers Reward](minting/workers-reward.md)
+* [Minting](primitive/minting.md)
+* [Selling](primitive/selling.md)
+* [Market](primitive/market.md)
+* [Redeem](primitive/redeem.md)
 
-## Markets
+## Use Case
 
-* [Market PoC by Newt](markets/market-poc-by-newt.md)
-* [Markets Layer 2](markets/markets-layer-2.md)
-* [Builders Reward](markets/builders-reward.md)
+* [Markets](use-case/markets.md)
+* [Reputations](use-case/reputations.md)
+* [Collateral](use-case/collateral.md)
+* [Guilds](use-case/guilds.md)
 
-## Collateral
+## Building
 
-* [Reputations](collateral/reputations/README.md)
-  * [Audits](collateral/reputations/audits.md)
-  * [Proof of Work](collateral/reputations/proof-of-work.md)
-  * [Certificates](collateral/reputations/certificates.md)
-  * [On Chain Earnings](collateral/reputations/on-chain-earnings.md)
-* [Insurance](collateral/insurance.md)
-* [Lending and Borrowing](collateral/lending-and-borrowing.md)
-* [WorkFi Guilds](collateral/workfi-guilds.md)
+* [WorkFi](building/workfi.md)
+* [Team](building/team.md)
+* [Rewards](building/rewards.md)
