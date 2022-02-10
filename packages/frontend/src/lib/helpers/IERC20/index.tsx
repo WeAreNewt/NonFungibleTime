@@ -9,12 +9,11 @@ import {
   isPositiveAmount,
   isPositiveOrMinusOneAmount,
   valueToWei,
-  SUPER_BIG_ALLOWANCE_NUMBER,
-  ZERO_ADDRESS,
 } from '../base-service';
 
 import { IERC20Detailed } from './typechain/IERC20Detailed';
 import { IERC20Detailed__factory } from './typechain/factory/IERC20Detailed__factory';
+import { ZERO_ADDRESS } from '../constants';
 
 export interface IERC20ServiceInterface {
   decimalsOf: (token: DecimalsOfType) => Promise<number>;
@@ -79,7 +78,7 @@ export class ERC20Service extends BaseService<IERC20Detailed> implements IERC20S
     const allowance: BigNumber = await erc20Contract.allowance(user, spender);
     const amountBNWithDecimals: BigNumber =
       amount === '-1'
-        ? BigNumber.from(SUPER_BIG_ALLOWANCE_NUMBER)
+        ? BigNumber.from(MAX_ALLOWANCE)
         : BigNumber.from(valueToWei(amount, decimals));
     return allowance.gte(amountBNWithDecimals);
   }
@@ -97,3 +96,7 @@ export class ERC20Service extends BaseService<IERC20Detailed> implements IERC20S
     return this.tokenDecimals[token];
   }
 }
+function MAX_ALLOWANCE(MAX_ALLOWANCE: any): BigNumber {
+  throw new Error('Function not implemented.');
+}
+

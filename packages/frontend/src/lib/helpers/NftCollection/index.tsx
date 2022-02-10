@@ -1,7 +1,7 @@
 import { NonFungibleTimeCollection } from './typechain/NonFungibleTimeCollection';
 import { NonFungibleTimeCollection__factory } from './typechain/factory/NonFungibleTimeCollection__factory';
 import { BigNumber, providers } from 'ethers';
-import BaseService, { ZERO_ADDRESS, SUPER_BIG_ALLOWANCE_NUMBER } from '../base-service';
+import BaseService from '../base-service';
 import {
   eEthereumTxType,
   EthereumTransactionTypeExtended,
@@ -10,6 +10,7 @@ import {
   isEthAddress,
 } from '../base-service';
 import { ERC20Service, IERC20ServiceInterface } from '../IERC20';
+import { MAX_ALLOWANCE, ZERO_ADDRESS } from '../constants';
 
 export type MintParamsType = {
   userAddress: string;
@@ -99,8 +100,7 @@ export interface NftCollectionInterface {
 
 export class NftCollectionService
   extends BaseService<NonFungibleTimeCollection>
-  implements NftCollectionInterface
-{
+  implements NftCollectionInterface {
   readonly collectionAddress: string;
   readonly erc20Service: IERC20ServiceInterface;
 
@@ -190,7 +190,7 @@ export class NftCollectionService
           user: userAddress,
           token: currency,
           spender: this.collectionAddress,
-          amount: SUPER_BIG_ALLOWANCE_NUMBER,
+          amount: MAX_ALLOWANCE,
         });
         txs.push(approveTx);
       }
