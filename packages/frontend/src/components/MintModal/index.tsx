@@ -53,6 +53,8 @@ export default function MintModal({ open, onClose }: Props) {
   const [formNft, setFormNft] = useState<MintNftParams>(defaultValues);
 
   const [errors, setErrors] = useState<Errors>({})
+  // For tx submission error, should not prevent user from resubmitting
+  const [mainTxError, setMainTxError] = useState<string | undefined>(undefined);
   const [mintTxStatus, setMintTxStatus] = useState<TxStatus>({
     submitted: false,
     confirmed: false,
@@ -98,18 +100,22 @@ export default function MintModal({ open, onClose }: Props) {
         duration: formNft.duration * 3600, // in seconds
         royaltyBasisPoints: formNft.royalty * 100, // out of 10000
       };
-      const txs = await nftCollectionService.mint(input);
-      const tx = txs[0];
-      const extendedTxData = await tx.tx();
-      const { from, ...txData } = extendedTxData;
-      const signer = provider.getSigner(from);
-      const txResponse: TransactionResponse = await signer.sendTransaction({
-        ...txData,
-        value: txData.value ? BigNumber.from(txData.value) : undefined,
-      });
-      setMintTxStatus({ ...mintTxStatus, submitted: true });
-      const receipt = await txResponse.wait(1);
-      setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
+      try {
+        const txs = await nftCollectionService.mint(input);
+        const tx = txs[0];
+        const extendedTxData = await tx.tx();
+        const { from, ...txData } = extendedTxData;
+        const signer = provider.getSigner(from);
+        const txResponse: TransactionResponse = await signer.sendTransaction({
+          ...txData,
+          value: txData.value ? BigNumber.from(txData.value) : undefined,
+        });
+        setMintTxStatus({ ...mintTxStatus, submitted: true });
+        const receipt = await txResponse.wait(1);
+        setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
+      } catch (error) {
+        setMainTxError('Error submitting transaction (check browser console for full error):' + error);
+      }
     }
   };
 
@@ -215,7 +221,7 @@ export default function MintModal({ open, onClose }: Props) {
                           }
                         >
                           <option key={''} value="">-</option>
-                          {Object.values(Category).map((category, index) => (
+                          {Object.values(Category).sort().map((category, index) => (
                             <option key={index}>{category}</option>
                           ))}
                         </Select>
@@ -386,6 +392,7 @@ export default function MintModal({ open, onClose }: Props) {
                 </button>
               )}
             </div>
+            {mainTxError && <div className="text-red-500 text-center break-words">{mainTxError}</div>}
           </div>
         </div>
       </div>

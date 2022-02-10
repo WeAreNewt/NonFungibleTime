@@ -11,7 +11,7 @@ import { TxStatus } from "../../modules/NFTDetails";
 import { NFT } from "../../types";
 import { Input, Select } from "../Forms";
 
-interface BuyingConditionChangePanel {
+interface BuyingConditionChangePanelProps {
     nft: NFT;
     setTxStatus: (arg0: TxStatus) => void;
 }
@@ -23,10 +23,12 @@ interface BuyingConditions {
     reservedBuyer: string;
 }
 
-export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingConditionChangePanel) {
+export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingConditionChangePanelProps) {
     const { library: provider } = useWeb3React();
     const { currentAccount, nftCollectionService, availablePaymentTokens } = useAppDataProvider();
+    // TO-DO: Condense like MintModal
     const [formError, setFormError] = useState<string | undefined>(undefined);
+    const [mainTxError, setMainTxError] = useState<string | undefined>(undefined);
     const [reservedBuyer, setreservedBuyer] = useState<boolean>(true);
     const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({
         forSale: nft.forSale,
@@ -66,23 +68,27 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
                     forSale: buyingConditions.forSale,
                 };
                 setFormError(undefined);
-                const txs = await nftCollectionService.changeBuyingConditions(input);
-                const tx = txs[0];
-                const extendedTxData = await tx.tx();
-                const { from, ...txData } = extendedTxData;
-                const signer = provider.getSigner(from);
-                const txResponse = await signer.sendTransaction({
-                    ...txData,
-                    value: txData.value ? BigNumber.from(txData.value) : undefined,
-                });
-                setTxStatus({ submitted: true, confirmed: false, txHash: undefined, action: 'Change Listing Conditions' });
-                const receipt = await txResponse.wait(2);
-                setTxStatus({ submitted: false, confirmed: true, txHash: receipt.transactionHash, action: 'Change Listing Conditions' });
+                try {
+                    const txs = await nftCollectionService.changeBuyingConditions(input);
+                    const tx = txs[0];
+                    const extendedTxData = await tx.tx();
+                    const { from, ...txData } = extendedTxData;
+                    const signer = provider.getSigner(from);
+                    const txResponse = await signer.sendTransaction({
+                        ...txData,
+                        value: txData.value ? BigNumber.from(txData.value) : undefined,
+                    });
+                    setTxStatus({ submitted: true, confirmed: false, txHash: undefined, action: 'Change Listing Conditions' });
+                    const receipt = await txResponse.wait(2);
+                    setTxStatus({ submitted: false, confirmed: true, txHash: receipt.transactionHash, action: 'Change Listing Conditions' });
+                } catch (error) {
+                    setMainTxError('Error submitting transaction (check browser console for full error): ' + error);
+                }
             } else {
                 setFormError('Reserved buyer must be valid ethereum address');
             }
         } else {
-            setFormError('No wallet connected');
+            setMainTxError('No wallet connected');
         }
     };
 
@@ -144,7 +150,8 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
                             }
                         />
                     </div>
-                        <div className="text-red-500 text-center">{formError}</div></div>
+                        <div className="text-red-500 text-center">{formError}</div>
+                    </div>
                 }
 
 
@@ -199,6 +206,7 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
             >
                 Update
             </div>
+            {mainTxError && <div className="text-red-500 text-center break-words">{mainTxError}</div>}
         </div>
     )
 }

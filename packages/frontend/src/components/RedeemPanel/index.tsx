@@ -21,18 +21,22 @@ export function RedeemPanel({ nft, setTxStatus }: RedeemPanelParams) {
         if (nft) {
             const input: RedeemParamsType = { userAddress: nft.owner.id, tokenId: nft.tokenId };
             setFormError(undefined);
-            const txs = await nftCollectionService.redeem(input);
-            const tx = txs[0];
-            const extendedTxData = await tx.tx();
-            const { from, ...txData } = extendedTxData;
-            const signer = provider.getSigner(from);
-            const txResponse = await signer.sendTransaction({
-                ...txData,
-                value: txData.value ? BigNumber.from(txData.value) : undefined,
-            });
-            setTxStatus({ submitted: true, confirmed: false, txHash: undefined, action: 'Redeem NFT' });
-            const receipt = await txResponse.wait(2);
-            setTxStatus({ submitted: false, confirmed: true, txHash: receipt.transactionHash, action: 'Redeem NFT' });
+            try {
+                const txs = await nftCollectionService.redeem(input);
+                const tx = txs[0];
+                const extendedTxData = await tx.tx();
+                const { from, ...txData } = extendedTxData;
+                const signer = provider.getSigner(from);
+                const txResponse = await signer.sendTransaction({
+                    ...txData,
+                    value: txData.value ? BigNumber.from(txData.value) : undefined,
+                });
+                setTxStatus({ submitted: true, confirmed: false, txHash: undefined, action: 'Redeem NFT' });
+                const receipt = await txResponse.wait(2);
+                setTxStatus({ submitted: false, confirmed: true, txHash: receipt.transactionHash, action: 'Redeem NFT' });
+            } catch (error) {
+                setFormError('Error submitting transaction (check browser console for full error): ' + error);
+            }
         } else {
             setFormError('No wallet connected');
         }
@@ -51,7 +55,7 @@ export function RedeemPanel({ nft, setTxStatus }: RedeemPanelParams) {
             >
                 Redeem
             </div>
-            <div className="text-red-500 text-center">{formError}</div>
+            <div className="text-red-500 text-center break-words">{formError}</div>
         </div>
     )
 }
