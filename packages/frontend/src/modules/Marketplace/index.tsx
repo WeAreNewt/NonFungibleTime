@@ -79,7 +79,7 @@ export default function Marketplace() {
           </div>
         </div>
         {loading || !nfts ? (
-          <FaSpinner />
+          <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
         ) : (
           <>
             <NFTGrid>
@@ -89,10 +89,10 @@ export default function Marketplace() {
             </NFTGrid>
             {canLoadMore && (
               <div
-                style={{ marginTop: 20, width: '100%', padding: 20, backgroundColor: 'cyan' }}
+                style={{ marginTop: 20, width: '100%', padding: 20 }}
                 ref={observe}
               >
-                Loader...
+                <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
               </div>
             )}
           </>

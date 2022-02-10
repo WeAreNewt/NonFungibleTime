@@ -10,7 +10,7 @@ import { BigNumber } from 'ethers';
 import { Category } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
-import { required, greaterThan, inBetween, validateDate} from '../../lib/utils/validators'
+import { required, greaterThan, inBetween, validateDate } from '../../lib/utils/validators'
 
 const validateDuration = greaterThan(0)
 const validateRoyalty = inBetween(0, 100)
@@ -38,7 +38,7 @@ interface MintNftParams {
 
 type Errors = Record<string, string | undefined>
 
-const defaultValues : MintNftParams = {
+const defaultValues: MintNftParams = {
   name: '',
   description: '',
   category: '',
@@ -48,11 +48,13 @@ const defaultValues : MintNftParams = {
   royalty: 0,
 }
 
-export default function MintModal({ open, onClose } : Props) {
+export default function MintModal({ open, onClose }: Props) {
 
   const [formNft, setFormNft] = useState<MintNftParams>(defaultValues);
 
   const [errors, setErrors] = useState<Errors>({})
+  // For tx submission error, should not prevent user from resubmitting
+  const [mainTxError, setMainTxError] = useState<string | undefined>(undefined);
   const [mintTxStatus, setMintTxStatus] = useState<TxStatus>({
     submitted: false,
     confirmed: false,
@@ -86,7 +88,7 @@ export default function MintModal({ open, onClose } : Props) {
     return newErrors
   }
   const mintNft = async () => {
-    if(!isValidForm(triggerValidations())) return
+    if (!isValidForm(triggerValidations())) return
     if (currentAccount) {
       const input: MintParamsType = {
         userAddress: currentAccount,
@@ -98,18 +100,22 @@ export default function MintModal({ open, onClose } : Props) {
         duration: formNft.duration * 3600, // in seconds
         royaltyBasisPoints: formNft.royalty * 100, // out of 10000
       };
-      const txs = await nftCollectionService.mint(input);
-      const tx = txs[0];
-      const extendedTxData = await tx.tx();
-      const { from, ...txData } = extendedTxData;
-      const signer = provider.getSigner(from);
-      const txResponse: TransactionResponse = await signer.sendTransaction({
-        ...txData,
-        value: txData.value ? BigNumber.from(txData.value) : undefined,
-      });
-      setMintTxStatus({ ...mintTxStatus, submitted: true });
-      const receipt = await txResponse.wait(1);
-      setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
+      try {
+        const txs = await nftCollectionService.mint(input);
+        const tx = txs[0];
+        const extendedTxData = await tx.tx();
+        const { from, ...txData } = extendedTxData;
+        const signer = provider.getSigner(from);
+        const txResponse: TransactionResponse = await signer.sendTransaction({
+          ...txData,
+          value: txData.value ? BigNumber.from(txData.value) : undefined,
+        });
+        setMintTxStatus({ ...mintTxStatus, submitted: true });
+        const receipt = await txResponse.wait(1);
+        setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
+      } catch (error) {
+        setMainTxError('Error submitting transaction (check browser console for full error):' + error);
+      }
     }
   };
 
@@ -178,7 +184,7 @@ export default function MintModal({ open, onClose } : Props) {
                           onChange={(e) => {
                             setFormNft({ ...formNft, name: e.target.value })
                             setErrors({ ...errors, name: required(e.target.value) })
-                            }
+                          }
                           }
                           error={errors.name}
                         />
@@ -215,7 +221,7 @@ export default function MintModal({ open, onClose } : Props) {
                           }
                         >
                           <option key={''} value="">-</option>
-                          {Object.values(Category).map((category, index) => (
+                          {Object.values(Category).sort().map((category, index) => (
                             <option key={index}>{category}</option>
                           ))}
                         </Select>
@@ -228,11 +234,11 @@ export default function MintModal({ open, onClose } : Props) {
                           name="numhours"
                           id="numhours"
                           placeholder="Add time..."
-                          value={formNft.duration}
+                          value={formNft.duration.toString()}
                           min={0}
                           onChange={(e) => {
-                            const duration = Number(e.target.value)
-                            setFormNft({ ...formNft, duration})
+                            const duration = parseInt(e.target.value)
+                            setFormNft({ ...formNft, duration })
                             setErrors({
                               ...errors,
                               duration: validateDuration(duration),
@@ -252,10 +258,10 @@ export default function MintModal({ open, onClose } : Props) {
                         className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": formNft.availabilityFrom === 0 }, { "bg-indigo-500": formNft.availabilityFrom !== 0 })}
                         onClick={() => {
                           const availabilityFrom = formNft.availabilityFrom === 0
-                          ? Math.floor(
-                            Date.now() / 1000 - ((Date.now() / 1000) % 300)
-                          )
-                          : 0;
+                            ? Math.floor(
+                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
+                            )
+                            : 0;
                           setFormNft({
                             ...formNft,
                             availabilityFrom
@@ -279,8 +285,8 @@ export default function MintModal({ open, onClose } : Props) {
                         placeholderText='ANY'
                         onChange={(date) => {
                           const availabilityFrom = date
-                          ? Math.floor(date.getTime() / 1000)
-                          : 0;
+                            ? Math.floor(date.getTime() / 1000)
+                            : 0;
                           setFormNft({
                             ...formNft,
                             availabilityFrom
@@ -289,7 +295,7 @@ export default function MintModal({ open, onClose } : Props) {
                             ...errors,
                             date: validateDate(availabilityFrom, formNft.availabilityTo, formNft.duration)
                           })
-                          }
+                        }
                         }
                         disabled={formNft.availabilityFrom === 0}
                       />
@@ -301,10 +307,10 @@ export default function MintModal({ open, onClose } : Props) {
                         className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": formNft.availabilityTo === 0 }, { "bg-indigo-500": formNft.availabilityTo !== 0 })}
                         onClick={() => {
                           const availabilityTo = formNft.availabilityTo === 0
-                          ? Math.floor(
-                            Date.now() / 1000 - ((Date.now() / 1000) % 300)
-                          )
-                          : 0;
+                            ? Math.floor(
+                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
+                            )
+                            : 0;
                           setFormNft({
                             ...formNft,
                             availabilityTo
@@ -329,8 +335,8 @@ export default function MintModal({ open, onClose } : Props) {
                         placeholderText='ANY'
                         onChange={(date) => {
                           const availabilityTo = date
-                          ? Math.floor(date.getTime() / 1000)
-                          : 0;
+                            ? Math.floor(date.getTime() / 1000)
+                            : 0;
                           setFormNft({
                             ...formNft,
                             availabilityTo
@@ -343,7 +349,7 @@ export default function MintModal({ open, onClose } : Props) {
                         }
                         disabled={formNft.availabilityTo === 0}
                       />
-                    {errors.date && <span className="text-xs text-red-500">{errors.date}</span>}
+                      {errors.date && <span className="text-xs text-red-500">{errors.date}</span>}
                     </div>
                     <div>
                       <Label className="block text-sm font-medium text-gray-700">
@@ -354,7 +360,7 @@ export default function MintModal({ open, onClose } : Props) {
                         name="royalty"
                         id="royalty"
                         placeholder="Your share of secondary sales (%)"
-                        value={formNft.royalty}
+                        value={formNft.royalty.toString()}
                         min={0}
                         max={100}
                         onChange={(e) => {
@@ -364,7 +370,7 @@ export default function MintModal({ open, onClose } : Props) {
                             ...errors,
                             royalty: validateRoyalty(royalty)
                           })
-                        } 
+                        }
                         }
                         error={errors.royalty}
                       />
@@ -386,6 +392,7 @@ export default function MintModal({ open, onClose } : Props) {
                 </button>
               )}
             </div>
+            {mainTxError && <div className="text-red-500 text-center break-words">{mainTxError}</div>}
           </div>
         </div>
       </div>
