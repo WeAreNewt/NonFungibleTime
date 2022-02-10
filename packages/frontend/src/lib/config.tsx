@@ -63,7 +63,7 @@ export const networkConfigs: Record<number, NetworkConfig> = {
     [ChainId.mumbai]: {
         subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
         subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
-        collectionAddress: '0x4ECe6a51321B9F1B9FEc33A98f0513A7B626BFB4',
+        collectionAddress: '0x563b189cc2bc69b86716211d76fd5efdcb8f40ad',
         blockExplorer: 'https://explorer-mumbai.maticvigil.com',
         ...addChainParameters[ChainId.mumbai],
     },
