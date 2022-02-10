@@ -166,7 +166,7 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
   } else {
     const newPaymentToken = new PaymentToken(event.params.currency.toHexString());
     newPaymentToken.acceptable = true;
-    const contract = ERC20.bind(event.address);
+    const contract = ERC20.bind(event.params.currency);
     const decimals = contract.try_decimals();
     if (!decimals.reverted) {
       newPaymentToken.decimals = decimals.value;
