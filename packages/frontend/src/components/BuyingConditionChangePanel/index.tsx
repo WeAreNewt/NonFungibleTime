@@ -29,7 +29,7 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
     // TO-DO: Condense like MintModal
     const [formError, setFormError] = useState<string | undefined>(undefined);
     const [mainTxError, setMainTxError] = useState<string | undefined>(undefined);
-    const [reservedBuyer, setreservedBuyer] = useState<boolean>(true);
+    const [reservedBuyer, setreservedBuyer] = useState<boolean>(false);
     const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({
         forSale: nft.forSale,
         price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
