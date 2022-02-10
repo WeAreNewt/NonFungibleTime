@@ -111,7 +111,7 @@ export default function MintModal({ open, onClose }: Props) {
           value: txData.value ? BigNumber.from(txData.value) : undefined,
         });
         setMintTxStatus({ ...mintTxStatus, submitted: true });
-        const receipt = await txResponse.wait(1);
+        const receipt = await txResponse.wait(2);
         setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
       } catch (error) {
         setMainTxError('Error submitting transaction (check browser console for full error):' + error);
