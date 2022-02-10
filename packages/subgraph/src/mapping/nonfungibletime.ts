@@ -67,10 +67,7 @@ export function handleTokenBought(event: TokenBought): void {
       .div(BigInt.fromI32(BASIS_POINTS));
     purchase.royaltyReceiver = nftParams.value6.toHexString();
     purchase.save();
-    nft.forSale = false;
-    const uri = getTokenURI(event, event.params.tokenId);
-    nft.tokenURI = uri;
-    nft.owner = to;
+    // Only setting `lastPurchaseTimestamp` here; `tokenURI`, `owner` and `forSale` updated when handling Transfer event
     nft.lastPurchaseTimestamp = event.block.timestamp.toI32();
     nft.save();
   } else {
@@ -244,6 +241,9 @@ export function handleTransfer(event: Transfer): void {
     }
   } else {
     nft.owner = to;
+    nft.forSale = false;
+    const uri = getTokenURI(event, event.params.tokenId);
+    nft.tokenURI = uri;
     nft.save();
   }
 }
