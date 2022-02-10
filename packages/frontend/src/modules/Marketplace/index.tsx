@@ -88,7 +88,12 @@ export default function Marketplace() {
               })}
             </NFTGrid>
             {canLoadMore && (
-              <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
+              <div
+                style={{ marginTop: 20, width: '100%', padding: 20 }}
+                ref={observe}
+              >
+                <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
+              </div>
             )}
           </>
         )}
