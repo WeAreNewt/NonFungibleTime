@@ -38,7 +38,7 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
                     value: txData.value ? BigNumber.from(txData.value) : undefined,
                 });
                 setTxStatus({ submitted: true, confirmed: false, txHash: undefined, action: 'Buy NFT' });
-                const receipt = await txResponse.wait(2);
+                const receipt = await txResponse.wait(1);
                 setTxStatus({ submitted: false, confirmed: true, txHash: receipt.transactionHash, action: 'Buy NFT' });
             } catch (error) {
                 setFormError('Error submitting transaction (check browser console for full error): ' + error);

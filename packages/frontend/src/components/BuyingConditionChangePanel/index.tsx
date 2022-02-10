@@ -67,7 +67,7 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
                         value: txData.value ? BigNumber.from(txData.value) : undefined,
                     });
                     setTxStatus({ submitted: true, confirmed: false, txHash: undefined, action: 'Change Listing Conditions' });
-                    const receipt = await txResponse.wait(2);
+                    const receipt = await txResponse.wait(1);
                     setTxStatus({ submitted: false, confirmed: true, txHash: receipt.transactionHash, action: 'Change Listing Conditions' });
                 } catch (error) {
                     setMainTxError('Error submitting transaction (check browser console for full error): ' + error);
