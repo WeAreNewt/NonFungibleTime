@@ -2,7 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import classNames from "classnames";
 import { BigNumber } from "ethers";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PaymentToken } from "../../lib/graphql";
 import { MaxUint256, ZERO_ADDRESS } from "../../lib/helpers/constants";
 import { ChangeBuyingConditionsParamsType } from "../../lib/helpers/NftCollection";
@@ -38,18 +38,6 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
         },
         reservedBuyer: nft.allowedBuyer,
     })
-
-    useEffect(() => {
-        // All of these fields will come from nft once fetching from subgraph
-        setBuyingConditions({
-            forSale: nft.forSale,
-            price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
-            token: {
-                ...nft.currency
-            },
-            reservedBuyer: nft.allowedBuyer,
-        });
-    }, [nft])
 
     // Trigger changeBuyingConditions transaction
     const changeBuyingConditions = async () => {
