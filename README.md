@@ -29,6 +29,7 @@ While freelance services is the initial use case for Non Fungible Time, this pri
   - [Frontend](#frontend)
   - [Subgraph](#subgraph)
   - [Audit](#audit)
+  - [License](#license)
 
 ## Project Details
 
@@ -203,4 +204,8 @@ The playground links below allow you to view and query the subgraph schema direc
 
 ## Audit
 
-You can find the full audit report from Peckshield under the audits folder and [here](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audits)
+You can find the full audit report from Peckshield under the [audits folder]((https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audits)) and [here](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audit/PeckShield-Audit-Report-TimeNFT-v1.0rc.pdf)
+
+## License
+
+[Link to code license](LICENSE.md)
