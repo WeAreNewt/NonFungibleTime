@@ -10,11 +10,11 @@ import { BigNumber } from 'ethers';
 import { Category } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
+import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
 import Tooltip from '../Tooltip'
-import { required, greaterThan, inBetween, validateDate } from '../../lib/utils/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
 
-const validateDuration = greaterThan(0)
+const validateDuration = greaterThanOrEqualTo(0)
 const validateRoyalty = inBetween(0, 100)
 
 interface Props {
