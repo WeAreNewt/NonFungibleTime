@@ -187,6 +187,6 @@ There is a corresponding subgraph for each network the collection contract is de
 
 The playground links below allow you to view and query the subgraph schema directly from your browser and provide the links for the api endpoint:
 
-- [Mumbai Subgraph](https://thegraph.com/hosted-service/subgraph/wearenewt/non-fungible-time-mumbai)
+- [Polygon Mainnet Subgraph](https://thegraph.com/hosted-service/subgraph/wearenewt/non-fungible-time-polygon)
 
 [More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/subgraph/README.md)
