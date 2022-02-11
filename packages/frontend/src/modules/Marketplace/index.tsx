@@ -47,7 +47,7 @@ export default function Marketplace() {
   useEffect(() => {
     setCanLoadMore(true);
     refetch()
-  }, [category,forSale,redeemed]);
+  }, [category,forSale,redeemed,refetch]);
 
   
   const nfts: NFT[] = data && data.nfts ? data.nfts : [];
