@@ -16,6 +16,7 @@ describe('Tokenized time collection', () => {
   let innerRingsSvgGenerator: InnerRingsSvgGenerator;
   let svgGenerator: SvgGenerator;
   let owner: SignerWithAddress;
+  let newOwner: SignerWithAddress;
   let minter: SignerWithAddress;
   let otherAccount: SignerWithAddress;
   let buyer: SignerWithAddress;
@@ -30,7 +31,7 @@ describe('Tokenized time collection', () => {
     const InnerRingsSvgGeneratorFactory = await ethers.getContractFactory('InnerRingsSvgGenerator');
     const SvgGeneratorFactory = await ethers.getContractFactory('SvgGenerator');
     const TestTokenFactory = await ethers.getContractFactory('TestToken');
-    [owner, otherAccount, buyer] = await ethers.getSigners();
+    [owner, otherAccount, buyer, newOwner] = await ethers.getSigners();
     minter = owner;
     outerRingsSvgGenerator = await OuterRingsSvgGeneratorFactory.deploy();
     middleRingsSvgGenerator = await MiddleRingsSvgGeneratorFactory.deploy();
@@ -42,7 +43,7 @@ describe('Tokenized time collection', () => {
     );
     nftCollection = await NftCollectionFactory.deploy();
     nftCollection.initialize(
-      'Non Fungible Time',
+      'NonFungibleTimeCollection',
       'NFTIME',
       false,
       svgGenerator.address,
@@ -51,15 +52,32 @@ describe('Tokenized time collection', () => {
     testToken = await TestTokenFactory.deploy();
   });
 
-  it('Should initialize the Tokenized Time contract', async () => {
-    expect(await nftCollection.name()).to.equal('Non Fungible Time');
-  });
-
-  it('Should set the right owner', async () => {
-    expect(await nftCollection.owner()).to.equal(await owner.address);
+  it('Should initialize the Tokenized Time contract properly', async () => {
+    expect(await nftCollection.name()).to.equal('NonFungibleTimeCollection');
+    expect(await nftCollection.symbol()).to.equal('NFTIME');
+    expect(await nftCollection.owner()).to.equal(owner.address);
+    expect(await nftCollection.svgGenerator()).to.equal(svgGenerator.address);
+    expect(await nftCollection.isCurrencyAllowed(ethers.constants.AddressZero)).to.be.false;
+    const NftCollectionFactory = await ethers.getContractFactory('NonFungibleTimeCollection');
+    const otherNftCollectionInstance = await NftCollectionFactory.deploy();
+    otherNftCollectionInstance.initialize(
+      'OtherNonFungibleTimeCollection',
+      'OTHER',
+      true,
+      svgGenerator.address,
+      otherAccount.address
+    );
+    expect(await otherNftCollectionInstance.name()).to.equal('OtherNonFungibleTimeCollection');
+    expect(await otherNftCollectionInstance.symbol()).to.equal('OTHER');
+    expect(await otherNftCollectionInstance.owner()).to.equal(otherAccount.address);
+    expect(await nftCollection.svgGenerator()).to.equal(svgGenerator.address);
+    expect(await otherNftCollectionInstance.isCurrencyAllowed(ethers.constants.AddressZero)).to.be
+      .true;
   });
 
   it('Should mint a NFT with the correct metadata', async () => {
+    expect(await nftCollection.totalMinted()).to.equal(0);
+    expect(await nftCollection.totalSupply()).to.equal(0);
     await nftCollection.mint(
       'One dev hour v1',
       'One development hour to be used for any dao',
@@ -85,6 +103,8 @@ describe('Tokenized time collection', () => {
       'One development hour to be used for any dao',
       'Development',
     ]);
+    expect(await nftCollection.totalMinted()).to.equal(1);
+    expect(await nftCollection.totalSupply()).to.equal(1);
   });
 
   it('Should success when mint an NFT with duration matching availability range duration', async () => {
@@ -241,6 +261,22 @@ describe('Tokenized time collection', () => {
         300
       )
     ).to.be.revertedWith('InvalidTimeParams()');
+  });
+
+  it('Should revert when mint an NFT with royalty basis points parameter above the maximum basis points', async () => {
+    const maxBasisPoints = 10000;
+    const royaltyBasisPoints = maxBasisPoints + 1;
+    await expect(
+      nftCollection.mint(
+        'One dev hour v1',
+        'One development hour to be used for any dao',
+        'Development',
+        1641342727,
+        1651342727,
+        10000000,
+        royaltyBasisPoints
+      )
+    ).to.be.revertedWith('InvalidRoyalty()');
   });
 
   it('Should revert if you set buying conditions with an unallowed currency', async () => {
@@ -614,6 +650,320 @@ describe('Tokenized time collection', () => {
     expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
   });
 
+  it('Should turn forSale false after being buyed', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(testToken.address);
+    await nftCollection.changeBuyingConditions(
+      ethers.constants.Zero,
+      testToken.address,
+      ethers.constants.One,
+      ethers.constants.AddressZero,
+      true
+    );
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.true;
+    await testToken.connect(buyer).mint(ethers.BigNumber.from(100));
+    await testToken
+      .connect(buyer)
+      .increaseAllowance(nftCollection.address, ethers.BigNumber.from(100));
+    await nftCollection.connect(buyer).buy(ethers.constants.Zero);
+    expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(buyer.address);
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.false;
+  });
+
+  it('Should turn forSale false after being tranferred through transferFrom', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(testToken.address);
+    await nftCollection.changeBuyingConditions(
+      ethers.constants.Zero,
+      testToken.address,
+      ethers.constants.One,
+      ethers.constants.AddressZero,
+      true
+    );
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.true;
+    await nftCollection.transferFrom(minter.address, otherAccount.address, ethers.constants.Zero);
+    expect(await nftCollection.ownerOf(ethers.constants.Zero)).to.equal(otherAccount.address);
+    expect((await nftCollection.tokens(ethers.constants.Zero)).forSale).to.be.false;
+  });
+
+  it('Should revert when trying to burn an unexistent token', async () => {
+    await expect(nftCollection.burn(0)).to.be.revertedWith('TokenDoesNotExist(0)');
+  });
+
+  it('Should revert when trying to burn an token without being the owner of it', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await expect(nftCollection.connect(otherAccount).burn(0)).to.be.revertedWith(
+      'OnlyTokenOwner(0)'
+    );
+  });
+
+  it('Should revert when calling ownerOf after being burned', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    expect(await nftCollection.ownerOf(0)).to.equal(minter.address);
+    await nftCollection.burn(0);
+    await expect(nftCollection.ownerOf(0)).to.be.revertedWith(
+      'ERC721: owner query for nonexistent token'
+    );
+  });
+
+  it('Should reduce totalSupply but not totalMinted after being burned', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    expect(await nftCollection.totalMinted()).to.equal(1);
+    expect(await nftCollection.totalSupply()).to.equal(1);
+    await nftCollection.burn(0);
+    expect(await nftCollection.totalMinted()).to.equal(1);
+    expect(await nftCollection.totalSupply()).to.equal(0);
+  });
+
+  it('Should return the correct royalty information when calling royaltyInfo', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      100
+    );
+    expect(await nftCollection.royaltyInfo(0, ethers.utils.parseEther('3'))).to.eql([
+      minter.address,
+      ethers.utils.parseEther('0.03'),
+    ]);
+  });
+
+  it('Should return the correct royalty information after changing royalty receiver', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      100
+    );
+    await nftCollection.changeRoyaltyReceiver(0, otherAccount.address);
+    expect(await nftCollection.royaltyInfo(0, ethers.utils.parseEther('3'))).to.eql([
+      otherAccount.address,
+      ethers.utils.parseEther('0.03'),
+    ]);
+  });
+
+  it('Should revert when calling changeRoyaltyReceiver for an nonexistent token', async () => {
+    await expect(nftCollection.changeRoyaltyReceiver(0, otherAccount.address)).to.be.revertedWith(
+      'TokenDoesNotExist(0)'
+    );
+  });
+
+  it('Should revert when calling changeRoyaltyReceiver from an address different than current receiver', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      100
+    );
+    await nftCollection.changeRoyaltyReceiver(0, otherAccount.address);
+    await nftCollection.transferFrom(minter.address, newOwner.address, 0);
+    await expect(
+      nftCollection.connect(newOwner).changeRoyaltyReceiver(0, newOwner.address)
+    ).to.be.revertedWith('OnlyCurrentRoyaltyReceiver(0)');
+    await expect(
+      nftCollection.connect(minter).changeRoyaltyReceiver(0, minter.address)
+    ).to.be.revertedWith('OnlyCurrentRoyaltyReceiver(0)');
+  });
+
+  it('Should revert when trying to buy a token that was listed with a currency that now is unallowed', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(testToken.address);
+    await nftCollection.changeBuyingConditions(
+      0,
+      testToken.address,
+      ethers.constants.One,
+      ethers.constants.AddressZero,
+      true
+    );
+    await nftCollection.toggleCurrencyAllowance(testToken.address);
+    await expect(nftCollection.connect(buyer).buy(ethers.constants.Zero)).to.be.revertedWith(
+      `UnallowedCurrency(0, "${testToken.address}")`
+    );
+  });
+
+  it('Should revert when trying to buy a token without enough funds using native currency', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(ethers.constants.AddressZero);
+    await nftCollection.changeBuyingConditions(
+      0,
+      ethers.constants.AddressZero,
+      ethers.utils.parseEther('3'),
+      ethers.constants.AddressZero,
+      true
+    );
+    await expect(
+      nftCollection
+        .connect(buyer)
+        .buy(ethers.constants.Zero, { value: ethers.utils.parseEther('1') })
+    ).to.be.revertedWith('TransferFailed()');
+  });
+
+  it('Should buy token when native currency', async () => {
+    const price = ethers.utils.parseEther('3');
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(ethers.constants.AddressZero);
+    await nftCollection.changeBuyingConditions(
+      0,
+      ethers.constants.AddressZero,
+      price,
+      ethers.constants.AddressZero,
+      true
+    );
+    await nftCollection.connect(buyer).buy(ethers.constants.Zero, { value: price });
+    expect(await nftCollection.ownerOf(0)).to.equal(buyer.address);
+  });
+
+  it('Should return new SVG generator address after calling setSvgGenerator', async () => {
+    expect(await nftCollection.svgGenerator()).to.equal(svgGenerator.address);
+    await nftCollection.setSvgGenerator(innerRingsSvgGenerator.address);
+    expect(await nftCollection.svgGenerator()).to.equal(innerRingsSvgGenerator.address);
+  });
+
+  it('Should support EIP-165 Standard Interface Detection interface', async () => {
+    const eip165InterfaceId = '0x01ffc9a7';
+    expect(await nftCollection.supportsInterface(eip165InterfaceId)).to.be.true;
+  });
+
+  it('Should support EIP-2981 NFT Royalty Standard interface', async () => {
+    const eip2981InterfaceId = '0x2a55205a';
+    expect(await nftCollection.supportsInterface(eip2981InterfaceId)).to.be.true;
+  });
+
+  it('Should support EIP-165 Standard Interface Detection interface', async () => {
+    const eip165InterfaceId = '0x01ffc9a7';
+    expect(await nftCollection.supportsInterface(eip165InterfaceId)).to.be.true;
+  });
+
+  it('Should match expected tokenURI', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    const expectedTokenURIHash =
+      '0xe354196f81fab3ae7c34adba410cfbf3c96f8ece0fe16ae1c1dc5969331d3a28';
+    const tokenURIHash = ethers.utils.hashMessage(await nftCollection.tokenURI(0));
+    expect(tokenURIHash).to.be.equal(expectedTokenURIHash);
+  });
+
+  it('Should match expected tokenURI after being put for sale', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.toggleCurrencyAllowance(ethers.constants.AddressZero);
+    await nftCollection.changeBuyingConditions(
+      0,
+      ethers.constants.AddressZero,
+      ethers.utils.parseEther('3'),
+      ethers.constants.AddressZero,
+      true
+    );
+    const expectedTokenURIHash =
+      '0x735ea356d7ef31ce778dbb45f5f1d0ccc155ce62f19723c8f4af9db34cd4f026';
+    const tokenURIHash = ethers.utils.hashMessage(await nftCollection.tokenURI(0));
+    expect(tokenURIHash).to.be.equal(expectedTokenURIHash);
+  });
+
+  it('Should match expected tokenURI after redemption', async () => {
+    await nftCollection.mint(
+      'One dev hour v1',
+      'One development hour to be used for any dao',
+      'Development',
+      1641342727,
+      1651342727,
+      10000000,
+      300
+    );
+    await nftCollection.redeem(0);
+    const expectedTokenURIHash =
+      '0xe56979b77cea4407a8cece0cd8d1b45a9f220a3a5967b27639fcb6bf51af27bd';
+    const tokenURIHash = ethers.utils.hashMessage(await nftCollection.tokenURI(0));
+    expect(tokenURIHash).to.be.equal(expectedTokenURIHash);
+  });
+
   describe('transfer', () => {
     it('Should revert transfer of nonexistent token', async () => {
       await expect(nftCollection.connect(minter).transfer(buyer.address, 999)).to.be.revertedWith("ERC721: operator query for nonexistent token");
@@ -672,7 +1022,7 @@ describe('Tokenized time collection', () => {
     it("has a domain seperator", async function () {
       // changes across deployments
       let seperator1 = await nftCollection.DOMAIN_SEPARATOR();
-      let seperator2 = getDomainSeparator('Non Fungible Time', nftCollection.address, chainId);
+      let seperator2 = getDomainSeparator('NonFungibleTimeCollection', nftCollection.address, chainId);
       expect(seperator1).to.eq(seperator2);
     });
     it("has a nonce", async function () {
@@ -702,7 +1052,7 @@ describe('Tokenized time collection', () => {
       // new contract and nft
       const NftCollectionFactory = await ethers.getContractFactory('NonFungibleTimeCollection');
       let nftCollection2 = await NftCollectionFactory.deploy();
-      await nftCollection2.initialize('Non Fungible Time','NFTIME',false,svgGenerator.address,owner.address);
+      await nftCollection2.initialize('NonFungibleTimeCollection','NFTIME',false,svgGenerator.address,owner.address);
       await nftCollection2.connect(minter).mint('One dev hour v1','One development hour to be used for any dao','Development',1641342727,1651342727,10000000,1000);
       // permit
       const { v, r, s } = await getErc721PermitSignature(minter, nftCollection2, buyer.address, tokenID);

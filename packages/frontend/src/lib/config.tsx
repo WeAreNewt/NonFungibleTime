@@ -1,6 +1,5 @@
 import { utils } from 'ethers';
 
-
 export enum ChainId {
     mumbai = 80001,
     polygon = 137,
@@ -21,10 +20,11 @@ export interface AddEthereumChainParameter {
 }
 
 export interface NetworkConfig extends AddEthereumChainParameter {
-    subgraphApi: string;
+    subgraphHttpLink: string;
+    subgraphWsLink: string;
     collectionAddress: string;
+    blockExplorer: string;
 }
-
 
 export class Matic {
     readonly name = 'Matic' as const;
@@ -36,7 +36,7 @@ export const matic = new Matic();
 
 export const addChainParameters: Record<number, AddEthereumChainParameter> = {
     [ChainId.mumbai]: {
-        rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+        rpcUrls: ['https://polygon-mumbai.g.alchemy.com/v2/demo', 'https://matic-mumbai.chainstacklabs.com'],
         chainId: utils.hexValue(ChainId.mumbai),
         blockExplorerUrls: ['https://explorer-mumbai.maticvigil.com'],
         chainName: 'Polygon Mainnet',
@@ -57,17 +57,21 @@ export const addChainParameters: Record<number, AddEthereumChainParameter> = {
             decimals: matic.decimals,
         },
     },
-}
+};
 
 export const networkConfigs: Record<number, NetworkConfig> = {
     [ChainId.mumbai]: {
-        subgraphApi: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
-        collectionAddress: '0xb1070faee6ea3cb630b4c46285783968527538c2',
+        subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
+        subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
+        collectionAddress: '0x563b189cc2bc69b86716211d76fd5efdcb8f40ad',
+        blockExplorer: 'https://explorer-mumbai.maticvigil.com',
         ...addChainParameters[ChainId.mumbai],
     },
     [ChainId.polygon]: {
-        subgraphApi: '',
+        subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
+        subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
         collectionAddress: '',
+        blockExplorer: 'https://polygon-rpc.com/',
         ...addChainParameters[ChainId.polygon],
     },
 };

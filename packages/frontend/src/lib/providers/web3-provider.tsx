@@ -24,17 +24,18 @@ const PROTOCOL_CHAIN = ChainId.mumbai;
 
 export interface Web3DataContextType {
   chainId: number;
-  connect: (walletType: WalletType) => Promise<void>,
-  account: string | undefined,
-  isCorrectChain: boolean,
-  active: boolean,
-  requestToSwitchChain: () => Promise<void>,
+  connect: (walletType: WalletType) => Promise<void>;
+  disconnect: () => Promise<void>;
+  account: string | undefined;
+  isCorrectChain: boolean;
+  active: boolean;
+  requestToSwitchChain: () => Promise<void>;
 }
 
 const Web3DataContext = React.createContext<Web3DataContextType>({} as Web3DataContextType);
 
 export const Web3DataProvider: React.FC = ({ children }) => {
-  const { chainId, account, activate, active, connector } = useWeb3React<Web3Provider>();
+  const { chainId, account, activate, active, connector, deactivate } = useWeb3React<Web3Provider>();
   const isCorrectChain = chainId === PROTOCOL_CHAIN;
 
   const connect = useCallback(
@@ -52,6 +53,22 @@ export const Web3DataProvider: React.FC = ({ children }) => {
     },
     [activate]
   );
+
+  const disconnect = useCallback(
+   async () => {
+     try {
+          await deactivate()
+          localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
+     }
+     catch {
+       //todo: add error msg
+       console.log("error when deactivating wallet")
+     }
+    },
+    [deactivate]
+  );
+
+
 
   const requestToSwitchChain = useCallback(
     async function () {
@@ -93,11 +110,12 @@ export const Web3DataProvider: React.FC = ({ children }) => {
         active,
         requestToSwitchChain,
         chainId: PROTOCOL_CHAIN,
-      }}>
+        disconnect,
+      }}
+    >
       {children}
     </Web3DataContext.Provider>
-  )
+  );
 };
-
 
 export const useWeb3 = () => useContext(Web3DataContext);

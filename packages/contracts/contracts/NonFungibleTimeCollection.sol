@@ -98,6 +98,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721PermittableUpgradeable, Ow
         _transferOwnership(owner);
         if (useNativeCurrency) {
             isCurrencyAllowed[address(0)] = true;
+            emit CurrencyAllowanceToggled(address(0));
         }
         svgGenerator = svgGeneratorContract;
     }
@@ -165,8 +166,6 @@ contract NonFungibleTimeCollection is IERC2981, ERC721PermittableUpgradeable, Ow
         if (token.allowedBuyer != address(0) && msg.sender != token.allowedBuyer) {
             revert UnauthorizedBuyer(msg.sender, tokenId);
         }
-        token.forSale = false;
-        tokens[tokenId] = token;
         _transfer(owner, msg.sender, tokenId);
         if (owner != token.royaltyReceiver) {
             uint256 royaltyAmount = (token.price * token.royaltyBasisPoints) / BASIS_POINTS;
@@ -422,5 +421,19 @@ contract NonFungibleTimeCollection is IERC2981, ERC721PermittableUpgradeable, Ow
             ((availabilityFrom == 0 || availabilityTo == 0) ||
                 (availabilityTo > availabilityFrom &&
                     duration <= availabilityTo - availabilityFrom));
+    }
+
+    /// @dev Transfers the token with the given tokenId from sender to receiver. This function overrides
+    /// ERC721Upgradeable's implementation to set forSale to false, which is needed for transferFrom and buy operations.
+    /// @param sender The address of who will send the transfer.
+    /// @param receiver The address of who will receive the transfer.
+    /// @param tokenId The ID of the token to be transferred.
+    function _transfer(
+        address sender,
+        address receiver,
+        uint256 tokenId
+    ) internal override {
+        super._transfer(sender, receiver, tokenId);
+        tokens[tokenId].forSale = false;
     }
 }

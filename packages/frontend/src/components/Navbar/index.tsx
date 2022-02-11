@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ConnectButton from '../ConnectButton';
-import { FaClock } from 'react-icons/fa';
+import icon from '../../images/icon.png';
 import { useLocation } from 'react-router-dom';
 import Toggle from '../../ThemeToggle';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -17,12 +17,10 @@ export default function Navbar() {
   const location = useLocation();
   const activePage = location.pathname.split('/')[1];
 
-
-
   // Navbar Links
   const navigation: Navigation[] = [
     {
-      link: '/profile/' + currentAccount,
+      link: '/profile/' + (currentAccount ? currentAccount : ''),
       title: 'Profile',
     },
     {
@@ -35,7 +33,7 @@ export default function Navbar() {
     },
     {
       link: 'https://github.com/wearenewt/NonFungibleTime',
-      title: 'Code',
+      title: 'GitHub',
     },
   ];
 
@@ -91,7 +89,7 @@ export default function Navbar() {
             {/** Clock Icon */}
             <div className="flex-shrink-0 flex items-center">
               <Link to="/">
-                <FaClock className="block h-8 w-auto text-indigo-600" />
+                <img src={icon} alt="clock icon" width="50" height="50" />
               </Link>
             </div>
           </div>
@@ -107,7 +105,9 @@ export default function Navbar() {
                           href={link.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={"text-gray-500 dark:text-white px-3 py-2 hover:underline decoration-indigo-600 decoration-4 underline-offset-8 rounded-md text-lg font-semibold"}
+                          className={
+                            'text-gray-500 dark:text-white px-3 py-2 hover:underline decoration-indigo-600 decoration-4 underline-offset-8 rounded-md text-lg font-semibold'
+                          }
                           aria-current={undefined}
                         >
                           {link.title}

@@ -1,33 +1,31 @@
+import { useSubscription } from '@apollo/client';
 import { Dialog } from '@headlessui/react';
-import { useWeb3React } from '@web3-react/core';
-import { BigNumber } from 'ethers';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { formatUnits } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
-import { FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt } from 'react-icons/fa';
+import ClockSpinner from '../../images/clock-loader.webp';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
-import { PriceDisplay } from '../../components/PriceDisplay';
 import { UserDetail } from '../../components/UserDetail';
-import { PaymentToken } from '../../lib/graphql';
-import { isEthAddress, ZERO_ADDRESS } from '../../lib/helpers/base-service';
-import {
-  BuyTokenParamsType,
-  ChangeBuyingConditionsParamsType,
-  RedeemParamsType,
-} from '../../lib/helpers/NftCollection';
+import { NftDocument } from '../../lib/graphql';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { NFT } from '../../types';
+import { BuyPanel } from '../../components/BuyPanel';
+import { RedeemPanel } from '../../components/RedeemPanel';
+import { BuyingConditionChangePanel } from '../../components/BuyingConditionChangePanel';
+import { MaxUint256, ZERO_ADDRESS } from '../../lib/helpers/constants';
 
 interface NftState {
   nft?: NFT;
 }
 
-interface BuyingConditions {
-  forSale: boolean;
-  price: number;
-  currency: PaymentToken;
-  whitelistedBuyer: string;
+export interface TxStatus {
+  submitted: boolean;
+  confirmed: boolean;
+  txHash?: string;
+  action: string;
 }
 
 function HeadingSeparator({ children }: { children: React.ReactNode }) {
@@ -39,31 +37,36 @@ function HeadingSeparator({ children }: { children: React.ReactNode }) {
 }
 
 export default function NFTDetails() {
-  const { currentAccount, nftCollectionService } = useAppDataProvider();
+  const { currentAccount, networkConfig } = useAppDataProvider();
   const [owner, setOwner] = useState<Boolean>(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { library: provider } = useWeb3React();
   const state = location.state as NftState;
-  const [nft, setNft] = useState<NFT>();
-  const [uri, setURI] = useState<string>();
-  const [formError, setFormError] = useState<string | undefined>(undefined);
-  const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>(
-    {
-      forSale: true,
-      price: 0,
-      currency: {
-        acceptable: true,
-        decimals: 18,
-        id: '0x0',
-        symbol: ''
-      },
-      whitelistedBuyer: '0x0',
-    }
-  );
+  const [uri, setURI] = useState<string>('');
   const [ownerSelectedMode, setOwnerSelectedMode] = useState<string>('update');
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
+  const [txStatus, setTxStatus] = useState<TxStatus>({
+    submitted: false,
+    confirmed: false,
+    txHash: undefined,
+    action: '',
+  });
+  const [txStatusModalOpen, setTxStatusModalOpen] = useState<boolean>(false);
   const path = location.pathname.split('/');
+  const tokenId: string | undefined = path[2];
+  let tokenIdSanitized = '';
+  // Ensure we are querying for an nft that could actually exist
+  if (tokenId && Number(tokenId) >= 0 && Number(tokenId) < MaxUint256) {
+    tokenIdSanitized = Number(tokenId).toString();
+  }
+  const { data, loading, error } = useSubscription(NftDocument, {
+    variables: {
+      nft: tokenIdSanitized
+    },
+  });
+
+  // Use subscription data, or fallback to nft passed through useLocation state, or undefined
+  const nft: NFT | undefined = data && data.nft ? data.nft : (state && state.nft ? state.nft : undefined);
 
   const fetchURI = async (nft: NFT) => {
     const response = await fetch(nft.tokenURI);
@@ -71,149 +74,134 @@ export default function NFTDetails() {
     setURI(data.image);
   };
 
-  // Trigger buy transaction (+ approval if required)
-  const buy = async () => {
-    if (nft && currentAccount) {
-      const input: BuyTokenParamsType = {
-        userAddress: currentAccount,
-        tokenId: nft.tokenId,
-        currency: nft.currency.id,
-        price: BigNumber.from(nft.price),
-      };
-      setFormError(undefined);
-      const txs = await nftCollectionService.buyToken(input);
-      const tx = txs[0];
-      const extendedTxData = await tx.tx();
-      const { from, ...txData } = extendedTxData;
-      const signer = provider.getSigner(from);
-      const txResponse = await signer.sendTransaction({
-        ...txData,
-        value: txData.value ? BigNumber.from(txData.value) : undefined,
-      });
-      console.log(txResponse);
-    } else {
-      setFormError('No wallet connected');
-    }
-  };
+  const onClose = () => {
+    setTxStatus({
+      submitted: false,
+      confirmed: false,
+      txHash: undefined,
+      action: '',
+    });
+    setTxStatusModalOpen(false);
+  }
 
-  // Trigger redeem transaction
-  const redeem = async () => {
-    if (nft && currentAccount) {
-      const input: RedeemParamsType = { userAddress: currentAccount, tokenId: nft.tokenId };
-      setFormError(undefined);
-      const txs = await nftCollectionService.redeem(input);
-      const tx = txs[0];
-      const extendedTxData = await tx.tx();
-      const { from, ...txData } = extendedTxData;
-      const signer = provider.getSigner(from);
-      const txResponse = await signer.sendTransaction({
-        ...txData,
-        value: txData.value ? BigNumber.from(txData.value) : undefined,
-      });
-      console.log(txResponse);
-    } else {
-      setFormError('No wallet connected');
-    }
-  };
-
-  // Trigger changeBuyingConditions transaction
-  const changeBuyingConditions = async () => {
-    if (nft && currentAccount && buyingConditions) {
-      if (isEthAddress(buyingConditions.whitelistedBuyer)) {
-        const formattedPrice = parseUnits(
-          buyingConditions.price.toString(),
-          buyingConditions.currency.decimals
-        );
-        const input: ChangeBuyingConditionsParamsType = {
-          userAddress: currentAccount,
-          tokenId: nft.tokenId,
-          currency: buyingConditions.currency.id,
-          price: formattedPrice,
-          allowedBuyer: buyingConditions.whitelistedBuyer,
-          forSale: buyingConditions.forSale,
-        };
-        console.log(input);
-        setFormError(undefined);
-        const txs = await nftCollectionService.changeBuyingConditions(input);
-        const tx = txs[0];
-        const extendedTxData = await tx.tx();
-        const { from, ...txData } = extendedTxData;
-        const signer = provider.getSigner(from);
-        const txResponse = await signer.sendTransaction({
-          ...txData,
-          value: txData.value ? BigNumber.from(txData.value) : undefined,
-        });
-        console.log(txResponse);
-      } else {
-        setFormError('Whitelisted buyer is not a valid ethereum address');
-      }
-    } else {
-      setFormError('No wallet connected');
-    }
-  };
-
-  // Get NFT data from state parameters or subgraph query
-  useEffect(() => {
-    if (state && state.nft) {
-      setNft(state.nft);
-      state.nft.owner.id.toLowerCase() === currentAccount?.toLowerCase() ? setOwner(true) : setOwner(false);
-    } else {
-      // If no NFT is passed (not accessing from profile or marketplace link), fetch from GQl
-      console.log('NO NFT PASSSED');
-    }
-  }, [path, currentAccount, state]);
-
-  // Render token svg
+  // Update nft ownership, svg, and buying conditions 
   useEffect(() => {
     if (nft) {
+      nft.owner.id.toLowerCase() === currentAccount?.toLowerCase()
+        ? setOwner(true)
+        : setOwner(false);
       fetchURI(nft);
-      // All of these fields will come from nft once fetching from subgraph
-      setBuyingConditions({
-        forSale: nft.forSale,
-        price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
-        currency: {
-          acceptable: true,
-          decimals: 18,
-          id: ZERO_ADDRESS,
-          symbol: nft.currency.symbol,
-        },
-        whitelistedBuyer: '0x0000000000000000000000000000000000000000',
-      });
     }
-  }, [nft]);
+  }, [nft, currentAccount]);
 
-  // Hard-coded for now, will come from app-data-provider
-  const availableCurrencies: Record<string, PaymentToken> = {
-    MATIC: {
-      acceptable: true,
-      id: ZERO_ADDRESS,
-      symbol: 'MATIC',
-      decimals: 18,
-    },
-  };
+  useEffect(() => {
+    if (txStatus.submitted) {
+      setTxStatusModalOpen(true);
+    }
+  }, [txStatus])
 
   // Styling for owner buttons
   const selected =
-    'items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer';
+    'font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 md:py-2 md:text-md md:px-8 cursor-pointer';
   const unselected =
-    'items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-lg md:px-8 cursor-pointer';
-
+    'font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-md md:px-8 cursor-pointer';
 
   if (!nft) {
-    return <FaSpinner />;
+    if (error) {
+      return <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-red font-bold text-xl p-20">
+            An Error occured: {error}
+          </div>
+        </div>
+      </div>
+    } else if (loading) {
+      return <div className="w-1/5 mx-auto p-4 pb-0">
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+      </div>;
+    } else {
+      return <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-black dark:text-white font-bold text-xl p-20">
+            No NFT found with TokenId {tokenIdSanitized}
+          </div>
+        </div>
+      </div>
+    }
   } else {
     const mintDatetime = new Date(nft.mintTimestamp * 1000);
-    const mintDateString = mintDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
+    const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
     let lastPurchaseDateString = mintDateString;
     if (nft.lastPurchaseTimestamp !== 0) {
       const lastPurchaseDatetime = new Date(nft.lastPurchaseTimestamp * 1000);
-      lastPurchaseDateString = lastPurchaseDatetime.toLocaleString("en-us", { dateStyle: 'medium' });
-
+      lastPurchaseDateString = lastPurchaseDatetime.toLocaleString('en-us', {
+        dateStyle: 'medium',
+      });
     }
-
     return (
       <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-black">
         {/* <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" /> */}
+
+        <Dialog
+          open={txStatusModalOpen}
+          onClose={onClose}
+          className="fixed z-10 inset-0 overflow-y-auto"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              aria-hidden="true"
+            ></div>
+
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+
+            <div className="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white p-10">
+                <div className="flex">
+                  <div className="w-full space-y-5">
+                    <div className="flex flex-row justify-between">
+                      <h3
+                        className="text-lg leading-6 font-semibold text-gray-900"
+                        id="modal-title"
+                      >
+                        {txStatus.action}
+                      </h3>
+                      <div className="cursor-pointer text-xl" onClick={onClose}>
+                        <FaRegWindowClose className="hover:text-red-500" />
+                      </div>
+                    </div>
+
+                    {txStatus.submitted ? (
+                      <div className="text-center flex-col p-4">
+                        <div className="font-semibold">Transaction Submitted</div>
+                        <div className="w-1/5 mx-auto p-4 pb-0">
+                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                        </div>
+                      </div>
+                    ) : txStatus.confirmed && (
+                      <div className="text-center flex-col">
+                        <div className="font-semibold">Transaction Confirmed</div>
+                        <div className="pt-4">
+                          <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + txStatus.txHash}>
+                            View Transaction <FaExternalLinkAlt className="inline-block" />
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Dialog>
         <div className="flex flex-col sm:flex-row  gap-10 ">
           {/** Column 1: NFT Image + buy/sell/redeem options */}
           <div className="flex w-full sm:w-1/3 md:w-1/4 flex-col gap-5 ">
@@ -225,27 +213,17 @@ export default function NFTDetails() {
              *      if not owner -> display purchase panel or not for sale
              *      if owner -> display panel to toggle between redeem or change selling options
              * */}
-            {nft.redeemed ? (
-              <div>This NFT has been redeemed</div>
-            ) : !owner ? (
+            {!owner ? (
               nft.forSale ? (
                 <div>
-                  <FieldLabel>Price</FieldLabel>
-                  <PriceDisplay amount={nft.price} currency={nft.currency} />
-                  <div
-                    className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
-                    onClick={buy}
-                  >
-                    Buy Now
-                  </div>
-                  <div className="text-red-500 text-center">{formError}</div>
+                  <BuyPanel nft={nft} setTxStatus={setTxStatus} />
                 </div>
               ) : (
-                <div>This NFT is not for sale</div>
+                <div className="text-center p-4 font-semibold">This NFT is not for sale</div>
               )
             ) : (
               <div className="flex flex-col p-5">
-                <div className="flex flex-row">
+                <div className="flex flex-row justify-evenly space-x-2 pb-5">
                   <div
                     className={ownerSelectedMode === 'update' ? selected : unselected}
                     onClick={() => setOwnerSelectedMode('update')}
@@ -260,94 +238,10 @@ export default function NFTDetails() {
                   </div>
                 </div>
                 {ownerSelectedMode === 'redeem' ? (
-                  <div className="flex flex-col">
-                    <div>
-                      This NFT has not yet been redeemed. Note: This is a one time action and cannot
-                      be reversed
-                    </div>
-                    <div
-                      className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
-                      onClick={() => redeem()}
-                    >
-                      Redeem
-                    </div>
-                  </div>
+                  (nft.redeemed ? <div className="text-center p-4 font-semibold">This NFT has been redeemed</div> : <RedeemPanel nft={nft} setTxStatus={setTxStatus} />)
                 ) : (
-                  <div className="flex flex-col">
-                    {/** For sale toggle */}
-                    <label className="relative flex justify-between items-center p-2 text-xl">
-                      For Sale
-                      <input
-                        type="checkbox"
-                        className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md cursor-pointer"
-                        checked={buyingConditions.forSale}
-                        onChange={() => {
-                          setBuyingConditions({
-                            ...buyingConditions,
-                            forSale: !buyingConditions.forSale,
-                          });
-                        }}
-                      />
-                      <span className="w-16 h-10 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-indigo-600 after:w-8 after:h-8 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-6 cursor-pointer"></span>
-                    </label>
-                    {/** Price and currency */}
-                    <div className="flex flex-row">
-                      <label className="relative flex justify-between items-center p-2 text-xl">
-                        Price
-                        <input
-                          className="text-black"
-                          type="number"
-                          value={buyingConditions.price}
-                          onChange={(e) => {
-                            setBuyingConditions({
-                              ...buyingConditions,
-                              price: Number(e.target.value),
-                            });
-                          }}
-                        />
-                      </label>
-                      <label className="relative flex justify-between items-center p-2 text-xl">
-                        Currency
-                        <select
-                          className="text-black"
-                          onChange={(e) => {
-                            setBuyingConditions({
-                              ...buyingConditions,
-                              currency: availableCurrencies[e.target.value],
-                            });
-                          }}
-                        >
-                          {Object.entries(availableCurrencies).map((currency) => (
-                            <option key={currency[0]}>{currency[0]}</option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-                    {/** Whitelist buyer */}
-                    <label className="relative flex justify-between items-center p-2 text-xl">
-                      Whitelist Buyer Address (optional)
-                      <input
-                        className="text-black"
-                        type="text"
-                        value={buyingConditions.whitelistedBuyer}
-                        onChange={(e) => {
-                          setBuyingConditions({
-                            ...buyingConditions,
-                            whitelistedBuyer: e.target.value,
-                          });
-                        }}
-                        placeholder="Reserve NFT for a single buyer"
-                      />
-                    </label>
-                    <div
-                      className="items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
-                      onClick={() => changeBuyingConditions()}
-                    >
-                      Update
-                    </div>
-                  </div>
+                  <BuyingConditionChangePanel nft={nft} setTxStatus={setTxStatus} />
                 )}
-                <div className="text-red-500 text-center">{formError}</div>
               </div>
             )}
           </div>
@@ -359,18 +253,20 @@ export default function NFTDetails() {
               <div className="flex-start">
                 <div className="flex flex-col">
                   <div className="text-4xl leading-10 font-extrabold mb-2">{nft.name}</div>
-                  <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
+                  <CategoryDisplay className="self-start">
+                    {nft.category ? nft.category : 'Other'}
+                  </CategoryDisplay>
                 </div>
               </div>
               {/** Share Profile */}
               <div className="flex-end">
                 <div className="flex flex-row justify-evenly">
-                  <div
-                    className="items-center justify-center px-6 py-1 border border-gray text-base font-semibold rounded-md text-black bg-white hover:bg-gray-400 md:py-2 md:text-lg md:px-8 cursor-pointer"
+                  <Button
+                    variant={ButtonVariant.SECONDARY}
                     onClick={() => setShareProfileModalOpen(true)}
                   >
                     <FaShareAlt /> Share
-                  </div>
+                  </Button>
                   {/** Share Profile Modal */}
                   <Dialog
                     open={shareProfileModalOpen}
@@ -454,13 +350,19 @@ export default function NFTDetails() {
             <div className="flex max-w-xl">
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Created By</FieldLabel>
-                <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.creator.id)}>
+                <div
+                  className="flex cursor-pointer"
+                  onClick={() => navigate('/profile/' + nft.creator.id)}
+                >
                   <UserDetail address={nft.creator.id} caption={mintDateString} />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
-                <div className="flex cursor-pointer" onClick={() => navigate('/profile/' + nft.owner.id)}>
+                <div
+                  className="flex cursor-pointer"
+                  onClick={() => navigate('/profile/' + nft.owner.id)}
+                >
                   <UserDetail address={nft.owner.id} caption={lastPurchaseDateString} />
                 </div>
               </div>
@@ -468,35 +370,58 @@ export default function NFTDetails() {
 
             <div className="flex flex-col">
               <HeadingSeparator>Description</HeadingSeparator>
-
-              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500">{nft.description}</div>
+              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500 pb-5">
+                {nft.description}
+              </div>
             </div>
 
             <div className="flex flex-col">
               <HeadingSeparator>Details</HeadingSeparator>
               <div className="space-y-5">
                 <div>
-                  <FieldLabel className="mb-2">Duration</FieldLabel>
-                  <div>{nft.duration / 3600} hours</div>
+                  <FieldLabel className="mb-2 font-semibold">Duration</FieldLabel>
+                  <div className="font-semibold">{nft.duration / 3600} hours</div>
                 </div>
-                {
-                  nft.availabilityTo !== 0 && nft.availabilityTo < Date.now() / 1000 ? <div>Out of availability range</div> :
-                    <div className="flex gap-5">
-                      <div>
-                        <FieldLabel className="mb-2">Availability From</FieldLabel>
-                        <div>{nft.availabilityFrom > Date.now() / 1000 ? new Date(nft.availabilityFrom * 1000).toLocaleString("en-us", { dateStyle: 'long' }) : 'Now'}</div>
-                      </div>
-                      <div>
-                        <FieldLabel className="mb-2">Availability To</FieldLabel>
-                        <div>{nft.availabilityTo === 0 ? 'No End Date' : new Date(nft.availabilityTo * 1000).toLocaleString("en-us", { dateStyle: 'long' })}</div>
-                      </div>
+                <div className="flex gap-5">
+                  <div>
+                    <FieldLabel className="mb-2 font-semibold">Availability From</FieldLabel>
+                    <div className="font-semibold">
+                      {nft.availabilityFrom > Date.now() / 1000
+                        ? new Date(nft.availabilityFrom * 1000).toLocaleString('en-us', {
+                          dateStyle: 'long',
+                        })
+                        : 'Any'}
                     </div>
-                }
+                  </div>
+                  <div>
+                    <FieldLabel className="mb-2 font-semibold">Availability To</FieldLabel>
+                    <div className="font-semibold">
+                      {nft.availabilityTo > 0
+                        ? new Date(nft.availabilityTo * 1000).toLocaleString('en-us', {
+                          dateStyle: 'long',
+                        }) : 'Any'}
+                    </div>
+                  </div>
+                </div>
                 <div>
-                  <FieldLabel className="mb-2">Royalities</FieldLabel>
-                  <div>{(nft.royaltyBasisPoints / 100).toString()} %</div>
+                  <FieldLabel className="mb-2 font-semibold">Royalities</FieldLabel>
+                  <div className="font-semibold">{(nft.royaltyBasisPoints / 100).toString()} %</div>
                 </div>
               </div>
+            </div>
+            <div>
+              <FieldLabel className="mb-2 font-semibold">Redeemed</FieldLabel>
+              <div className="font-semibold">{nft.redeemed ? 'Yes' : 'No'}</div>
+            </div>
+            <div>
+              <FieldLabel className="mb-2 font-semibold">Current Listing</FieldLabel>
+              {nft.forSale ? <div>
+                <div className="font-semibold">For Sale</div>
+                <div className="font-semibold">
+                  {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}
+                </div>
+                <div className="font-semibold">{nft.allowedBuyer === ZERO_ADDRESS ? 'No Reserved Buyer' : 'Reserved For ' + nft.allowedBuyer}</div>
+              </div> : <div className="font-semibold">Not For Sale</div>}
             </div>
           </div>
         </div>

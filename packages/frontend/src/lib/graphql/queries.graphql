@@ -1,10 +1,28 @@
-query Nfts {
-  nfts(first: 100) {
+query Nfts(
+  $where: Nft_filter
+  $orderBy: Nft_orderBy
+  $orderDirection: OrderDirection
+  $first: Int!
+  $skip: Int
+) {
+  nfts(
+    where: $where
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+    first: $first
+    skip: $skip
+  ) {
     ...NftFields
   }
 }
 
-query Sales(
+subscription Nft($nft: ID!) {
+  nft(id: $nft) {
+    ...NftFields
+  }
+}
+
+subscription Sales(
   $first: Int
   $skip: Int
   $orderBy: Sale_orderBy
@@ -33,7 +51,7 @@ query Sales(
   }
 }
 
-query ProfileNfts($user: ID!) {
+subscription ProfileNfts($user: ID!) {
   user(id: $user) {
     createdNfts {
       ...NftFields

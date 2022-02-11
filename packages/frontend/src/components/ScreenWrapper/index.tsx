@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import Navbar from '../Navbar';
+import Footer from '../Footer';
 
 interface ScreenWrapperProps {
   children: ReactNode;
@@ -7,9 +8,12 @@ interface ScreenWrapperProps {
 
 export default function ScreenWrapper({ children }: ScreenWrapperProps) {
   return (
-    <div className="relative h-full bg-slate-100 dark:bg-black">
-      <Navbar />
-      {children}
+    <div className="bg-slate-100 dark:bg-black flex flex-col">
+      <div className="min-h-screen grow">
+        <Navbar />
+        {children}
+      </div>
+      <Footer />
     </div>
   );
 }

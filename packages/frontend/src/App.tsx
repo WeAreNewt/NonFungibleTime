@@ -21,7 +21,8 @@ function getWeb3Library(provider: any): ethers.providers.Web3Provider {
 }
 
 const apolloClient = createApolloClient({
-  uri: networkConfigs[ChainId.mumbai].subgraphApi,
+  httpUri: networkConfigs[ChainId.mumbai].subgraphHttpLink,
+  wsUri: networkConfigs[ChainId.mumbai].subgraphWsLink
 });
 
 function App() {
@@ -38,7 +39,7 @@ function App() {
                       <Route path="/" element={<Home />} key="home" />
                       <Route path="/profile/*" element={<Profile />} key="profile" />
                       <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
-                      <Route path="/details/*" element={<Details />} key="details" />
+                      <Route path="/nft/*" element={<Details />} key="details" />
                     </Routes>
                   </ScreenWrapper>
                 </BrowserRouter>

@@ -6,6 +6,7 @@
     "@ethersproject/providers": "^5.5.2",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
+    "@tailwindcss/forms": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
@@ -25,12 +26,14 @@
     "ethers": "^5.5.3",
     "graphql": "^15.8.0",
     "react": "^17.0.2",
+    "react-cool-inview": "^2.0.9",
     "react-datepicker": "^4.6.0",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
     "reflect-metadata": "^0.1.13",
+    "subscriptions-transport-ws": "^0.11.0",
     "typescript": "^4.5.4",
     "web-vitals": "^2.1.0",
     "zod": "^3.11.6"
@@ -40,7 +43,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "subgraph:codegen": "graphql-codegen"
+    "subgraph:codegen": "graphql-codegen",
+    "prettier": "prettier -w \"src/**/*.tsx\""
   },
   "husky": {
     "hooks": {
