@@ -29,11 +29,11 @@ export default function Marketplace() {
     if (category === 'Show All') return {owner_not: "0x0000000000000000000000000000000000000000",forSale,redeemed} as Nft_Filter
     
     return {
-      category,forSale,redeemed
+      owner_not: "0x0000000000000000000000000000000000000000",category,forSale,redeemed
     };
   }, [category,forSale,redeemed]);
 
-  const { data, loading, fetchMore } = useQuery(NftsDocument, {
+  const { data, loading, fetchMore, refetch } = useQuery(NftsDocument, {
     variables: {
       first: PAGE_SIZE,
       where: whereArg,
@@ -46,6 +46,7 @@ export default function Marketplace() {
   // so it can recalculate if should paginate or not
   useEffect(() => {
     setCanLoadMore(true);
+    refetch()
   }, [category,forSale,redeemed]);
 
   
