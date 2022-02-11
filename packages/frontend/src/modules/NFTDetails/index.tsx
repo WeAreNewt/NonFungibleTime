@@ -2,7 +2,8 @@ import { useSubscription } from '@apollo/client';
 import { Dialog } from '@headlessui/react';
 import { formatUnits } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
-import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt } from 'react-icons/fa';
+import ClockSpinner from '../../images/clock-loader.webp';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
@@ -115,7 +116,9 @@ export default function NFTDetails() {
         </div>
       </div>
     } else if (loading) {
-      return <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />;
+      return <div className="w-1/5 mx-auto p-4 pb-0">
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+      </div>;
     } else {
       return <div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
@@ -179,7 +182,9 @@ export default function NFTDetails() {
                     {txStatus.submitted ? (
                       <div className="text-center flex-col p-4">
                         <div className="font-semibold">Transaction Submitted</div>
-                        <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
+                        <div className="w-1/5 mx-auto p-4 pb-0">
+                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                        </div>
                       </div>
                     ) : txStatus.confirmed && (
                       <div className="text-center flex-col">
