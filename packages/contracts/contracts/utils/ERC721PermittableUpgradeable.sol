@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import './../interfaces/IERC1271.sol';
 
 /// @title ERC721PermittableUpgradeable
-/// @author solace.f
+/// @author The Newt team.
 /// @notice An extension of `ERC721`.
 /// The base is OpenZeppelin's `ERC721Upgradeable` which also includes the `Metadata` extension. This extension includes simpler transfers and gasless approvals.
 contract ERC721PermittableUpgradeable is ERC721Upgradeable, EIP712Upgradeable {
