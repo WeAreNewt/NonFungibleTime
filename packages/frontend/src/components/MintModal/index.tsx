@@ -240,7 +240,7 @@ export default function MintModal({ open, onClose }: Props) {
                           value={formNft.duration.toString()}
                           min={0}
                           onChange={(e) => {
-                            const duration = parseInt(e.target.value)
+                            const duration = Number(e.target.value)
                             setFormNft({ ...formNft, duration })
                             setErrors({
                               ...errors,
