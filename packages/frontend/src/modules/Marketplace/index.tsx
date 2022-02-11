@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import React, { useEffect, useMemo, useState } from 'react';
 import useInView from 'react-cool-inview';
-import { FaSpinner } from 'react-icons/fa';
+import ClockSpinner from '../../images/clock-loader.webp';
 import CategoryFilter from '../../components/CategoryFilter';
 import NFTCard from '../../components/NFTCard';
 import { NFTGrid } from '../../components/NFTGrid';
@@ -79,7 +79,10 @@ export default function Marketplace() {
           </div>
         </div>
         {loading || !nfts ? (
-          <FaSpinner />
+          <div className="w-1/5 mx-auto p-4 pb-0">
+            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+          </div>
+
         ) : (
           <>
             <NFTGrid>
@@ -89,10 +92,12 @@ export default function Marketplace() {
             </NFTGrid>
             {canLoadMore && (
               <div
-                style={{ marginTop: 20, width: '100%', padding: 20, backgroundColor: 'cyan' }}
+                style={{ marginTop: 20, width: '100%', padding: 20 }}
                 ref={observe}
               >
-                Loader...
+                <div className="w-1/5 mx-auto p-4 pb-0">
+                  <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                </div>
               </div>
             )}
           </>
