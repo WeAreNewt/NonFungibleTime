@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
+import Tooltip from '../Tooltip';
 
 const validateDuration = greaterThanOrEqualTo(0.01)
 const validateRoyalty = inBetween(0, 100)
@@ -355,9 +356,12 @@ export default function MintModal({ open, onClose }: Props) {
                       {errors.date && <span className="text-xs text-red-500">{errors.date}</span>}
                     </div>
                     <div>
-                      <Label className="block text-sm font-medium text-gray-700">
-                        Royalties (%)
-                      </Label>
+                      <div className="flex gap-3 mb-2 align-center">
+                        <Label className="block text-sm font-medium text-gray-700">
+                          Royalties (%)
+                        </Label>
+                        <Tooltip content="You share of secondary sales: every time your time is resold, you receive royalties on the sale"/>
+                      </div>
                       <Input
                         type="number"
                         name="royalty"
