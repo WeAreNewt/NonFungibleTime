@@ -14,7 +14,7 @@ import classnames from 'classnames';
 import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Button, ButtonVariant } from '../../components/Button';
-import MintModal from '../../components/MintModal';
+import MintModal, { TxStatus } from '../../components/MintModal';
 import { isAddress } from 'ethers/lib/utils';
 
 export default function Profile() {
@@ -24,7 +24,13 @@ export default function Profile() {
   const [owner, setOwner] = useState<Boolean>(true);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
   const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
+  const [mintStatus, setMintStatus] = useState<TxStatus>({
+    submitted: false,
+    confirmed: false,
+    txHash: undefined,
+  })
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
+  const [lastNft, setLastNft] = useState<NFT | undefined>(undefined);
   const location = useLocation();
   const path = location.pathname.split('/');
   const accountName = path[2] ? path[2] : '';
@@ -52,11 +58,13 @@ export default function Profile() {
       user: sanitizedUser,
     },
   });
+
   const categories = ['Minted', 'Owned'];
   // Use app-data-provider for pre-loaded data if user if profile owner, otherwise use separate subscription
   const user: User | undefined = owner ? userData : (data && data.user ? data.user : undefined);
   const userLoading: boolean = owner ? loadingUserData : loading;
   const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
+
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
       setNftsShown(user.createdNfts);
@@ -65,6 +73,15 @@ export default function Profile() {
       setNftsShown(user.ownedNfts);
     }
   }, [user, toggleIndex]);
+
+  useEffect(() => {
+    if (user && user.createdNfts.length > 1 && (mintStatus.submitted || mintStatus.confirmed)) {
+      const sortedCreatedNfts = user.createdNfts.sort((a, b) => (a.mintTimestamp > b.mintTimestamp ? 1 : -1));
+      setLastNft(sortedCreatedNfts.at(-1));
+    } else {
+      setLastNft(undefined);
+    }
+  }, [data, user, mintStatus])
 
   const onChangeTab = (index: number) => {
     if (index === 0) {
@@ -171,7 +188,7 @@ export default function Profile() {
                   </Button>
                 )}
                 {/** Mint Modal */}
-                <MintModal open={mintModalOpen} onClose={() => setMintModalOpen(false)} />
+                <MintModal open={mintModalOpen} onClose={() => { setMintModalOpen(false); setMintStatus({ submitted: false, confirmed: false, txHash: undefined }) }} setProfileMintStatus={setMintStatus} lastNft={lastNft} />
                 {/** Share Profile Modal */}
                 <Dialog
                   open={shareProfileModalOpen}

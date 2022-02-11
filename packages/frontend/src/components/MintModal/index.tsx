@@ -7,11 +7,12 @@ import { Input, Label, Select, baseInputClassNames } from '../../components/Form
 import { TransactionResponse } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from 'ethers';
-import { Category } from '../../types';
+import { Category, NFT } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
+import { useNavigate } from 'react-router-dom';
 import Tooltip from '../Tooltip';
 
 const validateDuration = greaterThanOrEqualTo(0.01)
@@ -19,10 +20,12 @@ const validateRoyalty = inBetween(0, 100)
 
 interface Props {
   open: boolean,
-  onClose: () => void
+  onClose: () => void,
+  setProfileMintStatus: (arg0: TxStatus) => void;
+  lastNft: NFT | undefined;
 }
 
-interface TxStatus {
+export interface TxStatus {
   submitted: boolean;
   confirmed: boolean;
   txHash?: string;
@@ -50,7 +53,7 @@ const defaultValues: MintNftParams = {
   royalty: 0,
 }
 
-export default function MintModal({ open, onClose }: Props) {
+export default function MintModal({ open, onClose, setProfileMintStatus, lastNft }: Props) {
 
   const [formNft, setFormNft] = useState<MintNftParams>(defaultValues);
 
@@ -62,6 +65,7 @@ export default function MintModal({ open, onClose }: Props) {
     confirmed: false,
   });
 
+  const navigate = useNavigate();
   const { currentAccount, nftCollectionService, networkConfig } = useAppDataProvider();
   const { library: provider } = useWeb3React();
 
@@ -113,8 +117,10 @@ export default function MintModal({ open, onClose }: Props) {
           value: txData.value ? BigNumber.from(txData.value) : undefined,
         });
         setMintTxStatus({ ...mintTxStatus, submitted: true });
+        setProfileMintStatus({ ...mintTxStatus, submitted: true })
         const receipt = await txResponse.wait(1);
         setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
+        setProfileMintStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
       } catch (error) {
         setMainTxError('Error submitting transaction (check browser console for full error):' + error);
       }
@@ -168,12 +174,23 @@ export default function MintModal({ open, onClose }: Props) {
                   </div>
                 ) : mintTxStatus.confirmed ? (
                   <div className="text-center flex-col">
-                    <div className="font-semibold">Transaction Confirmed</div>
-                    <div className="pt-4">
-                      <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
+                    <div className="font-semibold p-4">Transaction Confirmed</div>
+                    <div className="p-4">
+                      <a target="_blank" rel="noopener noreferrer" className="cursor-pointer" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
                         View Transaction <FaExternalLinkAlt className="inline-block" />
                       </a>
                     </div>
+                    {lastNft && (
+                      <div className="p-4">
+                        <button
+                          type="button"
+                          className="disabled:opacity-50 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:w-auto sm:text-sm"
+                          onClick={() => navigate('/nft/' + lastNft.tokenId)}
+                        >
+                          View NFT
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3">
