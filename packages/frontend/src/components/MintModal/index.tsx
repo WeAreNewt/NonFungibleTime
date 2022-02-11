@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { FaExternalLinkAlt, FaRegWindowClose, FaSpinner } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose } from 'react-icons/fa';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { MintParamsType } from '../../lib/helpers/NftCollection';
 import { Input, Label, Select, baseInputClassNames } from '../../components/Forms';
@@ -11,6 +11,7 @@ import { Category } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import { required, greaterThan, inBetween, validateDate } from '../../lib/utils/validators'
+import ClockSpinner from '../../images/clock-loader.webp';
 
 const validateDuration = greaterThan(0)
 const validateRoyalty = inBetween(0, 100)
@@ -160,7 +161,9 @@ export default function MintModal({ open, onClose }: Props) {
                 {mintTxStatus.submitted ? (
                   <div className="text-center flex-col p-4">
                     <div className="font-semibold">Transaction Submitted</div>
-                    <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
+                    <div className="w-1/5 mx-auto p-4 pb-0">
+                      <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                    </div>
                   </div>
                 ) : mintTxStatus.confirmed ? (
                   <div className="text-center flex-col">

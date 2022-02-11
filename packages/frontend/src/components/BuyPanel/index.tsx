@@ -7,6 +7,7 @@ import { BigNumber } from "ethers";
 import { useState } from "react";
 import { useAppDataProvider } from "../../lib/providers/app-data-provider";
 import { TxStatus } from '../../modules/NFTDetails/index'
+import { ZERO_ADDRESS } from "../../lib/helpers/constants";
 
 interface BuyPanelParams {
     nft: NFT;
