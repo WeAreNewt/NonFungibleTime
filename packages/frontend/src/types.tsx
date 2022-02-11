@@ -10,6 +10,7 @@ export enum Category {
   business = 'Business',
   lessons = 'Lessons',
   video = 'Video & Animation',
+  other = 'Other'
 }
 
 export interface HistoryItem {
