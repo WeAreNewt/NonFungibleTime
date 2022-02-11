@@ -1,16 +1,14 @@
----
-description: What is it and why should we tokenize our time?
----
+<p align="center">
+    <img src="newt_mayan.svg" width="300" height="300" >
+<p>
 
 # Non Fungible Time
 
-{% hint style="info" %}
-Non Fungible Time is a Proof Of Concept
-{% endhint %}
+Mint and purchase NFTs representing time for performing freelance services and other use cases. Time NFTs can represent an on-chain attestation of contributions, and a way for organizations to recruit talent for specialized needs.
 
-### Web3 Is Empowering
+While freelance services is the initial use case for Non Fungible Time, this primitive can be extended to other use cases, such as reservations, asset ownership, and autonomous on-chain agreements.
 
-In Web 2, reputations are limited to the platforms they are built on. Employment history is owned by the employer. The collateral you can demand against your future production is subject to bias.
+## Contents
 
 - [Non Fungible Time](#non-fungible-time)
   - [Contents](#contents)
@@ -33,85 +31,70 @@ In Web 2, reputations are limited to the platforms they are built on. Employment
   - [Audit](#audit)
   - [License](#license)
 
-Delivering top quality work and high levels of production is a virtuous cycle with Non Fungible Time and _only you can define your own limitations_.
+## Project Details
 
-### The 3 Primary Branches Of The WorkFi Economy
+### About
 
-Non Fungible Time is a WorkFi primitive. The functions are stripped down to their most basic attributes. They are a universal format for exchanging human collateral on a decentralized network. Developers can build applications on top of the primitive to mint and exchange time in dynamic ways that serves any unique use case, while workers can move their minted time
+Time NFTs are a way for users to mint and own NFTs representing their time. Each NFT has customizable fields which are stored as on-chain metadata, and have a dynamic animated representation. Time NFTs allow users to take ownership of their time through collecting, sharing, monetizing, or creating other unique use cases.
 
-**1) Minting** platforms that workers use to represent their time as a Non Fungible Token.
+### Infrastructure
 
-> Examples: DAO Contributors, Consultants,  Engineers, Designers, Professionals.
->
-> _Produce a non fungible token that secures your service._
+<p align="center">
+    <img src="circle_of_life.png" width="550" height="300" >
+<p>
 
-**2) Markets** that connect buyers with minters of time
+This diagram lays out the basic project structure. Smart contracts were developed using [hardhat](https://github.com/nomiclabs/hardhat). [Typechain](https://github.com/dethcrypto/TypeChain) is used to generate a typesafe ethers sdk for interacting with the smart contracts, and [Web3React](https://github.com/NoahZinsmeister/web3-react) is used to handle wallet connections and transaction signing.
 
-> Examples: DAO Services Market, Rideshare/Delivery Apps, Professional Scheduling &#x20;
->
-> _Deliver the best matching experience to customers with while optimizing labor utility_
+### Buidling
 
-**3) Collateral** solutions for producers of time and yield opportunities for liquidity providers.
+Given the modular nature of smart contracts, Time NFTs can be integrated, enhanced, or forked by anyone. The sections below will cover the [smart contract](#smart-contract), [data](#subgraph), and [frontend](#frontend) components of the Time NFT project. See [contributing](CONTRIBUTING.md) for more info on joining the Newt community to build with Time NFTs.
 
-> Examples: Lending and Borrowing, Insurance Products, Aggregated Labor &#x20;
->
-> _Smart contracts that allocate time efficiently and maximize its value._
+<br />
 
-{% hint style="info" %}
-Newt developed the base contracts for minting and exchanging, and is supporting efforts to build on top of them.
-{% endhint %}
+## Smart Contracts
 
 The smart contracts store the NFT collection (ERC-721) on the blockchain - with the reference implementation being deployed to the Polygon network. This package uses the hardhat framework for contract development and deployment.
     
 ### NonFungibleTimeCollection
 
-{% content-ref url="primitive/minting.md" %}
-[minting.md](primitive/minting.md)
-{% endcontent-ref %}
+The [NonFungibleTimeCollection.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/NonFungibleTimeCollection.sol) contract defines the Time NFT collection
 
-{% content-ref url="primitive/selling.md" %}
-[selling.md](primitive/selling.md)
-{% endcontent-ref %}
+<details>
+<summary>Contract Functions</summary>
 
-{% content-ref url="primitive/market.md" %}
-[market.md](primitive/market.md)
-{% endcontent-ref %}
+#### mint()
 
-{% content-ref url="primitive/redeem.md" %}
-[redeem.md](primitive/redeem.md)
-{% endcontent-ref %}
+**`function mint(string memory name, string memory description, string memory work, uint256 availabilityFrom, uint256 availabilityTo, uint256 duration, uint256 royaltyBasisPoints)`**
 
-### [Use Case: Examples ](broken-reference)
+Mints a new token with the given parameters.
 
-{% content-ref url="use-case/markets.md" %}
-[markets.md](use-case/markets.md)
-{% endcontent-ref %}
+|      Parameter Name      |  Type   |                                     Description                                     |
+| :----------------------: | :-----: | :---------------------------------------------------------------------------------: |
+|        **`name`**        | string  |                            Name of the NFT being minted.                            |
+|    **`description`**     | string  |                        Description of the NFT being minted.                         |
+|      **`category`**      | string  |         Category of service that will be completed by the NFT being minted          |
+|  **`availabilityFrom`**  | uint256 |  Unix timestamp indicating start of availability. Zero if there is no lower bound.  |
+|   **`availabilityTo`**   | uint256 |   Unix timestamp indicating end of availability. Zero if there is no upper bound.   |
+|      **`duration`**      | uint256 |    The total time tokenized within the availability range. Measured in seconds.     |
+| **`royaltyBasisPoints`** | uint256 | The royalty percentage measured in basis points. Each basis point represents 0.01%. |
 
-{% content-ref url="use-case/reputations.md" %}
-[reputations.md](use-case/reputations.md)
-{% endcontent-ref %}
+| Returns |  Type   |      Description      |
+| :-----: | :-----: | :-------------------: |
+|    0    | uint256 | tokenId of minted NFT |
 
-{% content-ref url="use-case/collateral.md" %}
-[collateral.md](use-case/collateral.md)
-{% endcontent-ref %}
+#### buyToken()
 
-{% content-ref url="use-case/guilds.md" %}
-[guilds.md](use-case/guilds.md)
-{% endcontent-ref %}
+**`function buyToken(uint256 tokenId)`**
 
-### [Building: Incentives and New Constructs](broken-reference)
+Purchases token based on the provided tokenID.
 
-{% content-ref url="building/workfi.md" %}
-[workfi.md](building/workfi.md)
-{% endcontent-ref %}
+| Parameter Name | Type    | Description                             |
+| -------------- | ------- | --------------------------------------- |
+| **`tokenId`**  | uint256 | The tokenID of the NFT being purchased. |
 
-{% content-ref url="building/team.md" %}
-[team.md](building/team.md)
-{% endcontent-ref %}
+#### changeTokenBuyingConditions()
 
-{% content-ref url="building/rewards.md" %}
-[rewards.md](building/rewards.md)
-{% endcontent-ref %}
+**`function changeTokenBuyingConditions(uint256 tokenId, address currency, uint256 price, address allowedBuyer, bool forSale)`**
 
 Changes the price and currency of the token with the provided tokenID.
 
