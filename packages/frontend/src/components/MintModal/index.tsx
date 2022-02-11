@@ -14,7 +14,7 @@ import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../l
 import Tooltip from '../Tooltip'
 import ClockSpinner from '../../images/clock-loader.webp';
 
-const validateDuration = greaterThanOrEqualTo(0)
+const validateDuration = greaterThanOrEqualTo(0.01)
 const validateRoyalty = inBetween(0, 100)
 
 interface Props {
