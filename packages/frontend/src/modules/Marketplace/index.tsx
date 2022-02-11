@@ -7,19 +7,31 @@ import NFTCard from '../../components/NFTCard';
 import { NFTGrid } from '../../components/NFTGrid';
 import { NftsDocument, Nft_Filter, Nft_OrderBy, OrderDirection } from '../../lib/graphql/index';
 import { NFT } from '../../types';
+import { Switch } from '@headlessui/react';
 
 const PAGE_SIZE = 12;
 
-export default function Marketplace() {
-  const [canLoadMore, setCanLoadMore] = useState(true);
-  const [category, setCategory] = useState('Show All');
-  const whereArg = useMemo<Nft_Filter | undefined>(() => {
-    if (category === 'Show All') return undefined;
+interface filters  {
+category: string;
+forSale: boolean;
+redeemed: boolean
+}
 
+const defaultFilter = {category: 'Show All', forSale: true, redeemed: true}
+
+
+export default function Marketplace() {
+ 
+  const [canLoadMore, setCanLoadMore] = useState(true);
+  const [filters, setFilters] = useState<filters>(defaultFilter);
+  const {category, forSale, redeemed} = filters;
+  const whereArg = useMemo<Nft_Filter | undefined>(() => {
+    if (category === 'Show All') return {owner_not: "0x0000000000000000000000000000000000000000",forSale,redeemed} as Nft_Filter
+    
     return {
-      category,
+      category,forSale,redeemed
     };
-  }, [category]);
+  }, [category,forSale,redeemed]);
 
   const { data, loading, fetchMore } = useQuery(NftsDocument, {
     variables: {
@@ -34,9 +46,15 @@ export default function Marketplace() {
   // so it can recalculate if should paginate or not
   useEffect(() => {
     setCanLoadMore(true);
-  }, [category]);
+  }, [category,forSale,redeemed]);
 
-  const nfts: NFT[] | undefined = data && data.nfts ? data.nfts : [];
+  
+  const nfts: NFT[] = data && data.nfts ? data.nfts : [];
+  const [nftsShown, setNftsShown] = useState<NFT[]>(nfts);
+
+  useEffect(() => {
+    data && data.nfts ? setNftsShown(data.nfts) : setNftsShown([])
+  }, [data]);
 
   const { observe } = useInView({
     // For better UX, we can grow the root margin so the data will be loaded earlier
@@ -73,9 +91,50 @@ export default function Marketplace() {
               Explore marketplace
             </div>
           </div>
+          <div className="w-full mr-10 md:w-1/3 justify-items-end ">
+            <CategoryFilter onSelect={(category) => {setFilters({...filters,category})
+             
+            }} selected={category} />
+          </div>
+          <div className="flex mt-2 flex-row md:w-1/3 justify-items-end">
+            <p className="mr-4 mt-0.5 ">For sale</p>
+              
+           <Switch
+        checked={forSale}
+        onChange={()=> {setFilters({...filters,forSale: !forSale})
+        
+      }
+      }
+        className={`${forSale? 'bg-indigo-900' : 'bg-indigo-700'}
+          relative inline-flex flex-shrink-0 h-[30px] w-[66px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+      >
+        <span
+          aria-hidden="true"
+          className={`${forSale ? 'translate-x-9' : 'translate-x-0'}
+            pointer-events-none inline-block h-[26px] w-[26px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
+        />
+      </Switch>
 
-          <div className="w-full md:w-1/3 justify-items-end ">
-            <CategoryFilter onSelect={setCategory} selected={category} />
+          </div>
+      <div className="flex mt-2 flex-row md:w-1/3 justify-items-end">
+            <p className="mr-4 mt-0.5 ">Redeemed </p>
+              
+           <Switch
+        checked={redeemed}
+        onChange={()=> {
+          setFilters({...filters,redeemed: !redeemed})
+         
+      }}
+        className={`${redeemed? 'bg-indigo-900' : 'bg-indigo-700'}
+          relative inline-flex flex-shrink-0 h-[30px] w-[66px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+      >
+        <span
+          aria-hidden="true"
+          className={`${redeemed ? 'translate-x-9' : 'translate-x-0'}
+            pointer-events-none inline-block h-[26px] w-[26px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
+        />
+      </Switch>
+
           </div>
         </div>
         {loading || !nfts ? (
@@ -86,7 +145,7 @@ export default function Marketplace() {
         ) : (
           <>
             <NFTGrid>
-              {nfts.map((nft, index) => {
+              {nftsShown.map((nft, index) => {
                 return <NFTCard key={index} nft={nft} />;
               })}
             </NFTGrid>
