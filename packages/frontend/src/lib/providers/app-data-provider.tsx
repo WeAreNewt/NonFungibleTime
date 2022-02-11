@@ -3,7 +3,8 @@ import { ethers, providers } from 'ethers';
 import React, { useContext } from 'react';
 import { User } from '../../types';
 import { NetworkConfig, networkConfigs } from '../config';
-import { ProfileNftsDocument } from '../graphql';
+import { PaymentToken, ProfileNftsDocument } from '../graphql';
+import { ZERO_ADDRESS } from '../helpers/constants';
 import { NftCollectionService } from '../helpers/NftCollection';
 import { useWeb3 } from './web3-provider';
 
@@ -14,7 +15,7 @@ export interface AppDataContextType {
   nftCollectionService: NftCollectionService;
   userData: User | undefined;
   loadingUserData: boolean;
-  //allowedCurrencies: string[];
+  availablePaymentTokens: Record<string, PaymentToken>;
 }
 
 const AppDataContext = React.createContext<AppDataContextType>({} as AppDataContextType);
@@ -47,6 +48,17 @@ export const AppDataProvider: React.FC = ({ children }) => {
   });
   const userData = data && data.user ? data.user : undefined;
 
+
+  // Hard-coded for now, will come from subgraph
+  const availablePaymentTokens: Record<string, PaymentToken> = {
+    MATIC: {
+      acceptable: true,
+      id: ZERO_ADDRESS,
+      symbol: 'MATIC',
+      decimals: 18,
+    },
+  };
+
   return (
     <AppDataContext.Provider
       value={{
@@ -56,6 +68,7 @@ export const AppDataProvider: React.FC = ({ children }) => {
         nftCollectionService,
         userData,
         loadingUserData: loading,
+        availablePaymentTokens,
       }}
     >
       {children}

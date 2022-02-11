@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { FaShareAlt } from 'react-icons/fa';
+import ClockSpinner from '../../images/clock-loader.webp';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -117,7 +118,9 @@ export default function Profile() {
         </div>
       </div>
     } else if (loadingUserData) {
-      return <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />;
+      return <div className="w-1/5 mx-auto p-4 pb-0">
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+      </div>;
     } else if (!accountName || !isAddress(accountName)) {
       return (<div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
@@ -269,7 +272,9 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" /> : renderNFTs()}
+          {userLoading ? <div className="w-1/5 mx-auto p-4 pb-0">
+            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+          </div> : renderNFTs()}
         </div>
       </div >
     </div >
