@@ -4,6 +4,7 @@ coverage
 coverage.json
 packages/contracts/typechain
 build
+!.github/actions/build
 
 .idea/
 .vscode
