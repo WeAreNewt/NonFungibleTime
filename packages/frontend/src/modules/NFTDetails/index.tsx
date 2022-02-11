@@ -217,7 +217,6 @@ export default function NFTDetails() {
               nft.forSale ? (
                 <div>
                   <BuyPanel nft={nft} setTxStatus={setTxStatus} />
-                  {!nft.redeemed && <div className="text-center p-4 font-semibold">This NFT has been redeemed</div>}
                 </div>
               ) : (
                 <div className="text-center p-4 font-semibold">This NFT is not for sale</div>
@@ -421,7 +420,7 @@ export default function NFTDetails() {
                 <div className="font-semibold">
                   {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}
                 </div>
-                <div className="font-semibold">{nft.allowedBuyer === ZERO_ADDRESS ? 'No Reserved Buyer' : 'Reserved For' + nft.allowedBuyer}</div>
+                <div className="font-semibold">{nft.allowedBuyer === ZERO_ADDRESS ? 'No Reserved Buyer' : 'Reserved For ' + nft.allowedBuyer}</div>
               </div> : <div className="font-semibold">Not For Sale</div>}
             </div>
           </div>
