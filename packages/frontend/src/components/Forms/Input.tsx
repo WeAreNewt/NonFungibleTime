@@ -16,7 +16,7 @@ export const Input = ({
   return (
     <>
       <input type={type} className={baseInputClassNames} placeholder={props.placeholder} {...props} />
-      {error && <span className="absolute text-xs text-red-500 pt-1">{error}</span>}
+      {error && <span className="text-xs text-red-500 pt-1">{error}</span>}
     </>
   );
 };

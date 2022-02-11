@@ -10,10 +10,10 @@ import { BigNumber } from 'ethers';
 import { Category } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
-import { required, greaterThan, inBetween, validateDate } from '../../lib/utils/validators'
+import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
 
-const validateDuration = greaterThan(0)
+const validateDuration = greaterThanOrEqualTo(0.01)
 const validateRoyalty = inBetween(0, 100)
 
 interface Props {
@@ -175,7 +175,7 @@ export default function MintModal({ open, onClose }: Props) {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-5">
+                  <div className="space-y-3">
                     <div className="">
                       <div>
                         <Label htmlFor="name">Name</Label>
@@ -228,7 +228,7 @@ export default function MintModal({ open, onClose }: Props) {
                             <option key={index}>{category}</option>
                           ))}
                         </Select>
-                        {errors.category && <span className="absolute text-xs text-red-500 pt-1">{errors.category}</span>}
+                        {errors.category && <span className="text-xs text-red-500 pt-1">{errors.category}</span>}
                       </div>
                       <div className="w-1/2">
                         <Label>Number Of Hours</Label>
@@ -240,7 +240,7 @@ export default function MintModal({ open, onClose }: Props) {
                           value={formNft.duration.toString()}
                           min={0}
                           onChange={(e) => {
-                            const duration = parseInt(e.target.value)
+                            const duration = Number(e.target.value)
                             setFormNft({ ...formNft, duration })
                             setErrors({
                               ...errors,
@@ -382,7 +382,7 @@ export default function MintModal({ open, onClose }: Props) {
                 )}
               </div>
             </div>
-            {!currentAccount && <span className="absolute text-xs text-red-500 pt-1">No account connected</span>}
+            {!currentAccount && <span className="text-xs text-red-500 pt-1">No account connected</span>}
             <div className="sm:flex sm:flex-row-reverse pt-5">
               {!mintTxStatus.submitted && !mintTxStatus.confirmed && (
                 <button
