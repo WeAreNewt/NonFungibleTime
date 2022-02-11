@@ -7,6 +7,7 @@ import { PaymentToken, ProfileNftsDocument } from '../graphql';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { NftCollectionService } from '../helpers/NftCollection';
 import { useWeb3 } from './web3-provider';
+import { Buffer } from 'buffer';
 
 
 export interface AppDataContextType {
@@ -22,7 +23,7 @@ export interface AppDataContextType {
 
 const AppDataContext = React.createContext<AppDataContextType>({} as AppDataContextType);
 
-const trmUrl = 'https://api.trmlabs.com/walletscreen/'
+const trmUrl = 'https://api.trmlabs.com/public/v2/screening/addresses'
 
 
 export const AppDataProvider: React.FC = ({ children }) => {
@@ -30,28 +31,33 @@ export const AppDataProvider: React.FC = ({ children }) => {
   const [trmRisk, setTrmRisk] = useState<RiskSeverity | undefined>(undefined);
 
 
-  const parseScreening = (networkScreens: TRMScreeningType[]) => {
-    networkScreens.forEach((networkScreen) => {
-      // Only care about SEVERE ratings
-      if (networkScreen.riskScore === RiskSeverity.SEVERE) {
-        setTrmRisk(RiskSeverity.SEVERE)
-      }
-    })
-  }
-
-  const trmScreening = useCallback(() => {
-    const authString = `${process.env.TRM_KEY}:${''}`
-    fetch(trmUrl + account, {
+  const trmScreening = useCallback(async () => {
+    const response = await fetch(trmUrl, {
       method: "POST",
-      headers: new Headers({
-        "Authorization": 'Basic ' + btoa(authString)
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + Buffer.from(`${process.env.REACT_APP_TRM_USERNAME}:${process.env.REACT_APP_TRM_PASSWORD}`).toString('base64')
+      },
+      body: JSON.stringify([
+        {
+          address: account,
+          chain: 'ethereum',
+        }
+      ])
     })
-      .then(response => response.json())
-      .then(json => {
-        console.log(json)
-        parseScreening(json as TRMScreeningType[])
-      });
+    const data = await response.json();
+    console.log(data);
+    const ds = data as string[];
+    if (ds.includes(RiskSeverity.SEVERE)) {
+      console.log("SEVERE RISK")
+      setTrmRisk(RiskSeverity.SEVERE);
+    } else {
+      console.log("NON-SEVERE RISK")
+      setTrmRisk(undefined);
+    }
+    const trmEntities = data as TRMScreeningType[];
+    // parseScreening(trmEntities)
+    console.log(trmEntities);
   }, [account])
 
 
