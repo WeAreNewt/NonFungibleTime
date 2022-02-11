@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import LandingPageClock from '../../images/LandingPageClock.jpg';
+import LandingPageClock from '../../images/LandingPageClock.png';
 
 export const Home = () => {
   const { currentAccount } = useAppDataProvider();

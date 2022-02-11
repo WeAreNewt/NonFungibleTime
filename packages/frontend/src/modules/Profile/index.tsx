@@ -1,66 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt, FaSpinner } from 'react-icons/fa';
+import { FaShareAlt } from 'react-icons/fa';
+import ClockSpinner from '../../images/clock-loader.webp';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import { Category, NFT, User } from '../../types';
+import { NFT, User } from '../../types';
 import { Dialog, Tab } from '@headlessui/react';
-import { BigNumber } from 'ethers';
-import { useWeb3React } from '@web3-react/core';
-import { MintParamsType } from '../../lib/helpers/NftCollection';
 import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
 import { useSubscription } from '@apollo/client';
 import makeBlockie from 'ethereum-blockies-base64';
-import DatePicker from 'react-datepicker';
 import classnames from 'classnames';
 import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Input, Label, Select } from '../../components/Forms';
-import { TransactionResponse } from '@ethersproject/providers';
 import { Button, ButtonVariant } from '../../components/Button';
-import classNames from 'classnames';
+import MintModal from '../../components/MintModal';
 import { isAddress } from 'ethers/lib/utils';
 
-interface MintNftParams {
-  name: string;
-  description: string;
-  category: string;
-  duration: number;
-  availabilityTo: number;
-  availabilityFrom: number;
-  royalty: number;
-}
-
-interface TxStatus {
-  submitted: boolean;
-  confirmed: boolean;
-  txHash?: string;
-}
-
 export default function Profile() {
-  const { currentAccount, nftCollectionService, userData, loadingUserData, networkConfig } =
+  const { currentAccount, userData, loadingUserData, } =
     useAppDataProvider();
   const navigate = useNavigate();
-  const { library: provider } = useWeb3React();
   const [owner, setOwner] = useState<Boolean>(true);
-  const [formError, setFormError] = useState<string | undefined>(undefined);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
-  const [formNft, setFormNft] = useState<MintNftParams>({
-    name: '',
-    description: '',
-    category: '',
-    duration: 1,
-    availabilityTo: 0,
-    availabilityFrom: 0,
-    royalty: 0,
-  });
   const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
   const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
-  const [mintTxStatus, setMintTxStatus] = useState<TxStatus>({
-    submitted: false,
-    confirmed: false,
-  });
   const location = useLocation();
   const path = location.pathname.split('/');
   const accountName = path[2] ? path[2] : '';
@@ -125,52 +89,6 @@ export default function Profile() {
       )
     );
   };
-  const mintNft = async () => {
-    if (currentAccount) {
-      if (formNft.duration > 0 && formNft.name && formNft.description && formNft.category) {
-        if (
-          formNft.availabilityTo === 0 ||
-          formNft.availabilityFrom === 0 ||
-          (formNft.availabilityTo > formNft.availabilityFrom &&
-            formNft.duration * 3600 <= formNft.availabilityTo - formNft.availabilityFrom)
-        ) {
-          if (formNft.royalty <= 100) {
-            const input: MintParamsType = {
-              userAddress: currentAccount,
-              name: formNft.name,
-              description: formNft.description,
-              category: formNft.category,
-              availabilityFrom: formNft.availabilityFrom,
-              availabilityTo: formNft.availabilityTo,
-              duration: formNft.duration * 3600, // in seconds
-              royaltyBasisPoints: formNft.royalty * 100, // out of 10000
-            };
-            setFormError(undefined);
-            const txs = await nftCollectionService.mint(input);
-            const tx = txs[0];
-            const extendedTxData = await tx.tx();
-            const { from, ...txData } = extendedTxData;
-            const signer = provider.getSigner(from);
-            const txResponse: TransactionResponse = await signer.sendTransaction({
-              ...txData,
-              value: txData.value ? BigNumber.from(txData.value) : undefined,
-            });
-            setMintTxStatus({ ...mintTxStatus, submitted: true });
-            const receipt = await txResponse.wait(1);
-            setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
-          } else {
-            setFormError('Royalty must be between 1 and 100');
-          }
-        } else {
-          setFormError('availabilityTo must be greater than availablilityFrom + duration');
-        }
-      } else {
-        setFormError('Name, Description, Category, and Duration are required fields');
-      }
-    } else {
-      setFormError('No account connected');
-    }
-  };
 
   // If user does not have a wallet connected and is not viewing another profile, only display wallet connect button
   // Any other pathname is treated as a profile address
@@ -200,7 +118,9 @@ export default function Profile() {
         </div>
       </div>
     } else if (loadingUserData) {
-      return <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />;
+      return <div className="w-1/5 mx-auto p-4 pb-0">
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+      </div>;
     } else if (!accountName || !isAddress(accountName)) {
       return (<div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
@@ -245,243 +165,13 @@ export default function Profile() {
                   <Button
                     onClick={() => {
                       setMintModalOpen(true);
-                      setMintTxStatus({ submitted: false, confirmed: false, txHash: undefined });
                     }}
                   >
                     Mint new
                   </Button>
                 )}
                 {/** Mint Modal */}
-                <Dialog
-                  open={mintModalOpen}
-                  onClose={() => setMintModalOpen(false)}
-                  className="fixed z-10 inset-0 overflow-y-auto"
-                  aria-labelledby="modal-title"
-                  role="dialog"
-                  aria-modal="true"
-                >
-                  <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <div
-                      className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                      aria-hidden="true"
-                    ></div>
-
-                    <span
-                      className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                      aria-hidden="true"
-                    >
-                      &#8203;
-                    </span>
-
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                      <div className="bg-white p-10">
-                        <div className="flex">
-                          <div className="w-full space-y-5">
-                            <div className="flex flex-row justify-between">
-                              <h3
-                                className="text-lg leading-6 font-semibold text-gray-900"
-                                id="modal-title"
-                              >
-                                Mint Time NFT
-                              </h3>
-                              <div className="cursor-pointer text-xl" onClick={() => setMintModalOpen(false)}>
-                                <FaRegWindowClose className="hover:text-red-500" />
-                              </div>
-                            </div>
-
-                            {mintTxStatus.submitted ? (
-                              <div className="text-center flex-col p-4">
-                                <div className="font-semibold">Transaction Submitted</div>
-                                <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />
-                              </div>
-                            ) : mintTxStatus.confirmed ? (
-                              <div className="text-center flex-col">
-                                <div className="font-semibold">Transaction Confirmed</div>
-                                <div className="pt-4">
-                                  <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
-                                    View Transaction <FaExternalLinkAlt className="inline-block" />
-                                  </a>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="space-y-5">
-                                <div className="">
-                                  <div>
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input
-                                      name="name"
-                                      id="name"
-                                      placeholder="Name for your service..."
-                                      value={formNft.name}
-                                      onChange={(e) =>
-                                        setFormNft({ ...formNft, name: e.target.value })
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                                <div>
-                                  <Label htmlFor="description">Description</Label>
-                                  <Input
-                                    type="text"
-                                    name="description"
-                                    id="description"
-                                    placeholder="Describe your service..."
-                                    value={formNft.description}
-                                    onChange={(e) =>
-                                      setFormNft({ ...formNft, description: e.target.value })
-                                    }
-                                  />
-                                </div>
-                                <div className="flex gap-4">
-                                  <div className="w-1/2">
-                                    <Label htmlFor="category">Category</Label>
-                                    <Select
-                                      id="category"
-                                      name="category"
-                                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 placeholder-gray-400 border-gray-300 rounded-md"
-                                      value={formNft.category}
-                                      onChange={(e) =>
-                                        setFormNft({ ...formNft, category: e.target.value })
-                                      }
-                                    >
-                                      <option key={''}>-</option>
-                                      {Object.values(Category).sort().map((category, index) => (
-                                        <option key={index}>{category}</option>
-                                      ))}
-                                    </Select>
-                                  </div>
-                                  <div className="w-1/2">
-                                    <Label>Number Of Hours</Label>
-                                    <Input
-                                      type="number"
-                                      name="numhours"
-                                      id="numhours"
-                                      placeholder="Add time..."
-                                      value={formNft.duration}
-                                      onChange={(e) =>
-                                        setFormNft({ ...formNft, duration: Number(e.target.value) })
-                                      }
-                                    />
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <Label>Beginning Of Availability (optional)</Label>
-
-                                  <div
-                                    className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": formNft.availabilityFrom === 0 }, { "bg-green-300": formNft.availabilityFrom !== 0 })}
-                                    onClick={() => {
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityFrom:
-                                          formNft.availabilityFrom === 0
-                                            ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
-                                            )
-                                            : 0,
-                                      });
-                                    }}
-                                  >
-                                    <div
-                                      className={
-                                        classNames('bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform', { 'transform translate-x-6': formNft.availabilityFrom !== 0 })
-                                      }
-                                    />
-                                  </div>
-
-                                  <DatePicker
-                                    className={classNames('my-2', { 'cursor-pointer': formNft.availabilityFrom !== 0 })}
-                                    selected={formNft.availabilityFrom !== 0 ? new Date(formNft.availabilityFrom * 1000) : undefined}
-                                    placeholderText='ANY'
-                                    onChange={(date) =>
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityFrom: date
-                                          ? Math.floor(date.getTime() / 1000)
-                                          : 0,
-                                      })
-                                    }
-                                    disabled={formNft.availabilityFrom === 0}
-                                  />
-
-                                </div>
-                                <div>
-                                  <Label>End Of Availablility (optional)</Label>
-                                  <div
-                                    className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": formNft.availabilityTo === 0 }, { "bg-green-300": formNft.availabilityTo !== 0 })}
-                                    onClick={() => {
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityTo:
-                                          formNft.availabilityTo === 0
-                                            ? Math.floor(
-                                              Date.now() / 1000 - ((Date.now() / 1000) % 300)
-                                            )
-                                            : 0,
-                                      });
-                                    }}
-                                  >
-                                    <div
-                                      className={
-                                        classNames('bg-white md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform', { 'transform translate-x-6': formNft.availabilityTo !== 0 })
-                                      }
-                                    />
-                                  </div>
-
-
-                                  <DatePicker
-                                    className={classNames('my-2', { 'cursor-pointer': formNft.availabilityTo !== 0 })}
-                                    selected={formNft.availabilityTo !== 0 ? new Date(formNft.availabilityTo * 1000) : undefined}
-                                    placeholderText='ANY'
-                                    onChange={(date) =>
-                                      setFormNft({
-                                        ...formNft,
-                                        availabilityTo: date
-                                          ? Math.floor(date.getTime() / 1000)
-                                          : 0,
-                                      })
-                                    }
-                                    disabled={formNft.availabilityTo === 0}
-                                  />
-
-                                </div>
-
-                                <div>
-                                  <Label className="block text-sm font-medium text-gray-700">
-                                    Royalties (%)
-                                  </Label>
-                                  <Input
-                                    type="number"
-                                    name="royalty"
-                                    id="royalty"
-                                    placeholder="Your share of secondary sales (%)"
-                                    value={formNft.royalty}
-                                    onChange={(e) =>
-                                      setFormNft({ ...formNft, royalty: Number(e.target.value) })
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-red-500 text-center">{formError}</div>
-                        <div className="bg-white sm:flex sm:flex-row-reverse pt-5">
-                          {!mintTxStatus.submitted && !mintTxStatus.confirmed && (
-                            <button
-                              type="button"
-                              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
-                              onClick={() => mintNft()}
-                            >
-                              Mint
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Dialog>
-
+                <MintModal open={mintModalOpen} onClose={() => setMintModalOpen(false)} />
                 {/** Share Profile Modal */}
                 <Dialog
                   open={shareProfileModalOpen}
@@ -582,7 +272,9 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" /> : renderNFTs()}
+          {userLoading ? <div className="w-1/5 mx-auto p-4 pb-0">
+            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+          </div> : renderNFTs()}
         </div>
       </div >
     </div >
