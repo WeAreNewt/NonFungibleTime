@@ -151,7 +151,7 @@ export function handleCurrencyAllowanceToggled(event: CurrencyAllowanceToggled):
     const network = dataSource.network();
     // === does not work for string comparison
     // eslint-disable-next-line eqeqeq
-    if (network == 'mumbai' || network == 'polygon') {
+    if (network == 'mumbai' || network == 'matic') {
       const nativeCurrency = new PaymentToken(event.params.currency.toHexString());
       nativeCurrency.symbol = 'MATIC';
       nativeCurrency.decimals = 18;

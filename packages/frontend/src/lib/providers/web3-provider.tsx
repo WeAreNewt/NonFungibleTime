@@ -20,7 +20,7 @@ export const connectors: Record<WalletType, AbstractConnector> = {
 };
 
 // No network toggle for now
-const PROTOCOL_CHAIN = ChainId.mumbai;
+const PROTOCOL_CHAIN = ChainId.polygon;
 
 export interface Web3DataContextType {
   chainId: number;
@@ -55,15 +55,15 @@ export const Web3DataProvider: React.FC = ({ children }) => {
   );
 
   const disconnect = useCallback(
-   async () => {
-     try {
-          await deactivate()
-          localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
-     }
-     catch {
-       //todo: add error msg
-       console.log("error when deactivating wallet")
-     }
+    async () => {
+      try {
+        await deactivate()
+        localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
+      }
+      catch {
+        //todo: add error msg
+        console.log("error when deactivating wallet")
+      }
     },
     [deactivate]
   );

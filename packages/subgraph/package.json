@@ -10,7 +10,7 @@
     "subgraph:codegen": "graph codegen --output-dir ./generated",
     "subgraph:deploy:hosted": "graph deploy $SLUG --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token $ACCESS_TOKEN",
     "deploy:hosted:mumbai": "NETWORK=mumbai env-cmd npm run prepare:mumbai && SLUG=wearenewt/non-fungible-time-mumbai env-cmd npm run subgraph:deploy:hosted",
-    "deploy:hosted:polygon": "NETWORK=polygon env-cmd npm run prepare:polygon && SLUG=wearenewt/non-fungible-time env-cmd npm run subgraph:deploy:hosted"
+    "deploy:hosted:polygon": "NETWORK=matic env-cmd npm run prepare:polygon && SLUG=wearenewt/non-fungible-time-polygon env-cmd npm run subgraph:deploy:hosted"
   },
   "repository": {
     "type": "git",

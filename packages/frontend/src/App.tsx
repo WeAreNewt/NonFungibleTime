@@ -21,8 +21,8 @@ function getWeb3Library(provider: any): ethers.providers.Web3Provider {
 }
 
 const apolloClient = createApolloClient({
-  httpUri: networkConfigs[ChainId.mumbai].subgraphHttpLink,
-  wsUri: networkConfigs[ChainId.mumbai].subgraphWsLink
+  httpUri: networkConfigs[ChainId.polygon].subgraphHttpLink,
+  wsUri: networkConfigs[ChainId.polygon].subgraphWsLink
 });
 
 function App() {
