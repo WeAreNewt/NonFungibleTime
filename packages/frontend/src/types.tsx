@@ -67,3 +67,34 @@ export interface User {
   createdNfts: NFT[];
   ownedNfts: NFT[];
 }
+
+// TRM
+
+export enum RiskSeverity {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  SEVERE = 'SEVERE',
+}
+
+export type RiskIndicatorType = {
+  trmRuleId: string; // 'TRM1003';
+  severity: string; // HIGH';
+  category: string; // 'Anti-Money Laundering';
+  description: string; // 'Used for Terrorism Financing.';
+};
+
+export type TRMEntityType = {
+  id: string; // '980';
+  name: string; // 'SamSam Ransomware';
+  categories: string[]; // ['Ransomware', 'Sanctions'];
+};
+
+export type TRMScreeningType = {
+  address: string; // '149w62rY42aZBox8fGcmqNsXUzSStKeq8C';
+  blockchain: string; // 'bitcoin';
+  asset: string; // 'BTC';
+  riskScore: string; // 'HIGH';
+  riskIndicators: RiskIndicatorType[];
+  entities: TRMEntityType[];
+};
