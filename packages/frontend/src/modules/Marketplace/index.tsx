@@ -183,6 +183,9 @@ export default function Marketplace() {
           </div>
 
         </div>
+        <div className="flex-auto h-10 text-sm text-slate-500">
+			A quick way to find the right talent for any project
+		</div>
         {loading || !nfts ? (
           <div className="w-1/5 mx-auto p-4 pb-0">
             <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
