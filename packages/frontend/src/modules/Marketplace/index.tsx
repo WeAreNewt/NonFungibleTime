@@ -8,7 +8,7 @@ import { NFTGrid } from '../../components/NFTGrid';
 import { NftsDocument, Nft_Filter, Nft_OrderBy, OrderDirection } from '../../lib/graphql/index';
 import { NFT } from '../../types';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import { MaxUint256, ZERO_ADDRESS } from '../../lib/helpers/constants';
+import { ZERO_ADDRESS } from '../../lib/helpers/constants';
 import { isAddress } from 'ethers/lib/utils';
 import ToggleFilter, { ToggleState } from '../../components/ToggleFilter';
 import SearchFilter, { Search } from '../../components/SearchFilter';
