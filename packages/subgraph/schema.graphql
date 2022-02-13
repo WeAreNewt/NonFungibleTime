@@ -13,7 +13,7 @@ type Nft @entity {
   availabilityFrom: BigInt!
   "nft creator can restrict buyer to a single address"
   allowedBuyer: String!
-  "number of hours"
+  "in seconds"
   duration: BigInt!
   history: [NftStatusChange!]! @derivedFrom(field: "nft")
   forSale: Boolean!
