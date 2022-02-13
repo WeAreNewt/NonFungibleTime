@@ -1,37 +1,58 @@
 import { useQuery } from '@apollo/client';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import useInView from 'react-cool-inview';
 import ClockSpinner from '../../images/clock-loader.webp';
-import CategoryFilter from '../../components/CategoryFilter';
+import CategoryFilter, { ListOption } from '../../components/CategoryFilter';
 import NFTCard from '../../components/NFTCard';
 import { NFTGrid } from '../../components/NFTGrid';
 import { NftsDocument, Nft_Filter, Nft_OrderBy, OrderDirection } from '../../lib/graphql/index';
 import { NFT } from '../../types';
-import { Switch } from '@headlessui/react';
+import { useAppDataProvider } from '../../lib/providers/app-data-provider';
+import { MaxUint256, ZERO_ADDRESS } from '../../lib/helpers/constants';
+import { isAddress } from 'ethers/lib/utils';
+import ToggleFilter, { ToggleState } from '../../components/ToggleFilter';
+import SearchFilter, { Search } from '../../components/SearchFilter';
+import { FieldLabel } from '../../components/FieldLabel';
+import { Listbox, Transition } from '@headlessui/react';
+import { SelectorIcon } from '@heroicons/react/solid';
 
 const PAGE_SIZE = 12;
 
-interface filters  {
-category: string;
-forSale: boolean;
-redeemed: boolean
+interface FormFilter {
+  category: string;
+  forSale: string;
+  redeemed: string;
+  searchType: Search;
+  active: string;
 }
 
-const defaultFilter = {category: 'Show All', forSale: true, redeemed: true}
+const defaultFilter: FormFilter = { category: 'Show All', forSale: ToggleState.Yes, redeemed: ToggleState.All, searchType: Search.Owner, active: "" }
 
 
 export default function Marketplace() {
- 
+  const { currentAccount } = useAppDataProvider();
+  const allowedBuyers = [ZERO_ADDRESS];
+  if (currentAccount) {
+    allowedBuyers.push(currentAccount.toLowerCase())
+  }
   const [canLoadMore, setCanLoadMore] = useState(true);
-  const [filters, setFilters] = useState<filters>(defaultFilter);
-  const {category, forSale, redeemed} = filters;
-  const whereArg = useMemo<Nft_Filter | undefined>(() => {
-    if (category === 'Show All') return {owner_not: "0x0000000000000000000000000000000000000000",forSale,redeemed} as Nft_Filter
-    
-    return {
-      owner_not: "0x0000000000000000000000000000000000000000",category,forSale,redeemed
-    };
-  }, [category,forSale,redeemed]);
+  const [filters, setFilters] = useState<FormFilter>(defaultFilter);
+  const [searchValue, setSearchValue] = useState<string>('')
+  const [searchError, setSearchError] = useState<string | undefined>(undefined)
+
+  const { category, forSale, redeemed } = filters;
+
+  // Generate subgraph query filter from form selections
+  const whereArg = useMemo<Nft_Filter>(() => {
+    const newFilter: Nft_Filter = {
+      category: filters.category !== 'Show All' ? filters.category : undefined,
+      forSale: filters.forSale === ToggleState.Yes ? true : filters.forSale === ToggleState.No ? false : undefined,
+      redeemed: filters.redeemed === ToggleState.Yes ? true : filters.redeemed === ToggleState.No ? false : undefined,
+      owner: filters.searchType === Search.Owner && filters.active ? filters.active : undefined,
+      creator: filters.searchType === Search.Creator && filters.active ? filters.active : undefined,
+    }
+    return (newFilter);
+  }, [filters])
 
   const { data, loading, fetchMore, refetch } = useQuery(NftsDocument, {
     variables: {
@@ -42,14 +63,13 @@ export default function Marketplace() {
     },
   });
 
-  // When category is reset, change this to true,
+  // When filters resets, change this to true
   // so it can recalculate if should paginate or not
   useEffect(() => {
     setCanLoadMore(true);
     refetch()
-  }, [category,forSale,redeemed,refetch]);
+  }, [whereArg, refetch]);
 
-  
   const nfts: NFT[] = data && data.nfts ? data.nfts : [];
   const [nftsShown, setNftsShown] = useState<NFT[]>(nfts);
 
@@ -87,56 +107,81 @@ export default function Marketplace() {
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center mb-10">
           {/** Marketplace Header */}
-          <div className="w-full md:w-2/3 justify-items-start">
+          <div className="w-1/3 justify-items-start">
             <div className="items-center text-gray-900 dark:text-white text-4xl font-extrabold">
               Explore marketplace
             </div>
           </div>
-          <div className="w-full mr-10 md:w-1/3 justify-items-end ">
-            <CategoryFilter onSelect={(category) => {setFilters({...filters,category})
-             
-            }} selected={category} />
-          </div>
-          <div className="flex mt-2 flex-row md:w-1/3 justify-items-end">
-            <p className="mr-4 mt-0.5 ">For sale</p>
-              
-           <Switch
-        checked={forSale}
-        onChange={()=> {setFilters({...filters,forSale: !forSale})
-        
-      }
-      }
-        className={`${forSale? 'bg-indigo-900' : 'bg-indigo-700'}
-          relative inline-flex flex-shrink-0 h-[30px] w-[66px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-      >
-        <span
-          aria-hidden="true"
-          className={`${forSale ? 'translate-x-9' : 'translate-x-0'}
-            pointer-events-none inline-block h-[26px] w-[26px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
-        />
-      </Switch>
+          <div className="w-2/3 justify-items-end">
+            <div className="flex flex-row w-full justify-around">
+              <div className="w-full p-2">
+                <FieldLabel>Category</FieldLabel>
+                <CategoryFilter onSelect={(category) => {
+                  setFilters({ ...filters, category });
+                }} selected={category} />
+              </div>
 
+              <div className="w-2/3 p-2">
+                <FieldLabel>For Sale</FieldLabel>
+                <ToggleFilter onSelect={(forSale) => {
+                  setFilters({ ...filters, forSale });
+                }} selected={forSale} />
+              </div>
+              <div className="w-2/3 p-2">
+                <FieldLabel>Redeemed</FieldLabel>
+                <ToggleFilter onSelect={(redeemed) => {
+                  setFilters({ ...filters, redeemed });
+                }} selected={redeemed} />
+              </div>
+              <div className="w-full p-2">
+                <FieldLabel>Search</FieldLabel>
+                <SearchFilter
+                  onChange={(searchValue) => {
+                    setSearchValue(searchValue)
+                    if (isAddress(searchValue)) {
+                      setFilters({ ...filters, active: searchValue.toLowerCase() })
+                      setSearchError(undefined)
+                    } else {
+                      searchValue.length > 0 ? setSearchError('Not a valid ethereum address') : setSearchError(undefined)
+                      setFilters({ ...filters, active: '' })
+                    }
+                  }} selected={searchValue} searchType={filters.searchType}
+                  error={searchError ? searchError : undefined}
+                />
+              </div>
+              <div className="w-2/3 p-2">
+                <FieldLabel>Search For</FieldLabel>
+                <Listbox value={filters.searchType} onChange={(searchType) => {
+                  setFilters({ ...filters, searchType });
+                }}>
+                  <div className="relative mt-1">
+                    <Listbox.Button className="relative border border-gray-300 w-full py-2 px-4  text-left font-medium bg-white rounded-lg  cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
+                      <span className="block truncate">{filters.searchType}</span>
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <SelectorIcon className="w-5 h-5 text-gray-400" aria-hidden="true" />
+                      </span>
+                    </Listbox.Button>
+                    <Transition
+                      as={Fragment}
+                      leave="transition ease-in duration-100"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                        {
+                          Object.keys(Search).map((search, index) => {
+                            return (
+                              <ListOption key={index} value={search} label={search} />
+                            )
+                          })}
+                      </Listbox.Options>
+                    </Transition>
+                  </div>
+                </Listbox>
+              </div>
+            </div>
           </div>
-      <div className="flex mt-2 flex-row md:w-1/3 justify-items-end">
-            <p className="mr-4 mt-0.5 ">Redeemed </p>
-              
-           <Switch
-        checked={redeemed}
-        onChange={()=> {
-          setFilters({...filters,redeemed: !redeemed})
-         
-      }}
-        className={`${redeemed? 'bg-indigo-900' : 'bg-indigo-700'}
-          relative inline-flex flex-shrink-0 h-[30px] w-[66px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-      >
-        <span
-          aria-hidden="true"
-          className={`${redeemed ? 'translate-x-9' : 'translate-x-0'}
-            pointer-events-none inline-block h-[26px] w-[26px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
-        />
-      </Switch>
 
-          </div>
         </div>
         {loading || !nfts ? (
           <div className="w-1/5 mx-auto p-4 pb-0">
@@ -163,6 +208,6 @@ export default function Marketplace() {
           </>
         )}
       </div>
-    </div>
+    </div >
   );
 }
