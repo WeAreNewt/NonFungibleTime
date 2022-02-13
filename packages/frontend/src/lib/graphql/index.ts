@@ -176,7 +176,7 @@ export type Nft = {
   creator: User;
   currency: PaymentToken;
   description: Scalars['String'];
-  /** number of hours */
+  /** in seconds */
   duration: Scalars['BigInt'];
   forSale: Scalars['Boolean'];
   history: Array<NftStatusChange>;
