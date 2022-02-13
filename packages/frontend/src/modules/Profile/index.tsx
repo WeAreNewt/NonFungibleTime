@@ -50,6 +50,7 @@ export default function Profile() {
   const { data, loading, error } = useSubscription(ProfileNftsDocument, {
     variables: {
       user: sanitizedUser,
+      where:{ owner_not: "0x0000000000000000000000000000000000000000" }
     },
   });
   const categories = ['Minted', 'Owned'];
