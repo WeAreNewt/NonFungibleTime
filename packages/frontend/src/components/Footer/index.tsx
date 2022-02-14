@@ -19,11 +19,11 @@ const textLinks: FooterLink[] = [
   },
   {
     title: 'Privacy Policy',
-    to: 'https://ethlend.sharepoint.com/:w:/s/Projects/ESQrldNcNYVEqZmphDFqFsoBYkHswfX8dJDTknSahgfNjw?e=v8HgfJ',
+    to: '/privacy-policy',
   },
   {
     title: 'Terms & Conditions',
-    to: 'https://ethlend.sharepoint.com/:w:/r/sites/Projects/_layouts/15/Doc.aspx?sourcedoc=%7B1108E258-0D31-46D4-8CBE-4CA9F4EEAC96%7D&file=Terms%20and%20Conditions%20Non-fungible%20time%20%5Brr%20comments%20incorporated%20from%2001.02.2022%5D.docx&nav=eyJjIjoyMTI2ODQ5MzI5fQ&action=default&mobileredirect=true&cid=28ccc981-d2d0-4cce-993e-5c831b8dd38b',
+    to: '/terms-and-conditions',
   },
   {
     title: 'Report bugs',
