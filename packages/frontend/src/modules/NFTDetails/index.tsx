@@ -17,6 +17,7 @@ import { RedeemPanel } from '../../components/RedeemPanel';
 import { BuyingConditionChangePanel } from '../../components/BuyingConditionChangePanel';
 import { MaxUint256, ZERO_ADDRESS } from '../../lib/helpers/constants';
 import Tooltip from '../../components/Tooltip';
+import { TokenIcon } from '@aave/aave-ui-kit';
 
 interface NftState {
   nft?: NFT;
@@ -216,7 +217,7 @@ export default function NFTDetails() {
              * */}
             {!owner ? (
               nft.forSale ? (
-                <div>
+                <div className="pt-4">
                   <BuyPanel nft={nft} setTxStatus={setTxStatus} />
                 </div>
               ) : (
@@ -422,7 +423,8 @@ export default function NFTDetails() {
               {nft.forSale ? <div>
                 <div className="font-semibold">For Sale</div>
                 <div className="font-semibold">
-                  {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}
+                  <div className="inline-block"> {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}</div>
+                  <TokenIcon className="inline-block align-middle pl-2 pb-1" tokenSymbol={nft.currency.symbol} width={20} height={20} />
                 </div>
                 <div className="font-semibold">{nft.allowedBuyer === ZERO_ADDRESS ? 'No Reserved Buyer' : 'Reserved For ' + nft.allowedBuyer}</div>
               </div> : <div className="font-semibold">Not For Sale</div>}
