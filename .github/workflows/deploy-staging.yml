@@ -2,9 +2,7 @@ name: Build and deploy staging
 
 on:
   push:
-    branches: 
-      - main
-      - github-actions-deploy
+    branches: [main]
 
 jobs:
   frontend:

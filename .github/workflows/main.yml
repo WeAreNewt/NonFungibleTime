@@ -9,25 +9,22 @@ on:
 jobs:
   contracts:
     runs-on: ubuntu-latest
-    env:
-      working-directory: ./packages/contracts
+    defaults:
+      run:
+        working-directory: ./packages/contracts
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '14.16.1'
-      - name: Install hardhat
-        run: npm install --save-dev hardhat
-        working-directory: ${{env.working-directory}}
+          cache: 'npm'
+          cache-dependency-path: ./packages/contracts/package-lock.json
       - name: Install packages
-        run: npm install
-        working-directory: ${{env.working-directory}}
+        run: npm ci
       - name: Compile code
         run: npx hardhat compile
-        working-directory: ${{env.working-directory}}
       - name: Run tests
         run: npx hardhat test
-        working-directory: ${{env.working-directory}}
 
   frontend:
     runs-on: ubuntu-latest
