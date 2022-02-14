@@ -1,7 +1,7 @@
 import { useQuery, useSubscription } from '@apollo/client';
 import { ethers, providers } from 'ethers';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { RiskSeverity, TRMScreeningType, User } from '../../types';
+import { RiskSeverity, User } from '../../types';
 import { NetworkConfig, networkConfigs } from '../config';
 import { PaymentToken, PaymentTokensDocument, ProfileNftsDocument } from '../graphql';
 import { ZERO_ADDRESS } from '../helpers/constants';
@@ -31,33 +31,34 @@ export const AppDataProvider: React.FC = ({ children }) => {
   const [trmRisk, setTrmRisk] = useState<RiskSeverity | undefined>(undefined);
 
 
+  // On user address change, run TRM screening
   const trmScreening = useCallback(async () => {
-    const response = await fetch(trmUrl, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + Buffer.from(`${process.env.REACT_APP_TRM_USERNAME}:${process.env.REACT_APP_TRM_PASSWORD}`).toString('base64')
-      },
-      body: JSON.stringify([
-        {
-          address: account,
-          chain: 'ethereum',
-        }
-      ])
-    })
-    const data = await response.json();
-    console.log(data);
-    const ds = data as string[];
-    if (ds.includes(RiskSeverity.SEVERE)) {
-      console.log("SEVERE RISK")
-      setTrmRisk(RiskSeverity.SEVERE);
-    } else {
-      console.log("NON-SEVERE RISK")
-      setTrmRisk(undefined);
+    try {
+      const response = await fetch(trmUrl, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Basic ' + Buffer.from(`${process.env.REACT_APP_TRM_USERNAME}:${process.env.REACT_APP_TRM_PASSWORD}`).toString('base64')
+        },
+        body: JSON.stringify([
+          {
+            address: account,
+            chain: 'ethereum',
+          }
+        ])
+      })
+      const trm = await response.json();
+      console.log(trm);
+      const screening = trm.data as string[];
+      if (screening.includes(RiskSeverity.SEVERE)) {
+        setTrmRisk(RiskSeverity.SEVERE);
+      } else {
+        setTrmRisk(undefined);
+      }
+      console.log(screening);
+    } catch (error) {
+      console.log(`Error fetching TRM screening: ${error}`)
     }
-    const trmEntities = data as TRMScreeningType[];
-    // parseScreening(trmEntities)
-    console.log(trmEntities);
   }, [account])
 
 
