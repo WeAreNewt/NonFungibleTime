@@ -40,14 +40,14 @@ export default function AddressInfo() {
   };
   return (
     <div>
-      <div onClick={onClick} className="w-full flex items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer">
+      <button onClick={onClick} className="w-full flex items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer">
         {account
           ? isCorrectChain
             ? formatEthAddress(account)
             : 'Wrong Network'
           : 'Connect Wallet'}
-      </div>
-      {isOpen && <div className="absolute top-100 w-full flex items-center justify-center px-6 py-1 border text-base font-semibold rounded-md  hover:bg-slate-200 md:py-2 md:text-lg md:px-8 border-1 border-black bg-white text-black cursor-pointer" onClick={() => { disconnect(); setIsOpen(false) }}>Disconnect</div>}
+      </button>
+      {isOpen && <button className="absolute top-100 w-full flex items-center justify-center px-6 py-1 border text-base font-semibold rounded-md  hover:bg-slate-200 md:py-2 md:text-lg md:px-8 border-1 border-black bg-white text-black cursor-pointer" onClick={() => { disconnect(); setIsOpen(false) }}>Disconnect</button>}
     </div>
   );
 }
