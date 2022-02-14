@@ -10,6 +10,7 @@ import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
 import { PriceDisplay } from '../../components/PriceDisplay';
+import { TwitterContainer } from '../../components/TwitterContainer';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument, PaymentToken } from '../../lib/graphql';
 import { isEthAddress, ZERO_ADDRESS } from '../../lib/helpers/base-service';
@@ -21,7 +22,6 @@ import {
 } from '../../lib/helpers/NftCollection';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { NFT } from '../../types';
-
 
 interface NftState {
   nft?: NFT;
@@ -73,13 +73,13 @@ export default function NFTDetails() {
   }
   const { data, loading, error } = useSubscription(NftDocument, {
     variables: {
-      nft: tokenIdSanitized
+      nft: tokenIdSanitized,
     },
   });
 
   // Use subscription data, or fallback to nft passed through useLocation state, or undefined
-  const nft: NFT | undefined = data && data.nft ? data.nft : (state && state.nft ? state.nft : undefined);
-
+  const nft: NFT | undefined =
+    data && data.nft ? data.nft : state && state.nft ? state.nft : undefined;
 
   const fetchURI = async (nft: NFT) => {
     const response = await fetch(nft.tokenURI);
@@ -168,7 +168,7 @@ export default function NFTDetails() {
     }
   };
 
-  // Update nft ownership, svg, and buying conditions 
+  // Update nft ownership, svg, and buying conditions
   useEffect(() => {
     if (nft) {
       nft.owner.id.toLowerCase() === currentAccount?.toLowerCase()
@@ -180,7 +180,7 @@ export default function NFTDetails() {
         forSale: nft.forSale,
         price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
         currency: {
-          ...nft.currency
+          ...nft.currency,
         },
         whitelistedBuyer: nft.allowedBuyer,
       });
@@ -205,23 +205,25 @@ export default function NFTDetails() {
 
   if (!nft) {
     if (error) {
-      return <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-red font-bold text-xl p-20">
-            An Error occured: {error}
+      return (
+        <div className="h-screen">
+          <div className="w-1/3 text-center mx-auto align-middle">
+            <div className="text-red font-bold text-xl p-20">An Error occured: {error}</div>
           </div>
         </div>
-      </div>
+      );
     } else if (loading) {
       return <FaSpinner className="text-indigo-600 text-xl animate-spin inline-block" />;
     } else {
-      return <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-black dark:text-white font-bold text-xl p-20">
-            No NFT found with TokenId {tokenIdSanitized}
+      return (
+        <div className="h-screen">
+          <div className="w-1/3 text-center mx-auto align-middle">
+            <div className="text-black dark:text-white font-bold text-xl p-20">
+              No NFT found with TokenId {tokenIdSanitized}
+            </div>
           </div>
         </div>
-      </div>
+      );
     }
   } else {
     const mintDatetime = new Date(nft.mintTimestamp * 1000);
@@ -436,7 +438,7 @@ export default function NFTDetails() {
                                   >
                                     Profile Link
                                   </label>
-                                  <div className="mt-1 relative rounded-md shadow-sm">
+                                  <div className="mt-1 relative rounded-md shadow-sm flex items-center justify-between gap-4">
                                     <input
                                       disabled={true}
                                       type="text"
@@ -444,6 +446,9 @@ export default function NFTDetails() {
                                       id="price"
                                       className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                       value={window.location.href}
+                                    />
+                                    <TwitterContainer
+                                      content={`I just put my time on the blockchain 👀 who wants to be the first owner of my time: ${window.location.href}`}
                                     />
                                   </div>
                                 </div>
@@ -521,8 +526,8 @@ export default function NFTDetails() {
                       <div>
                         {nft.availabilityFrom > Date.now() / 1000
                           ? new Date(nft.availabilityFrom * 1000).toLocaleString('en-us', {
-                            dateStyle: 'long',
-                          })
+                              dateStyle: 'long',
+                            })
                           : 'Now'}
                       </div>
                     </div>
@@ -532,8 +537,8 @@ export default function NFTDetails() {
                         {nft.availabilityTo === 0
                           ? 'No End Date'
                           : new Date(nft.availabilityTo * 1000).toLocaleString('en-us', {
-                            dateStyle: 'long',
-                          })}
+                              dateStyle: 'long',
+                            })}
                       </div>
                     </div>
                   </div>
