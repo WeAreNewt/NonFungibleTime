@@ -447,7 +447,7 @@ export default function NFTDetails() {
                                       value={window.location.href}
                                     />
                                     <TwitterContainer
-                                      content={`I just put my time on the blockchain 👀 who wants to be the first owner of my time: ${window.location.href}`}
+                                      content={`I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
                                     />
                                   </div>
                                 </div>
