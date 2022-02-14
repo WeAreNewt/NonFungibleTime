@@ -7,21 +7,25 @@ import { Input, Label, Select, baseInputClassNames } from '../../components/Form
 import { TransactionResponse } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from 'ethers';
-import { Category } from '../../types';
+import { Category, NFT } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
-import { required, greaterThan, inBetween, validateDate } from '../../lib/utils/validators'
+import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
+import { useNavigate } from 'react-router-dom';
+import Tooltip from '../Tooltip';
 
-const validateDuration = greaterThan(0)
+const validateDuration = greaterThanOrEqualTo(0.01)
 const validateRoyalty = inBetween(0, 100)
 
 interface Props {
   open: boolean,
-  onClose: () => void
+  onClose: () => void,
+  setProfileMintStatus: (arg0: TxStatus) => void;
+  lastNft: NFT | undefined;
 }
 
-interface TxStatus {
+export interface TxStatus {
   submitted: boolean;
   confirmed: boolean;
   txHash?: string;
@@ -49,7 +53,7 @@ const defaultValues: MintNftParams = {
   royalty: 0,
 }
 
-export default function MintModal({ open, onClose }: Props) {
+export default function MintModal({ open, onClose, setProfileMintStatus, lastNft }: Props) {
 
   const [formNft, setFormNft] = useState<MintNftParams>(defaultValues);
 
@@ -61,6 +65,7 @@ export default function MintModal({ open, onClose }: Props) {
     confirmed: false,
   });
 
+  const navigate = useNavigate();
   const { currentAccount, nftCollectionService, networkConfig } = useAppDataProvider();
   const { library: provider } = useWeb3React();
 
@@ -112,8 +117,10 @@ export default function MintModal({ open, onClose }: Props) {
           value: txData.value ? BigNumber.from(txData.value) : undefined,
         });
         setMintTxStatus({ ...mintTxStatus, submitted: true });
+        setProfileMintStatus({ ...mintTxStatus, submitted: true })
         const receipt = await txResponse.wait(1);
         setMintTxStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
+        setProfileMintStatus({ ...mintTxStatus, confirmed: true, txHash: receipt.transactionHash });
       } catch (error) {
         setMainTxError('Error submitting transaction (check browser console for full error):' + error);
       }
@@ -167,15 +174,26 @@ export default function MintModal({ open, onClose }: Props) {
                   </div>
                 ) : mintTxStatus.confirmed ? (
                   <div className="text-center flex-col">
-                    <div className="font-semibold">Transaction Confirmed</div>
-                    <div className="pt-4">
-                      <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
+                    <div className="font-semibold p-4">Transaction Confirmed</div>
+                    <div className="p-4">
+                      <a target="_blank" rel="noopener noreferrer" className="cursor-pointer" href={networkConfig.blockExplorer + '/tx/' + mintTxStatus.txHash}>
                         View Transaction <FaExternalLinkAlt className="inline-block" />
                       </a>
                     </div>
+                    {lastNft && (
+                      <div className="p-4">
+                        <button
+                          type="button"
+                          className="disabled:opacity-50 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:w-auto sm:text-sm"
+                          onClick={() => navigate('/nft/' + lastNft.tokenId)}
+                        >
+                          View NFT
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="space-y-5">
+                  <div className="space-y-3">
                     <div className="">
                       <div>
                         <Label htmlFor="name">Name</Label>
@@ -194,7 +212,10 @@ export default function MintModal({ open, onClose }: Props) {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="description">Description</Label>
+                      <div className="flex gap-3 mb-2 align-center">
+                        <Label htmlFor="description">Description</Label>
+                        <Tooltip content="If your time results in a deliverable, please state in the Description where the time buyer has personal and/or commercial rights to it" />
+                      </div>
                       <Input
                         type="text"
                         name="description"
@@ -228,7 +249,7 @@ export default function MintModal({ open, onClose }: Props) {
                             <option key={index}>{category}</option>
                           ))}
                         </Select>
-                        {errors.category && <span className="absolute text-xs text-red-500 pt-1">{errors.category}</span>}
+                        {errors.category && <span className="text-xs text-red-500 pt-1">{errors.category}</span>}
                       </div>
                       <div className="w-1/2">
                         <Label>Number Of Hours</Label>
@@ -240,7 +261,7 @@ export default function MintModal({ open, onClose }: Props) {
                           value={formNft.duration.toString()}
                           min={0}
                           onChange={(e) => {
-                            const duration = parseInt(e.target.value)
+                            const duration = Number(e.target.value)
                             setFormNft({ ...formNft, duration })
                             setErrors({
                               ...errors,
@@ -355,9 +376,12 @@ export default function MintModal({ open, onClose }: Props) {
                       {errors.date && <span className="text-xs text-red-500">{errors.date}</span>}
                     </div>
                     <div>
-                      <Label className="block text-sm font-medium text-gray-700">
-                        Royalties (%)
-                      </Label>
+                      <div className="flex gap-3 mb-2 align-center">
+                        <Label className="block text-sm font-medium text-gray-700">
+                          Royalties (%)
+                        </Label>
+                        <Tooltip content="Your share of secondary sales: every time your time is resold, you receive royalties on the sale. This only applies to sales on our marketplace and any other EIP-2981 compliant marketplace" />
+                      </div>
                       <Input
                         type="number"
                         name="royalty"
@@ -382,7 +406,7 @@ export default function MintModal({ open, onClose }: Props) {
                 )}
               </div>
             </div>
-            {!currentAccount && <span className="absolute text-xs text-red-500 pt-1">No account connected</span>}
+            {!currentAccount && <span className="text-xs text-red-500 pt-1">No account connected</span>}
             <div className="sm:flex sm:flex-row-reverse pt-5">
               {!mintTxStatus.submitted && !mintTxStatus.confirmed && (
                 <button

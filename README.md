@@ -10,15 +10,26 @@ While freelance services is the initial use case for Non Fungible Time, this pri
 
 ## Contents
 
-1. [Project Details](#about)
-   - [About](#about)
-   - [Infrastructure](#infrastructure)
-   - [Buidling](#buidling)
-2. [Smart Contracts](#smart-contracts)
-   - [NonFungibleTimeCollection](#NonFungibleTimeCollection)
-   - [SvgGenerator](#SvgGenerator)
-3. [Frontend](#frontend)
-4. [Subgraph](#subgraph)
+- [Non Fungible Time](#non-fungible-time)
+  - [Contents](#contents)
+  - [Project Details](#project-details)
+    - [About](#about)
+    - [Infrastructure](#infrastructure)
+    - [Buidling](#buidling)
+  - [Smart Contracts](#smart-contracts)
+    - [NonFungibleTimeCollection](#nonfungibletimecollection)
+      - [mint()](#mint)
+      - [buyToken()](#buytoken)
+      - [changeTokenBuyingConditions()](#changetokenbuyingconditions)
+      - [redeem()](#redeem)
+      - [toggleCurrencyAllowance()](#togglecurrencyallowance)
+      - [tokenURI()](#tokenuri)
+      - [tokens()](#tokens)
+    - [SvgGenerator](#svggenerator)
+  - [Frontend](#frontend)
+  - [Subgraph](#subgraph)
+  - [Audit](#audit)
+  - [License](#license)
 
 ## Project Details
 
@@ -190,3 +201,11 @@ The playground links below allow you to view and query the subgraph schema direc
 - [Polygon Mainnet Subgraph](https://thegraph.com/hosted-service/subgraph/wearenewt/non-fungible-time-polygon)
 
 [More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/subgraph/README.md)
+
+## Audit
+
+You can find the full audit report from Peckshield under the [audits folder]((https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audits)) and [here](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audit/PeckShield-Audit-Report-TimeNFT-v1.0rc.pdf)
+
+## License
+
+[Link to code license](LICENSE.md)
