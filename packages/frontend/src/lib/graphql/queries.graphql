@@ -61,3 +61,12 @@ subscription ProfileNfts($user: ID!) {
     }
   }
 }
+
+query PaymentTokens {
+  paymentTokens(where: { acceptable: true }) {
+    id
+    decimals
+    acceptable
+    symbol
+  }
+}
