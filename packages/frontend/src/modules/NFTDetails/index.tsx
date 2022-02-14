@@ -10,6 +10,7 @@ import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
 import { PriceDisplay } from '../../components/PriceDisplay';
+import { TwitterContainer } from '../../components/TwitterContainer';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument, PaymentToken } from '../../lib/graphql';
 import { isEthAddress, ZERO_ADDRESS } from '../../lib/helpers/base-service';
@@ -444,6 +445,9 @@ export default function NFTDetails() {
                                       id="price"
                                       className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                       value={window.location.href}
+                                    />
+                                    <TwitterContainer
+                                      content={`I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
                                     />
                                   </div>
                                 </div>
