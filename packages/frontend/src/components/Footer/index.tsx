@@ -66,10 +66,10 @@ export default function Footer() {
 
   return (
     <footer
-      className="fixed bottom-0 md:relative w-full text-white"
+      className="w-full text-white"
       style={{ backgroundColor: '#1F2937' }}
     >
-      <div className="flex flex-col lg:flex-row p-4 lg:px-20 sm:h-28 h-60">
+      <div className="flex flex-col lg:flex-row p-2 lg:px-20 md:py-6">
         <section className="flex items-center justify-center lg:justify-start w-full lg:w-3/4 h-full">
           <ul className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-10 items-center">
             {textLinks.map((link) => {
@@ -88,7 +88,7 @@ export default function Footer() {
             })}
           </ul>
         </section>
-        <section className="flex flex-row items-center justify-center lg:justify-end space-x-10 w-full lg:w-1/4 h-full">
+        <section className="flex flex-row items-center justify-center lg:justify-end space-x-10 w-full lg:w-1/4 h-full mt-3 lg:mt-0">
           {logoLinks.map((logo) => {
             return (
               <a href={logo.to} key={logo.to} target="_blank" rel="noopener noreferrer">

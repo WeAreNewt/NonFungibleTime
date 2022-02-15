@@ -39,6 +39,7 @@
     "@openzeppelin/contracts-upgradeable": "^4.4.2",
     "@primitivefi/hardhat-dodoc": "^0.1.3",
     "base64-sol": "^1.1.0",
+    "defender-relay-client": "^1.14.0",
     "solidity-json-writer": "^1.1.0"
   }
 }
