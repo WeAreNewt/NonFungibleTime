@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatEthAddress } from '../../lib/helpers/format';
 import { useWeb3, WalletType } from '../../lib/providers/web3-provider';
+import ConnectModal from '../ConnectModal';
 
 export default function AddressInfo() {
   const { connect, account, isCorrectChain, active, requestToSwitchChain, disconnect } = useWeb3();
   const [isOpen, setIsOpen] = useState(false)
+  const [ connectModalOpen, setConnectModalOpen ] = useState(false)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,9 +40,16 @@ export default function AddressInfo() {
       alert('Error on connecting wallet: ' + (err as Error).message);
     }
   };
+  
+  const onClickModalOpen = () => {
+    if(account) setIsOpen(true)
+    else setConnectModalOpen(true)
+  }
+
   return (
     <div>
-      <button onClick={onClick} className="w-full flex items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer">
+      <ConnectModal open={connectModalOpen} onClose={() => setConnectModalOpen(false)} />
+      <button onClick={onClickModalOpen} className="w-full flex items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer">
         {account
           ? isCorrectChain
             ? formatEthAddress(account)

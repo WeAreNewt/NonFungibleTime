@@ -2,20 +2,31 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 import React, { useCallback, useContext, useEffect } from 'react';
 import * as z from 'zod';
 import { addChainParameters, ChainId } from '../config';
 
 const WALLET_TYPE_STORAGE_KEY = 'WALLET_TYPE';
 
-export const WalletType = z.enum(['injected']);
+export const WalletType = z.enum(['injected', 'walletConnect']);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type WalletType = z.infer<typeof WalletType>;
 
 export const injected = new InjectedConnector({});
 
+export const walletConnect = new WalletConnectConnector({
+  rpc: {
+    80001: 'https://polygon-mumbai.g.alchemy.com/v2/demo',
+    137: 'https://polygon-rpc.com/'
+  },
+  qrcode: true,
+  bridge: 'https://bridge.walletconnect.org'
+});
+
 export const connectors: Record<WalletType, AbstractConnector> = {
   injected,
+  walletConnect
   // Add more supported connectors
 };
 
@@ -43,6 +54,12 @@ export const Web3DataProvider: React.FC = ({ children }) => {
       switch (walletType) {
         case WalletType.Values.injected:
           await activate(injected, (error) => {
+            console.log('Error: ', error);
+          });
+          localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
+          break;
+        case WalletType.Values.walletConnect:
+          await activate(walletConnect, (error) => {
             console.log('Error: ', error);
           });
           localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
