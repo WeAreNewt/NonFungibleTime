@@ -1,9 +1,10 @@
-import { useSubscription } from '@apollo/client';
+import { useQuery, useSubscription } from '@apollo/client';
 import { ethers, providers } from 'ethers';
 import React, { useContext } from 'react';
 import { User } from '../../types';
 import { NetworkConfig, networkConfigs } from '../config';
-import { ProfileNftsDocument } from '../graphql';
+import { PaymentToken, PaymentTokensDocument, ProfileNftsDocument } from '../graphql';
+import { ZERO_ADDRESS } from '../helpers/constants';
 import { NftCollectionService } from '../helpers/NftCollection';
 import { useWeb3 } from './web3-provider';
 
@@ -14,7 +15,7 @@ export interface AppDataContextType {
   nftCollectionService: NftCollectionService;
   userData: User | undefined;
   loadingUserData: boolean;
-  //allowedCurrencies: string[];
+  availablePaymentTokens: Record<string, PaymentToken>;
 }
 
 const AppDataContext = React.createContext<AppDataContextType>({} as AppDataContextType);
@@ -47,6 +48,29 @@ export const AppDataProvider: React.FC = ({ children }) => {
   });
   const userData = data && data.user ? data.user : undefined;
 
+
+  // Refresh every 5 minutes
+  const { data: paymentTokenData } = useQuery(PaymentTokensDocument, {
+    pollInterval: 300000,
+  });
+
+
+  // Hardcoded default
+  let availablePaymentTokens: Record<string, PaymentToken> = {
+    MATIC: {
+      acceptable: true,
+      id: ZERO_ADDRESS,
+      symbol: 'MATIC',
+      decimals: 18,
+    },
+  };
+
+  if (paymentTokenData) {
+    availablePaymentTokens = Object.assign({}, ...paymentTokenData.paymentTokens.map((token) => (
+      { [token.symbol]: token }
+    )))
+  }
+
   return (
     <AppDataContext.Provider
       value={{
@@ -56,6 +80,7 @@ export const AppDataProvider: React.FC = ({ children }) => {
         nftCollectionService,
         userData,
         loadingUserData: loading,
+        availablePaymentTokens,
       }}
     >
       {children}

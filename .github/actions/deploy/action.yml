@@ -1,0 +1,45 @@
+name: Deploy
+description: Deploy frontend to s3 and invalidate Cloudfront cache
+inputs:
+  S3_BUCKET:
+    description: S3 bucket to push to
+    required: true
+  S3_PREFIX:
+    description: S3 bucket prefix
+    required: true
+  AWS_ACCESS_KEY_ID:
+    description: AWS access key id
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: AWS secret access key
+    required: true
+  AWS_ROLE_TO_ASSUME:
+    description: AWS IAM role to assume
+    required: true
+  AWS_REGION:
+    description: AWS region
+    required: true
+  WORK_DIR: 
+    description: Path to source code
+    required: true
+runs:
+  using: "composite"
+  steps:  
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: "${{ inputs.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ inputs.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: "${{ inputs.AWS_REGION }}"
+        role-duration-seconds: 600
+        role-session-name: "nftime-deploy"
+    - name: Upload build to S3
+      shell: sh
+      working-directory: ${{inputs.WORK_DIR}}
+      run: |
+        aws s3 sync --quiet --only-show-errors --delete \
+        ./build 's3://${{inputs.S3_BUCKET}}/${{inputs.S3_PREFIX}}'
+    - name: Invalidate Cloudfront cache
+      shell: sh
+      working-directory: ./
+      run: ./scripts/cache_invalidation.sh '${{inputs.S3_BUCKET}}' '/${{inputs.S3_PREFIX}}/*'

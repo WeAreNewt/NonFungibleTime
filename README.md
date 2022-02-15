@@ -10,15 +10,26 @@ While freelance services is the initial use case for Non Fungible Time, this pri
 
 ## Contents
 
-1. [Project Details](#about)
-   - [About](#project-description)
-   - [Infrastructure](#infrastructure)
-   - [Buidling](#buidling)
-2. [Smart Contracts](#smart-contracts)
-   - [NonFungibleTimeCollection](#NonFungibleTimeCollection)
-   - [SvgGenerator](#svgGenerator)
-3. [Frontend](#frontend)
-4. [Subgraph](#subgraph)
+- [Non Fungible Time](#non-fungible-time)
+  - [Contents](#contents)
+  - [Project Details](#project-details)
+    - [About](#about)
+    - [Infrastructure](#infrastructure)
+    - [Buidling](#buidling)
+  - [Smart Contracts](#smart-contracts)
+    - [NonFungibleTimeCollection](#nonfungibletimecollection)
+      - [mint()](#mint)
+      - [buyToken()](#buytoken)
+      - [changeTokenBuyingConditions()](#changetokenbuyingconditions)
+      - [redeem()](#redeem)
+      - [toggleCurrencyAllowance()](#togglecurrencyallowance)
+      - [tokenURI()](#tokenuri)
+      - [tokens()](#tokens)
+    - [SvgGenerator](#svggenerator)
+  - [Frontend](#frontend)
+  - [Subgraph](#subgraph)
+  - [Audit](#audit)
+  - [License](#license)
 
 ## Project Details
 
@@ -43,6 +54,8 @@ Given the modular nature of smart contracts, Time NFTs can be integrated, enhanc
 ## Smart Contracts
 
 The smart contracts store the NFT collection (ERC-721) on the blockchain - with the reference implementation being deployed to the Polygon network. This package uses the hardhat framework for contract development and deployment.
+    
+### NonFungibleTimeCollection
 
 The [NonFungibleTimeCollection.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/NonFungibleTimeCollection.sol) contract defines the Time NFT collection
 
@@ -151,8 +164,10 @@ Returns token object for a specified
 |   13    | string  |                           Category label, defines the type of service being tokenized.                            |
 
 </details>
+    
+### SvgGenerator
 
-The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/SvgGenerator.sol) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
+The [SvgGenerator.sol](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/contracts/svg-generators) generates and stores the on-chain svg for each NFT, which is updated once an NFT is redeemed
 
 To generate contract abis and typechain artifacts:
 
@@ -161,7 +176,7 @@ npm install
 npx hardhat compile
 ```
 
-[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/README.md)
+[More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/docs/NonFungibleTimeCollection.md)
 
 <br />
 
@@ -186,3 +201,11 @@ The playground links below allow you to view and query the subgraph schema direc
 - [Mumbai Subgraph](https://thegraph.com/hosted-service/subgraph/wearenewt/non-fungible-time-mumbai)
 
 [More Info](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/subgraph/README.md)
+
+## Audit
+
+You can find the full audit report from Peckshield under the [audits folder]((https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audits)) and [here](https://github.com/WeAreNewt/NonFungibleTime/blob/main/packages/contracts/audit/PeckShield-Audit-Report-TimeNFT-v1.0rc.pdf)
+
+## License
+
+[Link to code license](LICENSE.md)

@@ -16,7 +16,7 @@ export default function NFTCard({ nft }: NftCardProps) {
 
   return (
     <div
-      className="bg-white dark:bg-black rounded-lg shadow-lg p-5 cursor-pointer space-y-2 dark:border dark:border-slate-500"
+      className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-5 cursor-pointer space-y-2"
       onClick={() =>
         navigate('/nft/' + nft.tokenId, {
           state: {
@@ -37,17 +37,10 @@ export default function NFTCard({ nft }: NftCardProps) {
         {nft.description}
       </div>
       {/** Pricing / Status */}
-      {nft.redeemed ? (
-        <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
-          Redeemed
-        </div>
-      ) : !nft.forSale ? (
-        <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
+      {nft.forSale ?
+        <PriceDisplay amount={nft.price} token={nft.currency} /> : <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
           Not for sale
-        </div>
-      ) : (
-        <PriceDisplay amount={nft.price} currency={nft.currency} />
-      )}
+        </div>}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { NonFungibleTimeCollection } from './typechain/NonFungibleTimeCollection';
 import { NonFungibleTimeCollection__factory } from './typechain/factory/NonFungibleTimeCollection__factory';
 import { BigNumber, providers } from 'ethers';
-import BaseService, { ZERO_ADDRESS, SUPER_BIG_ALLOWANCE_NUMBER } from '../base-service';
+import BaseService from '../base-service';
 import {
   eEthereumTxType,
   EthereumTransactionTypeExtended,
@@ -9,7 +9,8 @@ import {
   DEFAULT_NULL_VALUE_ON_TX,
   isEthAddress,
 } from '../base-service';
-import { ERC20Service, IERC20ServiceInterface } from '../IERC20';
+import { ERC20Service, ERC20ServiceInterface } from '../ERC20';
+import { MAX_ALLOWANCE, ZERO_ADDRESS } from '../constants';
 
 export type MintParamsType = {
   userAddress: string;
@@ -99,10 +100,9 @@ export interface NftCollectionInterface {
 
 export class NftCollectionService
   extends BaseService<NonFungibleTimeCollection>
-  implements NftCollectionInterface
-{
+  implements NftCollectionInterface {
   readonly collectionAddress: string;
-  readonly erc20Service: IERC20ServiceInterface;
+  readonly erc20Service: ERC20ServiceInterface;
 
   constructor(provider: providers.Provider, collectionAddress?: string) {
     super(provider, NonFungibleTimeCollection__factory);
@@ -176,7 +176,7 @@ export class NftCollectionService
       const txs: EthereumTransactionTypeExtended[] = [];
 
       // Check if collection is approved to spend the purchase currency
-      const { isApproved, approve }: IERC20ServiceInterface = this.erc20Service;
+      const { isApproved, approve }: ERC20ServiceInterface = this.erc20Service;
 
       const approved = await isApproved({
         token: currency,
@@ -190,7 +190,7 @@ export class NftCollectionService
           user: userAddress,
           token: currency,
           spender: this.collectionAddress,
-          amount: SUPER_BIG_ALLOWANCE_NUMBER,
+          amount: MAX_ALLOWANCE,
         });
         txs.push(approveTx);
       }

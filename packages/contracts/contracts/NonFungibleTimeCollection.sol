@@ -98,6 +98,7 @@ contract NonFungibleTimeCollection is IERC2981, ERC721Upgradeable, OwnableUpgrad
         _transferOwnership(owner);
         if (useNativeCurrency) {
             isCurrencyAllowed[address(0)] = true;
+            emit CurrencyAllowanceToggled(address(0));
         }
         svgGenerator = svgGeneratorContract;
     }
