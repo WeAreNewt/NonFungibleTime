@@ -4,6 +4,7 @@ import twitter from '../../images/twitter-logo.png';
 import github from '../../images/github-logo.png';
 import etherscan from '../../images/etherscan-logo.png';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
+import { Link } from 'react-router-dom';
 
 interface FooterLink {
   title: string;
@@ -19,11 +20,11 @@ const textLinks: FooterLink[] = [
   },
   {
     title: 'Privacy Policy',
-    to: 'https://ethlend.sharepoint.com/:w:/s/Projects/ESQrldNcNYVEqZmphDFqFsoBYkHswfX8dJDTknSahgfNjw?e=v8HgfJ',
+    to: '/privacy-policy',
   },
   {
     title: 'Terms & Conditions',
-    to: 'https://ethlend.sharepoint.com/:w:/r/sites/Projects/_layouts/15/Doc.aspx?sourcedoc=%7B1108E258-0D31-46D4-8CBE-4CA9F4EEAC96%7D&file=Terms%20and%20Conditions%20Non-fungible%20time%20%5Brr%20comments%20incorporated%20from%2001.02.2022%5D.docx&nav=eyJjIjoyMTI2ODQ5MzI5fQ&action=default&mobileredirect=true&cid=28ccc981-d2d0-4cce-993e-5c831b8dd38b',
+    to: '/terms-and-conditions',
   },
   {
     title: 'Report bugs',
@@ -65,15 +66,14 @@ export default function Footer() {
   ];
 
   return (
-    <footer
-      className="w-full text-white"
-      style={{ backgroundColor: '#1F2937' }}
-    >
+    <footer className="w-full text-white bg-gray-800 dark:bg-gray-900">
       <div className="flex flex-col lg:flex-row p-2 lg:px-20 md:py-6">
         <section className="flex items-center justify-center lg:justify-start w-full lg:w-3/4 h-full">
           <ul className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-10 items-center">
             {textLinks.map((link) => {
-              return (
+              const outerLink = link.to.substring(0, 5) === 'https'
+              return outerLink ? 
+              (
                 <li key={link.title}>
                   <a
                     className="hover:text-slate-300"
@@ -84,7 +84,18 @@ export default function Footer() {
                     {link.title}
                   </a>
                 </li>
-              );
+              ) :
+              (
+                <li key={link.title}>
+                  <Link 
+                    to={link.to}
+                    title={link.title}
+                    className="hover:text-slate-300"
+                  >
+                    {link.title}
+                  </Link>
+                </li>
+              )
             })}
           </ul>
         </section>

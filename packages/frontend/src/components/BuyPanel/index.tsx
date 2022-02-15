@@ -98,7 +98,7 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
     if (!transaction || balance === undefined) {
         return (
             <div className="w-1/5 mx-auto p-4 pb-0">
-                <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
             </div>
         )
     } else {
