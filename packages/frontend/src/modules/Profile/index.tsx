@@ -60,7 +60,7 @@ export default function Profile() {
     },
   });
 
-  const categories = ['Minted', 'Owned'];
+  const categories = ['Created', 'Collected'];
   // Use app-data-provider for pre-loaded data if user if profile owner, otherwise use separate subscription
   const user: User | undefined = owner ? userData : (data && data.user ? data.user : undefined);
   const userLoading: boolean = owner ? loadingUserData : loading;
