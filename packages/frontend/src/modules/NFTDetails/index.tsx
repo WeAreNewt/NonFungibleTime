@@ -208,7 +208,7 @@ export default function NFTDetails() {
           {/** Column 1: NFT Image + buy/sell/redeem options */}
           <div className="flex w-full sm:w-1/3 md:w-1/4 flex-col gap-5 ">
             <div className="w-full bg-white rounded-md border border-gray-300">
-              <img alt="token uri" src={uri} />
+              <object type="image/svg+xml" data={uri} aria-label="Animated SVG"></object>
             </div>
             {/** If redeemed -> show redeemed message
              *   if not redeemed -> display panel based on nft ownership
