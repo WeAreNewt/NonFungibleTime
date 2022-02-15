@@ -7,3 +7,27 @@ body,
 #root {
   height: 100%;
 }
+
+@layer utilities {
+  .terms-style p,h2,h3{
+    margin-top: 1.25rem;
+  }
+
+  .terms-style h2 b{
+    margin-left: 1.25rem;
+  }
+
+  .terms-style ol ol h3 b{
+    margin-left: 1.25rem;
+  }
+
+  .terms-style ol ol h3{
+    margin-left: 1.25rem;
+  }
+
+  .terms-style ol ul {
+    list-style-type: disc;
+    margin-left: 3rem;
+    margin-top: 1.5rem;
+  }
+}
