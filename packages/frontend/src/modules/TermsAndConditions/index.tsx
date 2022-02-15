@@ -325,13 +325,13 @@ export default function TermsAndConditions() {
             through the Services has been used in a way that violates your copyright, please report this by contacting our 
             designated DMCA agent at:  
           </p>
-          <p>
-            Avara UI Labs Ltd. 
-            Walkers Corporate Limited 
-            190 Elgin Avenue, George Town 
-            Grand Cayman KY1-9008, Cayman Islands  
-            Attn: Legal Department  
-            Email: IP@avaralabsui.com. 
+          <p className="flex flex-col">
+            <span>Avara UI Labs Ltd. </span>
+            <span>Walkers Corporate Limited </span>
+            <span>190 Elgin Avenue, George Town</span>
+            <span>Grand Cayman KY1-9008, Cayman Islands</span>
+            <span>Attn: Legal Department </span>
+            <span>Email: IP@avaralabsui.com.</span>
           </p>
           <p>
             Please be sure to include all information required by the DMCA. If you do not, we may ignore your takedown request and 
