@@ -183,14 +183,14 @@ export default function NFTDetails() {
 
                     {txStatus.submitted ? (
                       <div className="text-center flex-col p-4">
-                        <div className="font-semibold">Transaction Submitted</div>
+                        <div className="font-semibold">Transaction Submitted 👀</div>
                         <div className="w-1/5 mx-auto p-4 pb-0">
                           <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
                         </div>
                       </div>
                     ) : txStatus.confirmed && (
                       <div className="text-center flex-col">
-                        <div className="font-semibold">Transaction Confirmed</div>
+                        <div className="font-semibold">Transaction Confirmed 🥳🎉</div>
                         <div className="pt-4">
                           <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + txStatus.txHash}>
                             View Transaction <FaExternalLinkAlt className="inline-block" />
