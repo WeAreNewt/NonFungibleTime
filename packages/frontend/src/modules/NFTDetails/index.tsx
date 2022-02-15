@@ -183,7 +183,7 @@ export default function NFTDetails() {
 
                     {txStatus.submitted ? (
                       <div className="text-center flex-col p-4">
-                        <div className="font-semibold">Transaction Submitted</div>
+                        <div className="font-semibold">Transaction Submitted 👀</div>
                         <div className="w-1/5 mx-auto p-4 pb-0">
                           <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
                         </div>
