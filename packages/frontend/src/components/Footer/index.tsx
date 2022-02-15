@@ -4,6 +4,7 @@ import twitter from '../../images/twitter-logo.png';
 import github from '../../images/github-logo.png';
 import etherscan from '../../images/etherscan-logo.png';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
+import { Link } from 'react-router-dom';
 
 interface FooterLink {
   title: string;
@@ -73,7 +74,9 @@ export default function Footer() {
         <section className="flex items-center justify-center lg:justify-start w-full lg:w-3/4 h-full">
           <ul className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-10 items-center">
             {textLinks.map((link) => {
-              return (
+              const outerLink = link.to.substring(0, 5) === 'https'
+              return outerLink ? 
+              (
                 <li key={link.title}>
                   <a
                     className="hover:text-slate-300"
@@ -84,7 +87,18 @@ export default function Footer() {
                     {link.title}
                   </a>
                 </li>
-              );
+              ) :
+              (
+                <li key={link.title}>
+                  <Link 
+                    to={link.to}
+                    title={link.title}
+                    className="hover:text-slate-300"
+                  >
+                    {link.title}
+                  </Link>
+                </li>
+              )
             })}
           </ul>
         </section>
