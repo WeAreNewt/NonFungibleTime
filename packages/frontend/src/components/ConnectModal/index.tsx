@@ -51,7 +51,7 @@ export default function ConnectModal({ open, onClose } : Props) {
       role="dialog"
       aria-modal="true"
     >
-      <div className="rounded-lg bg-white min-w-[500px] min-h-[300px] p-2 flex flex-col">
+      <div className="rounded-lg bg-white w-[90%] sm:w-[500px] min-h-[300px] p-2 flex flex-col">
         <button className="ml-auto" onClick={onClose}>X</button>
         <h2 className="text-lg leading-6 font-semibold text-gray-900 self-center">Connect Your Wallet</h2>
         <div className="flex items-center justify-center mt-auto mb-auto gap-10">
