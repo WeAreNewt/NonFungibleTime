@@ -1,6 +1,6 @@
 export default function TermsAndConditions() {
   return (
-    <main className="terms-style px-10 md:px-20 lg:px-[15rem] xl:px-[25rem] py-10">
+    <main className="terms-style px-10 md:px-20 lg:px-[15rem] xl:px-[25rem] py-10 dark:text-white">
       <h1 className="w-full flex justify-center text-lg mb-5"><b>NEWT: AIKA - TERMS OF SERVICE </b></h1>
       <span >Effective Date: February 15, 2022</span>
       <ol>
