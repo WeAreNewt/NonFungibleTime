@@ -119,13 +119,16 @@ export default function NFTDetails() {
       </div>
     } else if (loading) {
       return <div className="w-1/5 mx-auto p-4 pb-0">
-        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
       </div>;
     } else {
       return <div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
           <div className="text-black dark:text-white font-bold text-xl p-20">
             No NFT found with TokenId {tokenIdSanitized}
+          </div>
+          <div className="text-black dark:text-white font-bold text-xl p-20">
+            If this is a new mint, it may take time to be indexed by the subgraph
           </div>
         </div>
       </div>
@@ -185,7 +188,7 @@ export default function NFTDetails() {
                       <div className="text-center flex-col p-4">
                         <div className="font-semibold">Transaction Submitted 👀</div>
                         <div className="w-1/5 mx-auto p-4 pb-0">
-                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                         </div>
                       </div>
                     ) : txStatus.confirmed && (
@@ -242,7 +245,7 @@ export default function NFTDetails() {
                 {ownerSelectedMode === 'redeem' ? (
                   (nft.redeemed ? <div className="text-center p-4 font-semibold">This NFT has been redeemed</div> : <RedeemPanel nft={nft} setTxStatus={setTxStatus} />)
                 ) : (
-                  <BuyingConditionChangePanel nft={nft} setTxStatus={setTxStatus} />
+                  <BuyingConditionChangePanel nft={nft} setTxStatus={setTxStatus} tokenId={nft.tokenId} />
                 )}
               </div>
             )}
