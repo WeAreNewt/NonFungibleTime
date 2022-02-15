@@ -152,7 +152,7 @@ export default function Profile() {
 
   // If the path contains a valid ethereum address, display profile data
   return (
-    <div className="bg-slate-100 dark:bg-black">
+    <div className="bg-slate-100 dark:bg-gray-800">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="p-4 md:p-10">
           <div className="flex flex-col gap-4 md:flex-row justify-between items-center">

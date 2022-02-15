@@ -65,10 +65,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer
-      className="w-full text-white"
-      style={{ backgroundColor: '#1F2937' }}
-    >
+    <footer className="w-full text-white bg-gray-800 dark:bg-gray-900">
       <div className="flex flex-col lg:flex-row p-2 lg:px-20 md:py-6">
         <section className="flex items-center justify-center lg:justify-start w-full lg:w-3/4 h-full">
           <ul className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-10 items-center">
