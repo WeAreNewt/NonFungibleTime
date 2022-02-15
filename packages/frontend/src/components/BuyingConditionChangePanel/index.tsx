@@ -12,7 +12,9 @@ import { NFT } from "../../types";
 import { Input, Select } from "../Forms";
 
 interface BuyingConditionChangePanelProps {
-    nft: NFT;
+    tokenId: number;
+    nft?: NFT;
+    disableForSale?: boolean;
     setTxStatus: (arg0: TxStatus) => void;
 }
 
@@ -23,7 +25,7 @@ interface BuyingConditions {
     reservedBuyer: string;
 }
 
-export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingConditionChangePanelProps) {
+export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableForSale }: BuyingConditionChangePanelProps) {
     const { library: provider } = useWeb3React();
     const { currentAccount, nftCollectionService, availablePaymentTokens } = useAppDataProvider();
     // TO-DO: Condense like MintModal
@@ -31,17 +33,19 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
     const [mainTxError, setMainTxError] = useState<string | undefined>(undefined);
     const [reservedBuyer, setreservedBuyer] = useState<boolean>(false);
     const [buyingConditions, setBuyingConditions] = useState<BuyingConditions>({
-        forSale: nft.forSale,
-        price: Number(formatUnits(nft.price.toString(), nft.currency.decimals)),
-        token: {
+        forSale: nft ? nft.forSale : true,
+        price: nft ? Number(formatUnits(nft.price.toString(), nft.currency.decimals)) : 0,
+        token: nft ? {
             ...nft.currency
+        } : {
+            ...Object.values(availablePaymentTokens)[0]
         },
-        reservedBuyer: nft.allowedBuyer,
+        reservedBuyer: nft ? nft.allowedBuyer : ZERO_ADDRESS,
     })
 
     // Trigger changeBuyingConditions transaction
     const changeBuyingConditions = async () => {
-        if (nft && currentAccount && buyingConditions) {
+        if (currentAccount && buyingConditions) {
             if (isAddress(buyingConditions.reservedBuyer)) {
                 const formattedPrice = parseUnits(
                     buyingConditions.price.toString(),
@@ -49,7 +53,7 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
                 );
                 const input: ChangeBuyingConditionsParamsType = {
                     userAddress: currentAccount,
-                    tokenId: nft.tokenId,
+                    tokenId: tokenId,
                     currency: buyingConditions.token.id,
                     price: formattedPrice,
                     allowedBuyer: buyingConditions.reservedBuyer,
@@ -84,7 +88,7 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
     return (
         <div className="flex flex-col">
             {/** For sale toggle */}
-            <label className="relative flex justify-between items-center p-2 text-xl">
+            {!disableForSale && <label className="relative flex justify-between items-center p-2 text-xl">
                 For Sale
                 <div
                     className={classNames("md:w-14 md:h-7 w-12 h-6 flex items-center rounded-full p-1 cursor-pointer", { "bg-gray-300": !buyingConditions.forSale }, { "bg-indigo-500": buyingConditions.forSale })}
@@ -101,7 +105,7 @@ export function BuyingConditionChangePanel({ nft, setTxStatus }: BuyingCondition
                         }
                     />
                 </div>
-            </label>
+            </label>}
             {buyingConditions.forSale && <div>
                 <label className="relative flex justify-between items-center p-2 text-xl">
                     Reserve for buyer
