@@ -144,7 +144,7 @@ export default function NFTDetails() {
       });
     }
     return (
-      <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-black">
+      <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-gray-800">
         {/* <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" /> */}
 
         <Dialog
@@ -375,7 +375,7 @@ export default function NFTDetails() {
 
             <div className="flex flex-col">
               <HeadingSeparator>Description</HeadingSeparator>
-              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500 pb-5">
+              <div className="text-sm leading-5 text-gray-900 dark:text-gray-400 pb-5">
                 {nft.description}
               </div>
             </div>

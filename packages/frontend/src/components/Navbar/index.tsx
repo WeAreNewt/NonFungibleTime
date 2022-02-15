@@ -39,7 +39,7 @@ export default function Navbar() {
 
   return (
     <nav>
-      <div className="max-w-8xl mx-auto px-1 sm:px-6 lg:px-12 border-b border-color-gray-500 bg-white dark:bg-black">
+      <div className="max-w-8xl mx-auto px-1 sm:px-6 lg:px-12 light:border-b light:border-color-gray-500 bg-white dark:bg-gray-900">
         <div className="relative flex items-center justify-between h-20">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/** Mobile Menu Icon */}

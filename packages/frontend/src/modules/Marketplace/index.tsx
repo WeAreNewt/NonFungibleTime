@@ -103,7 +103,7 @@ export default function Marketplace() {
   });
 
   return (
-    <div className="bg-slate-100 dark:bg-black p-10">
+    <div className="bg-slate-100 dark:bg-gray-800 p-10">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center mb-10">
           {/** Marketplace Header */}
