@@ -1,7 +1,8 @@
 export default function PrivacyPolicy() {
   return (
     <main className="terms-style px-10 md:px-20 lg:px-[15rem] xl:px-[25rem] py-10">
-      <h1 className="w-full flex justify-center text-lg"><b>NEWT: AIKA - PRIVACY POLICY</b></h1>
+      <h1 className="w-full flex justify-center text-lg mb-5"><b>NEWT: AIKA - PRIVACY POLICY</b></h1>
+      <span >Effective Date: February 15, 2022</span>
       <ol>
         <li>
           <h2>
