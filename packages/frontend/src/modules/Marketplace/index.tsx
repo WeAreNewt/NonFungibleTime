@@ -103,13 +103,13 @@ export default function Marketplace() {
   });
 
   return (
-    <div className="bg-slate-100 dark:bg-black p-10">
+    <div className="bg-slate-100 dark:bg-gray-800 p-10">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center mb-10">
           {/** Marketplace Header */}
           <div className="w-1/3 justify-items-start">
             <div className="items-center text-gray-900 dark:text-white text-4xl font-extrabold">
-              Explore marketplace
+              Marketplace
             </div>
           </div>
           <div className="w-2/3 justify-items-end">
@@ -183,12 +183,12 @@ export default function Marketplace() {
           </div>
 
         </div>
-        <div className="flex-auto h-10 text-sm text-slate-500">
-			A quick way to find the right talent for any project
-		</div>
+        <div className="flex-auto h-10 text-xl text-slate-500">
+          A quick way to find the right talent for any project
+        </div>
         {loading || !nfts ? (
           <div className="w-1/5 mx-auto p-4 pb-0">
-            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div>
 
         ) : (
@@ -204,7 +204,7 @@ export default function Marketplace() {
                 ref={observe}
               >
                 <div className="w-1/5 mx-auto p-4 pb-0">
-                  <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                  <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                 </div>
               </div>
             )}
