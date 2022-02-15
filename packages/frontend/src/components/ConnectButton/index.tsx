@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatEthAddress } from '../../lib/helpers/format';
-import { useWeb3, WalletType } from '../../lib/providers/web3-provider';
+import { useWeb3 } from '../../lib/providers/web3-provider';
 import ConnectModal from '../ConnectModal';
 
 export default function AddressInfo() {
-  const { connect, account, isCorrectChain, active, requestToSwitchChain, disconnect } = useWeb3();
+  const { account, isCorrectChain, disconnect } = useWeb3();
   const [isOpen, setIsOpen] = useState(false)
   const [ connectModalOpen, setConnectModalOpen ] = useState(false)
   const navigate = useNavigate();
@@ -21,28 +21,9 @@ export default function AddressInfo() {
       }
     }
   }, [account, location.pathname, navigate])
-
-  const onClick = async () => {
-    try {
-      if (active) {
-        if (!isCorrectChain) {
-          requestToSwitchChain();
-          return;
-        } else {
-          setIsOpen(!isOpen)
-        }
-      } else {
-        // For now, defaults to injected provider
-        connect(WalletType.Values.injected);
-      }
-    } catch (err) {
-      // TODO: Add error toaster
-      alert('Error on connecting wallet: ' + (err as Error).message);
-    }
-  };
   
   const onClickModalOpen = () => {
-    if(account) setIsOpen(true)
+    if(account) setIsOpen(!isOpen)
     else setConnectModalOpen(true)
   }
 

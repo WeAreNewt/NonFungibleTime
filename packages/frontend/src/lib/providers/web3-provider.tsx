@@ -2,7 +2,7 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
+import { WalletConnectConnector, resetWalletConnector } from '../connectors/WalletConnect';
 import React, { useCallback, useContext, useEffect } from 'react';
 import * as z from 'zod';
 import { addChainParameters, ChainId } from '../config';
@@ -20,8 +20,7 @@ export const walletConnect = new WalletConnectConnector({
     80001: 'https://polygon-mumbai.g.alchemy.com/v2/demo',
     137: 'https://polygon-rpc.com/'
   },
-  qrcode: true,
-  bridge: 'https://bridge.walletconnect.org'
+  supportedChainIds: [80001, 137]
 });
 
 export const connectors: Record<WalletType, AbstractConnector> = {
@@ -53,16 +52,19 @@ export const Web3DataProvider: React.FC = ({ children }) => {
     async (walletType: WalletType) => {
       switch (walletType) {
         case WalletType.Values.injected:
-          await activate(injected, (error) => {
+          await activate(injected, undefined, true).then(() => {
+            localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
+          }).catch(error => {
             console.log('Error: ', error);
           });
-          localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
           break;
         case WalletType.Values.walletConnect:
-          await activate(walletConnect, (error) => {
+          await activate(walletConnect, undefined, true).then(() => {
+            localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
+          }).catch(error => {
             console.log('Error: ', error);
+            resetWalletConnector(walletConnect)
           });
-          localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
           break;
         default:
           throw new Error('Wallet not supported');
@@ -114,7 +116,7 @@ export const Web3DataProvider: React.FC = ({ children }) => {
       WalletType.parse(previouslyConnectedWalletType) &&
       connectors[previouslyConnectedWalletType]
     ) {
-      connect(previouslyConnectedWalletType);
+      connect(previouslyConnectedWalletType)
     }
   }, [connect]);
 
