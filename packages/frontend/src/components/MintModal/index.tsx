@@ -214,7 +214,7 @@ export default function MintModal({ open, onClose, setProfileMintStatus, lastNft
                     <div>
                       <div className="flex gap-3 mb-2 align-center">
                         <Label htmlFor="description">Description</Label>
-                        <Tooltip content="If your time results in a deliverable, please state in the Description where the time buyer has personal and/or commercial rights to it" />
+                        <Tooltip content="If your time results in a deliverable, please state in the Description whether the time buyer can use the deliverable only for personal or also for commercial use" />
                       </div>
                       <Input
                         type="text"
