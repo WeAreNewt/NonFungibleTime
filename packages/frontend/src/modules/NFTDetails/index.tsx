@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
+import { TwitterContainer } from '../../components/TwitterContainer';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument } from '../../lib/graphql';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -321,6 +322,11 @@ export default function NFTDetails() {
                                       className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                       value={window.location.href}
                                     />
+                                    <div className="pt-2">
+                                      <TwitterContainer
+                                        content={`I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               </div>
