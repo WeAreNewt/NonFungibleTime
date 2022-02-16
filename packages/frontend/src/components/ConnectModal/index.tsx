@@ -69,6 +69,7 @@ export default function ConnectModal({ open, setOpen } : Props) {
             <span className="text-sm">WalletConnect</span>
           </button>
         </div>
+        <div className="text-sm text-gray-700 self-center mt-0 dark:text-white p-4">Don't have an Ethereum wallet? <a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer" className="text-indigo-600">Click Here</a></div>
         {error && <span className="text-sm text-red-500 text-center">{error}</span>}
       </div>
     </Dialog>
