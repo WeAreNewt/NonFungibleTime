@@ -92,7 +92,7 @@ export default function Navbar() {
                 <img src={icon} alt="clock icon" width="50" height="50" />
               </Link>
               <Link className="hidden lg:block" to="/">
-              <span className="text-3xl text-indigo-600 font-extrabold">Aika</span>
+                <span className="text-3xl text-indigo-600 font-extrabold font-inter">Aika</span>
               </Link>
             </div>
           </div>
