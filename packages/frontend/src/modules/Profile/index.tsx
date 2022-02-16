@@ -16,6 +16,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Button, ButtonVariant } from '../../components/Button';
 import MintModal from '../../components/MintModal';
 import { isAddress } from 'ethers/lib/utils';
+import { ZERO_ADDRESS } from '../../lib/helpers/constants';
 
 export default function Profile() {
   const { currentAccount, userData, loadingUserData, } =
@@ -47,22 +48,27 @@ export default function Profile() {
   if (!owner && isAddress(accountName)) {
     sanitizedUser = accountName.toLowerCase();
   }
+
   const { data, loading, error } = useSubscription(ProfileNftsDocument, {
     variables: {
       user: sanitizedUser,
     },
   });
-  const categories = ['Minted', 'Owned'];
+
+  const categories = ['Created', 'Collected'];
   // Use app-data-provider for pre-loaded data if user if profile owner, otherwise use separate subscription
   const user: User | undefined = owner ? userData : (data && data.user ? data.user : undefined);
   const userLoading: boolean = owner ? loadingUserData : loading;
-  const [nftsShown, setNftsShown] = useState<NFT[]>(user?.createdNfts ? user?.createdNfts : []);
+  const [nftsShown, setNftsShown] = useState<NFT[]>([]);
+
   useEffect(() => {
     if (user?.createdNfts && toggleIndex === 0) {
-      setNftsShown(user.createdNfts);
+      const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
+      setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
     }
     if (user?.ownedNfts && toggleIndex === 1) {
-      setNftsShown(user.ownedNfts);
+      const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
+      setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
     }
   }, [user, toggleIndex]);
 
@@ -119,7 +125,7 @@ export default function Profile() {
       </div>
     } else if (loadingUserData) {
       return <div className="w-1/5 mx-auto p-4 pb-0">
-        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
       </div>;
     } else if (!accountName || !isAddress(accountName)) {
       return (<div className="h-screen">
@@ -134,7 +140,7 @@ export default function Profile() {
 
   // If the path contains a valid ethereum address, display profile data
   return (
-    <div className="bg-slate-100 dark:bg-black">
+    <div className="bg-slate-100 dark:bg-gray-800">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="p-4 md:p-10">
           <div className="flex flex-col gap-4 md:flex-row justify-between items-center">
@@ -148,7 +154,7 @@ export default function Profile() {
                   className="rounded-full w-40"
                 />
                 {/** ENS Name/Address */}
-                <div className="text-black dark:text-white">{accountName}</div>
+                <div className="text-black dark:text-white tracking-widest font-semibold">{accountName}</div>
               </div>
             </div>
             {/** Share Profile */}
@@ -273,7 +279,7 @@ export default function Profile() {
             </Tab.List>
           </Tab.Group>
           {userLoading ? <div className="w-1/5 mx-auto p-4 pb-0">
-            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div> : renderNFTs()}
         </div>
       </div >

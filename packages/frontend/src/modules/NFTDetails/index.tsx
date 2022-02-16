@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
+import { TwitterContainer } from '../../components/TwitterContainer';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument } from '../../lib/graphql';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -16,6 +17,8 @@ import { BuyPanel } from '../../components/BuyPanel';
 import { RedeemPanel } from '../../components/RedeemPanel';
 import { BuyingConditionChangePanel } from '../../components/BuyingConditionChangePanel';
 import { MaxUint256, ZERO_ADDRESS } from '../../lib/helpers/constants';
+import Tooltip from '../../components/Tooltip';
+import { TokenIcon } from '@aave/aave-ui-kit';
 
 interface NftState {
   nft?: NFT;
@@ -117,13 +120,16 @@ export default function NFTDetails() {
       </div>
     } else if (loading) {
       return <div className="w-1/5 mx-auto p-4 pb-0">
-        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
       </div>;
     } else {
       return <div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
           <div className="text-black dark:text-white font-bold text-xl p-20">
             No NFT found with TokenId {tokenIdSanitized}
+          </div>
+          <div className="text-black dark:text-white font-bold text-xl p-20">
+            If this is a new mint, it may take time to be indexed by the subgraph
           </div>
         </div>
       </div>
@@ -139,7 +145,7 @@ export default function NFTDetails() {
       });
     }
     return (
-      <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-black">
+      <div className=" text-black dark:text-white p-10 bg-slate-100 dark:bg-gray-800">
         {/* <FaChevronCircleLeft onClick={() => navigate(-1)} className=" cursor-pointer" /> */}
 
         <Dialog
@@ -181,14 +187,14 @@ export default function NFTDetails() {
 
                     {txStatus.submitted ? (
                       <div className="text-center flex-col p-4">
-                        <div className="font-semibold">Transaction Submitted</div>
+                        <div className="font-semibold">Transaction Submitted 👀</div>
                         <div className="w-1/5 mx-auto p-4 pb-0">
-                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} />
+                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                         </div>
                       </div>
                     ) : txStatus.confirmed && (
                       <div className="text-center flex-col">
-                        <div className="font-semibold">Transaction Confirmed</div>
+                        <div className="font-semibold">Transaction Confirmed 🥳🎉</div>
                         <div className="pt-4">
                           <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + txStatus.txHash}>
                             View Transaction <FaExternalLinkAlt className="inline-block" />
@@ -215,7 +221,7 @@ export default function NFTDetails() {
              * */}
             {!owner ? (
               nft.forSale ? (
-                <div>
+                <div className="pt-4">
                   <BuyPanel nft={nft} setTxStatus={setTxStatus} />
                 </div>
               ) : (
@@ -240,7 +246,7 @@ export default function NFTDetails() {
                 {ownerSelectedMode === 'redeem' ? (
                   (nft.redeemed ? <div className="text-center p-4 font-semibold">This NFT has been redeemed</div> : <RedeemPanel nft={nft} setTxStatus={setTxStatus} />)
                 ) : (
-                  <BuyingConditionChangePanel nft={nft} setTxStatus={setTxStatus} />
+                  <BuyingConditionChangePanel nft={nft} setTxStatus={setTxStatus} tokenId={nft.tokenId} />
                 )}
               </div>
             )}
@@ -316,6 +322,11 @@ export default function NFTDetails() {
                                       className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                       value={window.location.href}
                                     />
+                                    <div className="pt-2">
+                                      <TwitterContainer
+                                        content={`I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -370,7 +381,7 @@ export default function NFTDetails() {
 
             <div className="flex flex-col">
               <HeadingSeparator>Description</HeadingSeparator>
-              <div className="text-sm leading-5 text-gray-900 dark:text-gray-500 pb-5">
+              <div className="text-sm leading-5 text-gray-900 dark:text-gray-400 pb-5">
                 {nft.description}
               </div>
             </div>
@@ -404,7 +415,10 @@ export default function NFTDetails() {
                   </div>
                 </div>
                 <div>
-                  <FieldLabel className="mb-2 font-semibold">Royalities</FieldLabel>
+                  <div className="flex gap-3 mb-2 align-center">
+                    <FieldLabel className="font-semibold">Royalities</FieldLabel>
+                    <Tooltip content="Your share of secondary sales: every time your time is resold, you receive royalties on the sale. This only applies to sales on our marketplace and any other EIP-2981 compliant marketplace" />
+                  </div>
                   <div className="font-semibold">{(nft.royaltyBasisPoints / 100).toString()} %</div>
                 </div>
               </div>
@@ -418,7 +432,8 @@ export default function NFTDetails() {
               {nft.forSale ? <div>
                 <div className="font-semibold">For Sale</div>
                 <div className="font-semibold">
-                  {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}
+                  <div className="inline-block"> {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}</div>
+                  <TokenIcon className="inline-block align-middle pl-2 pb-1" tokenSymbol={nft.currency.symbol} width={20} height={20} />
                 </div>
                 <div className="font-semibold">{nft.allowedBuyer === ZERO_ADDRESS ? 'No Reserved Buyer' : 'Reserved For ' + nft.allowedBuyer}</div>
               </div> : <div className="font-semibold">Not For Sale</div>}

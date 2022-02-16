@@ -9,7 +9,7 @@ import {
   DEFAULT_NULL_VALUE_ON_TX,
   isEthAddress,
 } from '../base-service';
-import { ERC20Service, IERC20ServiceInterface } from '../IERC20';
+import { ERC20Service, ERC20ServiceInterface } from '../ERC20';
 import { MAX_ALLOWANCE, ZERO_ADDRESS } from '../constants';
 
 export type MintParamsType = {
@@ -102,7 +102,7 @@ export class NftCollectionService
   extends BaseService<NonFungibleTimeCollection>
   implements NftCollectionInterface {
   readonly collectionAddress: string;
-  readonly erc20Service: IERC20ServiceInterface;
+  readonly erc20Service: ERC20ServiceInterface;
 
   constructor(provider: providers.Provider, collectionAddress?: string) {
     super(provider, NonFungibleTimeCollection__factory);
@@ -176,7 +176,7 @@ export class NftCollectionService
       const txs: EthereumTransactionTypeExtended[] = [];
 
       // Check if collection is approved to spend the purchase currency
-      const { isApproved, approve }: IERC20ServiceInterface = this.erc20Service;
+      const { isApproved, approve }: ERC20ServiceInterface = this.erc20Service;
 
       const approved = await isApproved({
         token: currency,
