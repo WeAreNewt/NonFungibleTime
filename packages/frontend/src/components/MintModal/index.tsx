@@ -178,13 +178,13 @@ export default function MintModal({ open, onClose }: Props) {
                 {txStatus.submitted ? (
                   <div className="text-center flex-col p-4">
                     <div className="font-semibold">Transaction Submitted 👀</div>
-                    <div className="w-1/5 mx-auto p-4 pb-0">
+                    <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
                       <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                     </div>
                   </div>
                 ) : displaySaleForm ? <div className="text-center flex-col p-4">
                   <BuyingConditionChangePanel tokenId={lastNft || 0} setTxStatus={setStatusHandler} disableForSale={true} />
-                </div> : true ?
+                </div> : txStatus.confirmed ?
                   (
                     <div className="text-center flex-col">
                       <div className="font-semibold p-4">Transaction Confirmed 🥳🎉</div>
@@ -193,7 +193,7 @@ export default function MintModal({ open, onClose }: Props) {
                           View Transaction <FaExternalLinkAlt className="inline-block" />
                         </a>
                       </div>
-                      {true && (
+                      {lastNft && (
                         <div className="p-4 flex flex-row justify-evenly">
                           <button
                             type="button"

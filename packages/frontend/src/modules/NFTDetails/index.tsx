@@ -119,7 +119,7 @@ export default function NFTDetails() {
         </div>
       </div>
     } else if (loading) {
-      return <div className="w-1/5 mx-auto p-4 pb-0">
+      return <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
         <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
       </div>;
     } else {
@@ -188,7 +188,7 @@ export default function NFTDetails() {
                     {txStatus.submitted ? (
                       <div className="text-center flex-col p-4">
                         <div className="font-semibold">Transaction Submitted 👀</div>
-                        <div className="w-1/5 mx-auto p-4 pb-0">
+                        <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
                           <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                         </div>
                       </div>
