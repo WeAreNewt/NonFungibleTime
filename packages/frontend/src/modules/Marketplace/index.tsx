@@ -107,13 +107,13 @@ export default function Marketplace() {
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center mb-10">
           {/** Marketplace Header */}
-          <div className="w-1/3 justify-items-start">
-            <div className="items-center text-gray-900 dark:text-white text-4xl font-extrabold">
+          <div className="w-full justify-items-center md:justify-items-start">
+            <div className="text-center md:text-left items-center text-gray-900 dark:text-white text-4xl font-extrabold">
               Marketplace
             </div>
           </div>
-          <div className="w-2/3 justify-items-end">
-            <div className="flex flex-row w-full justify-around">
+          <div className="w-full md:w-2/3 md:justify-items-end">
+            <div className="flex flex-row w-full justify-around flex-wrap md:flex-nowrap">
               <div className="w-full p-2">
                 <FieldLabel>Category</FieldLabel>
                 <CategoryFilter onSelect={(category) => {
@@ -121,19 +121,19 @@ export default function Marketplace() {
                 }} selected={category} />
               </div>
 
-              <div className="w-2/3 p-2">
+              <div className="w-1/2 p-2">
                 <FieldLabel>For Sale</FieldLabel>
                 <ToggleFilter onSelect={(forSale) => {
                   setFilters({ ...filters, forSale });
                 }} selected={forSale} />
               </div>
-              <div className="w-2/3 p-2">
+              <div className="w-1/2 p-2">
                 <FieldLabel>Redeemed</FieldLabel>
                 <ToggleFilter onSelect={(redeemed) => {
                   setFilters({ ...filters, redeemed });
                 }} selected={redeemed} />
               </div>
-              <div className="w-full p-2">
+              <div className="w-full p-2" style={{ minWidth: "150px" }}>
                 <FieldLabel>Search</FieldLabel>
                 <SearchFilter
                   onChange={(searchValue) => {
@@ -149,7 +149,7 @@ export default function Marketplace() {
                   error={searchError ? searchError : undefined}
                 />
               </div>
-              <div className="w-2/3 p-2">
+              <div className="w-1/2 p-2 mx-auto">
                 <FieldLabel>Search For</FieldLabel>
                 <Listbox value={filters.searchType} onChange={(searchType) => {
                   setFilters({ ...filters, searchType });
@@ -183,7 +183,7 @@ export default function Marketplace() {
           </div>
 
         </div>
-        <div className="flex-auto h-10 text-xl text-slate-500">
+        <div className="flex-auto h-10 text-sm md:text-xl text-slate-500">
           A quick way to find the right talent for any project
         </div>
         {loading || !nfts ? (
@@ -191,25 +191,27 @@ export default function Marketplace() {
             <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div>
 
-        ) : (
-          <>
-            <NFTGrid>
-              {nftsShown.map((nft, index) => {
-                return <NFTCard key={index} nft={nft} />;
-              })}
-            </NFTGrid>
-            {canLoadMore && (
-              <div
-                style={{ marginTop: 20, width: '100%', padding: 20 }}
-                ref={observe}
-              >
-                <div className="w-1/5 mx-auto p-4 pb-0">
-                  <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
-                </div>
-              </div>
+        ) :
+          nftsShown.length === 0 ? <div className="w-full mx-auto text-center text-red-500 font-semibold text-xl pt-4">No results found</div> :
+            (
+              <>
+                <NFTGrid>
+                  {nftsShown.map((nft, index) => {
+                    return <NFTCard key={index} nft={nft} />;
+                  })}
+                </NFTGrid>
+                {canLoadMore && (
+                  <div
+                    style={{ marginTop: 20, width: '100%', padding: 20 }}
+                    ref={observe}
+                  >
+                    <div className="w-1/5 mx-auto p-4 pb-0">
+                      <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
       </div>
     </div >
   );

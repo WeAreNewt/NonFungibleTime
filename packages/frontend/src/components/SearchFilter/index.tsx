@@ -26,7 +26,7 @@ const searchPlaceholder = (search: Search) => {
 export default function SearchFilter({ onChange, searchType, selected, error }: SearchFilterProps) {
     return (
         <div className="flex flex-row text-center">
-            <div>
+            <div className="w-full">
                 <Input
                     type="text"
                     name="search"

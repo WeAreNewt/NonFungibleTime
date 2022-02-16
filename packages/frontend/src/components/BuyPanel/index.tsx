@@ -109,12 +109,12 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
                         <FieldLabel>Price</FieldLabel>
                         <PriceDisplay amount={nft.price} token={nft.currency} />
                     </div>
-                    {balance > formattedPrice ? <div
-                        className="items-center text-center w-1/3 justify-center border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
+                    {balance > formattedPrice ? <button
+                        className="items-center text-center w-1/3 justify-center border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg cursor-pointer"
                         onClick={buy}
                     >
                         {approved ? 'Buy Now' : 'Approve'}
-                    </div> : <div className="text-red-500 my-auto">Insufficient wallet balance: {balance.toFixed(2)}</div>}
+                    </button> : <div className="text-red-500 my-auto">Insufficient wallet balance: {balance.toFixed(2)}</div>}
                 </div>
                 <div className="text-red-500 text-center break-words">{formError}</div>
             </div >

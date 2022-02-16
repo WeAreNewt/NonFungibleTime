@@ -148,8 +148,8 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
 
 
                 {/** Price and currency */}
-                <div className="flex gap-4 p-2 pb-6">
-                    <div className="w-1/2">
+                <div className="flex flex-row flex-wrap lg:flex-nowrap gap-4 p-2 pb-6">
+                    <div className="w-full">
                         <div className="font-semibold">Price</div>
                         <Input
                             type="number"
@@ -169,7 +169,7 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
                         />
                     </div>
 
-                    <div className="w-1/2">
+                    <div className="w-full">
                         <div className="font-semibold">Token</div>
                         <Select
                             id="acceptedCurrencies"
@@ -192,11 +192,13 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
             </div>
             }
 
-            <div
-                className="items-center text-center w-1/2 mx-auto justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
-                onClick={() => changeBuyingConditions()}
-            >
-                Update
+            <div className="pt-4 w-1/2 mx-auto">
+                <button
+                    className='w-full mx-auto text-center font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 py-4 md:text-md cursor-pointer'
+                    onClick={() => changeBuyingConditions()}
+                >
+                    <div>Update</div>
+                </button>
             </div>
             {mainTxError && <div className="text-red-500 text-center break-words">{mainTxError}</div>}
         </div>
