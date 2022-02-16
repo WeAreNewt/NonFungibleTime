@@ -105,9 +105,9 @@ export default function NFTDetails() {
 
   // Styling for owner buttons
   const selected =
-    'font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 md:py-2 md:text-md md:px-8 cursor-pointer';
+    'text-center font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 px-4 py-2 md:text-md cursor-pointer';
   const unselected =
-    'font-semibold rounded-md text-black bg-white hover:bg-gray-500 md:py-2 md:text-md md:px-8 cursor-pointer';
+    'text-center font-semibold rounded-md text-black bg-white hover:bg-gray-500 px-4 py-2 md:text-md cursor-pointer';
 
   if (!nft) {
     if (error) {
@@ -228,20 +228,22 @@ export default function NFTDetails() {
                 <div className="text-center p-4 font-semibold">This NFT is not for sale</div>
               )
             ) : (
-              <div className="flex flex-col p-5">
+              <div className="flex flex-col">
                 <div className="flex flex-row justify-evenly space-x-2 pb-5">
-                  <div
+                  <button
                     className={ownerSelectedMode === 'update' ? selected : unselected}
                     onClick={() => setOwnerSelectedMode('update')}
                   >
-                    Update Selling Options
-                  </div>
-                  <div
+                    <div>
+                      Update Selling Options
+                    </div>
+                  </button>
+                  <button
                     className={ownerSelectedMode === 'redeem' ? selected : unselected}
                     onClick={() => setOwnerSelectedMode('redeem')}
                   >
-                    Redeem
-                  </div>
+                    <div>Redeem</div>
+                  </button>
                 </div>
                 {ownerSelectedMode === 'redeem' ? (
                   (nft.redeemed ? <div className="text-center p-4 font-semibold">This NFT has been redeemed</div> : <RedeemPanel nft={nft} setTxStatus={setTxStatus} />)
