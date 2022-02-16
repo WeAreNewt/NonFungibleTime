@@ -49,12 +49,12 @@ export function RedeemPanel({ nft, setTxStatus }: RedeemPanelParams) {
             <div className="text-center pb-6">
                 This is a one time action and cannnot be reversed. Redeeming will modify the on-chain svg. You will still be able to list your redeemed NFT for sale (for holding rights only, but not redeemable for more time).
             </div>
-            <div
-                className="w-1/2 mx-auto items-center text-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
+            <button
+                className="w-1/2 mx-auto items-center text-center justify-center py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg cursor-pointer"
                 onClick={() => redeem()}
             >
                 Redeem
-            </div>
+            </button>
             <div className="text-red-500 text-center break-words">{formError}</div>
         </div>
     )
