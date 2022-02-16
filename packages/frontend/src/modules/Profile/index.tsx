@@ -154,7 +154,7 @@ export default function Profile() {
                   className="rounded-full w-40"
                 />
                 {/** ENS Name/Address */}
-                <div className="text-black dark:text-white">{accountName}</div>
+                <div className="text-black dark:text-white tracking-widest font-semibold">{accountName}</div>
               </div>
             </div>
             {/** Share Profile */}
