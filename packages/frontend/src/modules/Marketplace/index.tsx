@@ -187,7 +187,7 @@ export default function Marketplace() {
           A quick way to find the right talent for any project
         </div>
         {loading || !nfts ? (
-          <div className="w-1/5 mx-auto p-4 pb-0">
+          <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
             <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div>
 
@@ -205,7 +205,7 @@ export default function Marketplace() {
                     style={{ marginTop: 20, width: '100%', padding: 20 }}
                     ref={observe}
                   >
-                    <div className="w-1/5 mx-auto p-4 pb-0">
+                    <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
                       <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                     </div>
                   </div>
