@@ -114,26 +114,26 @@ export default function Marketplace() {
           </div>
           <div className="w-full md:w-2/3 md:justify-items-end">
             <div className="flex flex-row w-full justify-around flex-wrap md:flex-nowrap">
-              <div className="w-1/3 p-2">
+              <div className="w-full p-2">
                 <FieldLabel>Category</FieldLabel>
                 <CategoryFilter onSelect={(category) => {
                   setFilters({ ...filters, category });
                 }} selected={category} />
               </div>
 
-              <div className="w-1/3 p-2">
+              <div className="w-1/2 p-2">
                 <FieldLabel>For Sale</FieldLabel>
                 <ToggleFilter onSelect={(forSale) => {
                   setFilters({ ...filters, forSale });
                 }} selected={forSale} />
               </div>
-              <div className="w-1/3 p-2">
+              <div className="w-1/2 p-2">
                 <FieldLabel>Redeemed</FieldLabel>
                 <ToggleFilter onSelect={(redeemed) => {
                   setFilters({ ...filters, redeemed });
                 }} selected={redeemed} />
               </div>
-              <div className="w-2/3 p-2" style={{ minWidth: "150px" }}>
+              <div className="w-full p-2" style={{ minWidth: "150px" }}>
                 <FieldLabel>Search</FieldLabel>
                 <SearchFilter
                   onChange={(searchValue) => {
@@ -149,7 +149,7 @@ export default function Marketplace() {
                   error={searchError ? searchError : undefined}
                 />
               </div>
-              <div className="w-1/3 p-2">
+              <div className="w-1/2 p-2 mx-auto">
                 <FieldLabel>Search For</FieldLabel>
                 <Listbox value={filters.searchType} onChange={(searchType) => {
                   setFilters({ ...filters, searchType });
