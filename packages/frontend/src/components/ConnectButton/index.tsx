@@ -5,7 +5,7 @@ import { useWeb3 } from '../../lib/providers/web3-provider';
 import ConnectModal from '../ConnectModal';
 
 export default function AddressInfo() {
-  const { account, isCorrectChain, disconnect } = useWeb3();
+  const { account, isCorrectChain, disconnect, requestToSwitchChain } = useWeb3();
   const [isOpen, setIsOpen] = useState(false)
   const [ connectModalOpen, setConnectModalOpen ] = useState(false)
   const navigate = useNavigate();
@@ -23,13 +23,16 @@ export default function AddressInfo() {
   }, [account, location.pathname, navigate])
   
   const onClickModalOpen = () => {
-    if(account) setIsOpen(!isOpen)
+    if(account) {
+      if(isCorrectChain) setIsOpen(!isOpen)
+      else requestToSwitchChain()
+    }
     else setConnectModalOpen(true)
   }
 
   return (
     <div>
-      <ConnectModal open={connectModalOpen} onClose={() => setConnectModalOpen(false)} />
+      <ConnectModal open={connectModalOpen} setOpen={setConnectModalOpen} />
       <button onClick={onClickModalOpen} className="w-full flex items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer">
         {account
           ? isCorrectChain

@@ -13,14 +13,22 @@ export const WalletType = z.enum(['injected', 'walletConnect']);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type WalletType = z.infer<typeof WalletType>;
 
+// No network toggle for now
+export const PROTOCOL_CHAIN = ChainId.mumbai;
+
 export const injected = new InjectedConnector({});
 
+const chainsRpc = Object.keys(addChainParameters).reduce<Record<number, string>>((acum, current) => {
+  const chainId : number = Number(current)
+  if (addChainParameters[chainId].rpcUrls) {
+    acum[chainId] = addChainParameters[chainId].rpcUrls![0]
+  }
+  return acum;
+}, {})
+
 export const walletConnect = new WalletConnectConnector({
-  rpc: {
-    80001: 'https://polygon-mumbai.g.alchemy.com/v2/demo',
-    137: 'https://polygon-rpc.com/'
-  },
-  supportedChainIds: [80001, 137]
+  rpc: chainsRpc,
+  supportedChainIds: [PROTOCOL_CHAIN]
 });
 
 export const connectors: Record<WalletType, AbstractConnector> = {
@@ -28,9 +36,6 @@ export const connectors: Record<WalletType, AbstractConnector> = {
   walletConnect
   // Add more supported connectors
 };
-
-// No network toggle for now
-const PROTOCOL_CHAIN = ChainId.mumbai;
 
 export interface Web3DataContextType {
   chainId: number;
@@ -49,25 +54,21 @@ export const Web3DataProvider: React.FC = ({ children }) => {
   const isCorrectChain = chainId === PROTOCOL_CHAIN;
 
   const connect = useCallback(
-    async (walletType: WalletType) => {
+    (walletType: WalletType) => {
       switch (walletType) {
         case WalletType.Values.injected:
-          await activate(injected, undefined, true).then(() => {
+          return activate(injected, undefined, true).then(() => {
             localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
-          }).catch(error => {
-            console.log('Error: ', error);
-          });
-          break;
+          })
         case WalletType.Values.walletConnect:
-          await activate(walletConnect, undefined, true).then(() => {
+          return activate(walletConnect, undefined, true).then(() => {
             localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
           }).catch(error => {
-            console.log('Error: ', error);
             resetWalletConnector(walletConnect)
+            throw error;
           });
-          break;
         default:
-          throw new Error('Wallet not supported');
+          return Promise.reject('Wallet not supported');
       }
     },
     [activate]
@@ -116,7 +117,11 @@ export const Web3DataProvider: React.FC = ({ children }) => {
       WalletType.parse(previouslyConnectedWalletType) &&
       connectors[previouslyConnectedWalletType]
     ) {
-      connect(previouslyConnectedWalletType)
+      try {
+        connect(previouslyConnectedWalletType)
+      } catch(error) {
+        console.log(error)
+      }
     }
   }, [connect]);
 
