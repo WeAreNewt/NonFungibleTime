@@ -130,7 +130,7 @@ export default function Profile() {
         </div>
       </div>
     } else if (loadingUserData) {
-      return <div className="w-1/5 mx-auto p-4 pb-0">
+      return <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
         <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
       </div>;
     } else if (!accountName || !isAddress(accountName)) {
@@ -284,7 +284,7 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? <div className="w-1/5 mx-auto p-4 pb-0">
+          {userLoading ? <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
             <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div> : renderNFTs()}
         </div>

@@ -178,7 +178,7 @@ export default function MintModal({ open, onClose }: Props) {
                 {txStatus.submitted ? (
                   <div className="text-center flex-col p-4">
                     <div className="font-semibold">Transaction Submitted 👀</div>
-                    <div className="w-1/5 mx-auto p-4 pb-0">
+                    <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
                       <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                     </div>
                   </div>
@@ -197,14 +197,14 @@ export default function MintModal({ open, onClose }: Props) {
                         <div className="p-4 flex flex-row justify-evenly">
                           <button
                             type="button"
-                            className="disabled:opacity-50 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:w-auto sm:text-sm"
+                            className="disabled:opacity-50 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white w-auto sm:text-sm"
                             onClick={() => navigate('/nft/' + lastNft)}
                           >
                             View
                           </button>
                           <button
                             type="button"
-                            className="disabled:opacity-50 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:w-auto sm:text-sm"
+                            className="disabled:opacity-50 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white w-auto sm:text-sm"
                             onClick={() => { setDisplaySaleForm(true); setTxStatus({ submitted: false, confirmed: false, txHash: undefined }) }}
                           >
                             Sell
