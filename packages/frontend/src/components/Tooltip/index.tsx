@@ -22,7 +22,7 @@ const Tooltip : React.FC<Props> = ({ content }) => {
       >
         <img className="w-4" src={infoLogo} alt="info" />
       </button>
-      { open && <span className="absolute min-w-[200px] text-white p-3 bottom-7 text-sm bg-gray-800 rounded-lg">{content}</span> }
+      { open && <span className="absolute min-w-[200px] text-white p-3 bottom-7 text-sm bg-gray-800 dark:bg-gray-900 rounded-lg">{content}</span> }
     </div>
   )
 }

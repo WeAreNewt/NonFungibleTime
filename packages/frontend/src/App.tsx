@@ -6,6 +6,8 @@ import { Home } from './modules/Home';
 import Profile from './modules/Profile';
 import Marketplace from './modules/Marketplace';
 import Details from './modules/NFTDetails';
+import TermsAndConditions from './modules/TermsAndConditions';
+import PrivacyPolicy from './modules/PrivacyPolicy';
 import { Web3DataProvider } from './lib/providers/web3-provider';
 import { AppDataProvider } from './lib/providers/app-data-provider';
 import { Web3ReactProvider } from '@web3-react/core';
@@ -40,6 +42,8 @@ function App() {
                       <Route path="/profile/*" element={<Profile />} key="profile" />
                       <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
                       <Route path="/nft/*" element={<Details />} key="details" />
+                      <Route path="/terms-and-conditions" element={<TermsAndConditions />} key="terms-and-conditions"/>
+                      <Route path="/privacy-policy" element={<PrivacyPolicy />} key="privacy-policy"/>
                     </Routes>
                   </ScreenWrapper>
                 </BrowserRouter>

@@ -7,9 +7,9 @@ export const Home = () => {
   const { currentAccount } = useAppDataProvider();
   return (
     <div className="flex">
-      <div className="w-full md:w-1/2 2xl:w-2/3 flex flex-col p-5">
-        <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-          <div className="text-center sm:text-left">
+      <div className="w-full md:w-1/2 2xl:w-2/3 flex flex-col p-5 mt-28 md:mt-16 lg:mt-20 xl:mt-28">
+        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center md:text-left">
             <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl ">
               <span className="block xl:inline">Earn money</span>
               <span className="block text-indigo-600">on your time</span>
@@ -17,7 +17,7 @@ export const Home = () => {
             <div>
               <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">Mint your time as NFTs on the Polygon network. Sell your time to interested parties. Purchase other people’s time.</p>
             </div>
-            <div className="mt-5 sm:mt-8 sm:flex  sm:justify-center lg:justify-start">
+            <div className="mt-5 sm:mt-8 sm:flex  sm:justify-center md:justify-start">
               <div className="rounded-md shadow">
                 <Link
                   to={'/profile/' + currentAccount + '/mint/'}
