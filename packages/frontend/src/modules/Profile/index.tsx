@@ -17,11 +17,14 @@ import { Button, ButtonVariant } from '../../components/Button';
 import MintModal from '../../components/MintModal';
 import { isAddress } from 'ethers/lib/utils';
 import { ZERO_ADDRESS } from '../../lib/helpers/constants';
+import { formatEthAddress } from '../../lib/helpers/format';
+import { useViewportProvider } from '../../lib/providers/viewport-provider';
 
 export default function Profile() {
   const { currentAccount, userData, loadingUserData, } =
     useAppDataProvider();
   const navigate = useNavigate();
+  const { width } = useViewportProvider();
   const [owner, setOwner] = useState<Boolean>(true);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
   const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
@@ -29,6 +32,9 @@ export default function Profile() {
   const location = useLocation();
   const path = location.pathname.split('/');
   const accountName = path[2] ? path[2] : '';
+
+  // The width below which the mobile address view
+  const breakpoint = 650;
 
   useEffect(() => {
     if (accountName.toLowerCase() === currentAccount?.toLowerCase()) {
@@ -143,10 +149,10 @@ export default function Profile() {
     <div className="bg-slate-100 dark:bg-gray-800">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="p-4 md:p-10">
-          <div className="flex flex-col gap-4 md:flex-row justify-between items-center">
+          <div className="flex flex-row flex-wrap lg:flex-nowrap gap-4 justify-between items-center">
             {/** Profile Header */}
-            <div className="w-full md:w-1/4  justify-items-start ">
-              <div className="flex flex-row items-center gap-4">
+            <div className="w-full justify-items-center md:justify-items-start">
+              <div className="flex flex-row justify-center items-center gap-4">
                 {/** Avatar/Blockie */}
                 <img
                   alt="blockie or ens avatar"
@@ -154,12 +160,12 @@ export default function Profile() {
                   className="rounded-full w-40"
                 />
                 {/** ENS Name/Address */}
-                <div className="text-black dark:text-white">{accountName}</div>
+                <div className="text-black dark:text-white tracking-widest font-semibold">{width < breakpoint ? formatEthAddress(accountName) : accountName}</div>
               </div>
             </div>
             {/** Share Profile */}
-            <div className="flex md:px-5 w-full md:justify-end ">
-              <div className="flex gap-4 flex-1 md:flex-initial  ">
+            <div className="flex md:px-5 w-full py-2 justify-center lg:justify-end ">
+              <div className="flex gap-4 flex-1 py-2 justify-center lg:flex-initial  ">
                 <Button
                   variant={ButtonVariant.SECONDARY}
                   onClick={() => setShareProfileModalOpen(true)}

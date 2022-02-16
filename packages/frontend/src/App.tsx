@@ -17,6 +17,7 @@ import { createApolloClient } from './apollo/client';
 import { ApolloProvider } from '@apollo/client';
 import { ErrorBoundary } from './ErrorBoundary';
 import { ChainId, networkConfigs } from './lib/config';
+import { ViewportProvider } from './lib/providers/viewport-provider';
 
 function getWeb3Library(provider: any): ethers.providers.Web3Provider {
   return new ethers.providers.Web3Provider(provider);
@@ -36,16 +37,18 @@ function App() {
             <Web3DataProvider>
               <AppDataProvider>
                 <BrowserRouter>
-                  <ScreenWrapper>
-                    <Routes>
-                      <Route path="/" element={<Home />} key="home" />
-                      <Route path="/profile/*" element={<Profile />} key="profile" />
-                      <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
-                      <Route path="/nft/*" element={<Details />} key="details" />
-                      <Route path="/terms-and-conditions" element={<TermsAndConditions />} key="terms-and-conditions"/>
-                      <Route path="/privacy-policy" element={<PrivacyPolicy />} key="privacy-policy"/>
-                    </Routes>
-                  </ScreenWrapper>
+                  <ViewportProvider>
+                    <ScreenWrapper>
+                      <Routes>
+                        <Route path="/" element={<Home />} key="home" />
+                        <Route path="/profile/*" element={<Profile />} key="profile" />
+                        <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
+                        <Route path="/nft/*" element={<Details />} key="details" />
+                        <Route path="/terms-and-conditions" element={<TermsAndConditions />} key="terms-and-conditions" />
+                        <Route path="/privacy-policy" element={<PrivacyPolicy />} key="privacy-policy" />
+                      </Routes>
+                    </ScreenWrapper>
+                  </ViewportProvider>
                 </BrowserRouter>
               </AppDataProvider>
             </Web3DataProvider>
