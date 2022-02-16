@@ -124,11 +124,11 @@ export default function NFTDetails() {
       </div>;
     } else {
       return <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-black dark:text-white font-bold text-xl p-20">
+        <div className="w-3/4 text-center mx-auto align-middle">
+          <div className="text-black dark:text-white font-bold text-xl py-4">
             No NFT found with TokenId {tokenIdSanitized}
           </div>
-          <div className="text-black dark:text-white font-bold text-xl p-20">
+          <div className="text-black dark:text-white font-bold text-xl">
             If this is a new mint, it may take time to be indexed by the subgraph
           </div>
         </div>
