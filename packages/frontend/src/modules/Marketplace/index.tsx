@@ -191,25 +191,27 @@ export default function Marketplace() {
             <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div>
 
-        ) : (
-          <>
-            <NFTGrid>
-              {nftsShown.map((nft, index) => {
-                return <NFTCard key={index} nft={nft} />;
-              })}
-            </NFTGrid>
-            {canLoadMore && (
-              <div
-                style={{ marginTop: 20, width: '100%', padding: 20 }}
-                ref={observe}
-              >
-                <div className="w-1/5 mx-auto p-4 pb-0">
-                  <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
-                </div>
-              </div>
+        ) :
+          nftsShown.length === 0 ? <div className="w-full mx-auto text-center text-red-500 font-semibold text-xl pt-4">No results found</div> :
+            (
+              <>
+                <NFTGrid>
+                  {nftsShown.map((nft, index) => {
+                    return <NFTCard key={index} nft={nft} />;
+                  })}
+                </NFTGrid>
+                {canLoadMore && (
+                  <div
+                    style={{ marginTop: 20, width: '100%', padding: 20 }}
+                    ref={observe}
+                  >
+                    <div className="w-1/5 mx-auto p-4 pb-0">
+                      <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
       </div>
     </div >
   );

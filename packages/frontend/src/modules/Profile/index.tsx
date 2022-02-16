@@ -107,7 +107,7 @@ export default function Profile() {
   if (location.pathname === '/profile/') {
     return (
       <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
+        <div className="w-full text-center mx-auto align-middle">
           <div className="text-black dark:text-white font-bold text-xl p-20">
             No Wallet Connected
           </div>
