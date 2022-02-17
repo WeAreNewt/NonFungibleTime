@@ -105,35 +105,35 @@ export default function Marketplace() {
   return (
     <div className="bg-slate-100 dark:bg-gray-800 p-10">
       <div className="flex flex-col max-w-7xl m-auto">
-        <div className="flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center mb-10">
+        <div className="flex flex-col gap-4 lg:flex-row lg:gap-0 justify-between items-center mb-10">
           {/** Marketplace Header */}
-          <div className="w-full justify-items-center md:justify-items-start">
-            <div className="text-center md:text-left items-center text-gray-900 dark:text-white text-4xl font-extrabold">
+          <div className="w-full justify-items-center lg:justify-items-start">
+            <div className="text-center lg:text-left items-center text-gray-900 dark:text-white text-4xl font-extrabold">
               Marketplace
             </div>
           </div>
-          <div className="w-full md:w-2/3 md:justify-items-end">
-            <div className="flex flex-row w-full justify-around flex-wrap md:flex-nowrap">
-              <div className="w-full p-2">
+          <div className="w-full lg:w-2/3 lg:justify-items-end">
+            <div className="flex flex-row w-full justify-around flex-wrap lg:flex-nowrap">
+              <div className="w-full p-2" style={{ minWidth: "220px" }}>
                 <FieldLabel>Category</FieldLabel>
                 <CategoryFilter onSelect={(category) => {
                   setFilters({ ...filters, category });
                 }} selected={category} />
               </div>
 
-              <div className="w-1/2 p-2">
+              <div className="w-1/2 p-2" style={{ minWidth: "150px" }}>
                 <FieldLabel>For Sale</FieldLabel>
                 <ToggleFilter onSelect={(forSale) => {
                   setFilters({ ...filters, forSale });
                 }} selected={forSale} />
               </div>
-              <div className="w-1/2 p-2">
+              <div className="w-1/2 p-2" style={{ minWidth: "150px" }}>
                 <FieldLabel>Redeemed</FieldLabel>
                 <ToggleFilter onSelect={(redeemed) => {
                   setFilters({ ...filters, redeemed });
                 }} selected={redeemed} />
               </div>
-              <div className="w-full p-2" style={{ minWidth: "150px" }}>
+              <div className="w-full p-2" style={{ minWidth: "200px" }}>
                 <FieldLabel>Search</FieldLabel>
                 <SearchFilter
                   onChange={(searchValue) => {
@@ -149,7 +149,7 @@ export default function Marketplace() {
                   error={searchError ? searchError : undefined}
                 />
               </div>
-              <div className="w-1/2 p-2 mx-auto">
+              <div className="w-1/2 p-2 mx-auto" style={{ minWidth: "150px" }}>
                 <FieldLabel>Search For</FieldLabel>
                 <Listbox value={filters.searchType} onChange={(searchType) => {
                   setFilters({ ...filters, searchType });
@@ -183,11 +183,11 @@ export default function Marketplace() {
           </div>
 
         </div>
-        <div className="flex-auto h-10 text-sm md:text-xl text-slate-500">
+        <div className="flex-auto h-10 text-sm lg:text-xl text-slate-500">
           A quick way to find the right talent for any project
         </div>
         {loading || !nfts ? (
-          <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
+          <div className="w-full lg:w-1/5 mx-auto p-4 pb-0">
             <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
           </div>
 
@@ -205,7 +205,7 @@ export default function Marketplace() {
                     style={{ marginTop: 20, width: '100%', padding: 20 }}
                     ref={observe}
                   >
-                    <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
+                    <div className="w-full lg:w-1/5 mx-auto p-4 pb-0">
                       <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
                     </div>
                   </div>
