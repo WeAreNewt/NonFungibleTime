@@ -43,6 +43,12 @@ export default function Footer() {
   const chainId = networkConfig.chainId;
   const logoLinks: FooterLink[] = [
     {
+      title: 'OpenSea',
+      to: Number(chainId) === ChainId.polygon ? 'https://opensea.io/collection/nonfungibletimecollection' : 'https://testnets.opensea.io/collection/non-fungible-time-nmhsylz5yr',
+      icon: opensea,
+      alt: 'OpenSea'
+    },
+    {
       title: 'Discord',
       to: 'https://discord.gg/newt',
       icon: discord,
@@ -65,12 +71,6 @@ export default function Footer() {
       to: networkConfig.blockExplorer + '/address/' + networkConfig.collectionAddress,
       icon: etherscan,
       alt: 'Etherscan',
-    },
-    {
-      title: 'OpenSea',
-      to: Number(chainId) === ChainId.polygon ? 'https://opensea.io/collection/nonfungibletimecollection' : 'https://testnets.opensea.io/collection/non-fungible-time-nmhsylz5yr',
-      icon: opensea,
-      alt: 'OpenSea'
     }
   ];
 
