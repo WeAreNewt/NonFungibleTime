@@ -27,7 +27,9 @@ export default function ConnectModal({ open, setOpen } : Props) {
   const supportedWallets = getSupportedWallets()
 
   const onWalletClick = (walletType: WalletType) => {
-      onClose()
+      if(walletType === 'walletConnect') {
+        onClose();
+      }
       connect(walletType).then(() => onClose())
       .catch(error => {
         if(error instanceof UnsupportedChainIdError) setError(`Error on connecting wallet: Unsupported chain, supported chains are: ${ChainId[PROTOCOL_CHAIN]}`)
@@ -44,7 +46,7 @@ export default function ConnectModal({ open, setOpen } : Props) {
   }
 
   const WalletOption : React.FC<WalletOptionProps> = ({ name, logo, onClick }) => (
-    <button className="border-2 h-20 w-28 flex flex-col items-center p-2 active:ring-indigo-500 active:border-indigo-500 border-gray-300 rounded-md" onClick={onClick}>
+    <button className="border-2 h-20 w-40 flex flex-col items-center p-2 active:ring-indigo-500 active:border-indigo-500 border-gray-300 rounded-md" onClick={onClick}>
       <img className="w-10 mt-auto mb-auto" src={logo} alt={name} />
       <span className="text-sm">{name}</span>
     </button>
@@ -59,12 +61,12 @@ export default function ConnectModal({ open, setOpen } : Props) {
       role="dialog"
       aria-modal="true"
     >
-      <div className="rounded-lg bg-white w-[90%] sm:w-[500px] min-h-[300px] p-5 flex flex-col dark:bg-gray-800 dark:text-white">
+      <div className="rounded-lg bg-white w-[90%] sm:w-[500px] min-h-[250px] p-5 flex flex-col dark:bg-gray-800 dark:text-white">
         <button className="ml-auto" onClick={onClose}>
           <FaRegWindowClose className="hover:text-red-500" />
         </button>
-        <h2 className="text-lg leading-6 font-semibold text-gray-900 self-center mt-0 dark:text-white">Connect Your Wallet</h2>
-        <div className="flex flex-col sm:flex-row items-center justify-center mt-auto mb-auto gap-5 sm:gap-10">
+        <h2 className="text-lg leading-6 font-semibold text-gray-900 self-center mt-0 dark:text-white mb-5">Connect Your Wallet</h2>
+        <div className="flex flex-col sm:flex-row items-center flex-wrap justify-center mt-auto mb-auto gap-5">
           {
             supportedWallets.map( wallet => <WalletOption key={wallet.name} name={wallet.name} logo={wallet.icon} onClick={() => onWalletClick(wallet.type)} />)
           }

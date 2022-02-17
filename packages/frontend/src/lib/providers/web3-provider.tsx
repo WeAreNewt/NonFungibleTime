@@ -5,6 +5,7 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector, resetWalletConnector } from '../connectors/WalletConnect';
 import metamaskLogo from '../../images/metamask_logo.svg';
 import walletConnectLogo from '../../images/walletconnect_logo.svg';
+import browserWalletLogo from '../../images/browser_wallet_logo.png';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { isMobile } from '../helpers/userAgent';
 import * as z from 'zod';
@@ -43,11 +44,7 @@ interface WalletInfo {
 }
 
 const isInjected = () => !!window.ethereum
-const isMetamask = () => {
-  console.log(window.ethereum)
-  return !!window.ethereum && window.ethereum.isMetaMask
-}
-
+const isMetamask = () => !!window.ethereum && window.ethereum.isMetaMask
 
 const isWalletConnect = () => !isMobile || (isMobile && !isInjected)
 
@@ -59,7 +56,7 @@ export const wallets : Wallets = {
     name: 'Browser Wallet',
     connector: injected,
     enabled: () => (isInjected() && !isMetamask()),
-    icon: metamaskLogo
+    icon: browserWalletLogo
   },
   metamask: {
     type: 'metamask',
