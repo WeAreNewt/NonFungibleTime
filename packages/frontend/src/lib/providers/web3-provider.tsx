@@ -6,6 +6,7 @@ import { WalletConnectConnector, resetWalletConnector } from '../connectors/Wall
 import metamaskLogo from '../../images/metamask_logo.svg';
 import walletConnectLogo from '../../images/walletconnect_logo.svg';
 import browserWalletLogo from '../../images/browser_wallet_logo.svg';
+import browserWalletLogoWhite from '../../images/browser_wallet_logo_white.svg'
 import React, { useCallback, useContext, useEffect } from 'react';
 import { isMobile } from '../helpers/userAgent';
 import * as z from 'zod';
@@ -39,6 +40,7 @@ interface WalletInfo {
   name: string,
   connector: AbstractConnector,
   icon: string,
+  darkModeIcon?: string,
   enabled: () => boolean,
   type: WalletType
 }
@@ -56,7 +58,8 @@ export const wallets : Wallets = {
     name: 'Browser Wallet',
     connector: injected,
     enabled: () => (isInjected() && !isMetamask()),
-    icon: browserWalletLogo
+    icon: browserWalletLogo,
+    darkModeIcon: browserWalletLogoWhite
   },
   metamask: {
     type: 'metamask',

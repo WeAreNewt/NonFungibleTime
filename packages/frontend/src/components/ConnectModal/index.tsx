@@ -1,16 +1,36 @@
 import { Dialog } from "@headlessui/react";
 import { UnsupportedChainIdError } from "@web3-react/core";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { PROTOCOL_CHAIN, useWeb3, WalletType } from '../../lib/providers/web3-provider';
 import { ChainId } from '../../lib/config';
 import { UserRejectedRequestError } from "@web3-react/injected-connector";
 import { UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } from "../../lib/connectors/WalletConnect";
 import { FaRegWindowClose } from 'react-icons/fa';
 import { getSupportedWallets } from '../../lib/providers/web3-provider';
+import { ThemeContext } from '../../ThemeContext'
 
 interface Props {
   open: boolean
   setOpen: (open: boolean) => void
+}
+
+interface WalletOptionProps {
+  name: string,
+  logo: string,
+  onClick: () => void,
+  darkModeLogo?: string
+}
+
+const WalletOption : React.FC<WalletOptionProps> = ({ name, logo, darkModeLogo, onClick }) => {
+  const { theme } = useContext(ThemeContext);
+  const isDarkTheme = theme === 'dark'
+  const icon = darkModeLogo ? isDarkTheme ? darkModeLogo : logo : logo
+  return (
+    <button className="border-2 h-20 w-40 flex flex-col items-center p-2 active:ring-indigo-500 active:border-indigo-500 border-gray-300 rounded-md" onClick={onClick}>
+      <img className="w-10 mt-auto mb-auto fill-white" src={icon} alt={name} />
+      <span className="text-sm">{name}</span>
+    </button>
+  )
 }
 
 export default function ConnectModal({ open, setOpen } : Props) {
@@ -39,19 +59,6 @@ export default function ConnectModal({ open, setOpen } : Props) {
       });
   }
 
-  interface WalletOptionProps {
-    name: string,
-    logo: string,
-    onClick: () => void
-  }
-
-  const WalletOption : React.FC<WalletOptionProps> = ({ name, logo, onClick }) => (
-    <button className="border-2 h-20 w-40 flex flex-col items-center p-2 active:ring-indigo-500 active:border-indigo-500 border-gray-300 rounded-md" onClick={onClick}>
-      <img className="w-10 mt-auto mb-auto" src={logo} alt={name} />
-      <span className="text-sm">{name}</span>
-    </button>
-  )
-
   return (
     <Dialog
       open={open}
@@ -68,7 +75,7 @@ export default function ConnectModal({ open, setOpen } : Props) {
         <h2 className="text-lg leading-6 font-semibold text-gray-900 self-center mt-0 dark:text-white mb-5">Connect Your Wallet</h2>
         <div className="flex flex-col sm:flex-row items-center flex-wrap justify-center mt-auto mb-auto gap-5">
           {
-            supportedWallets.map( wallet => <WalletOption key={wallet.name} name={wallet.name} logo={wallet.icon} onClick={() => onWalletClick(wallet.type)} />)
+            supportedWallets.map( wallet => <WalletOption key={wallet.name} name={wallet.name} logo={wallet.icon} darkModeLogo={wallet.darkModeIcon} onClick={() => onWalletClick(wallet.type)} />)
           }
         </div>
         <div className="text-sm text-gray-700 self-center mt-0 dark:text-white p-4">Don't have an Ethereum wallet? <a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer" className="text-indigo-600">Click Here</a></div>
