@@ -3,6 +3,9 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      colors: {
+        twitter: "#2f9bf0"
+      },
       fontFamily: {
         inter: ["Inter", "sans-serif"]
       }
