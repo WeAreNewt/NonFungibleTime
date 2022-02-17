@@ -17,18 +17,12 @@ import { BuyPanel } from '../../components/BuyPanel';
 import { RedeemPanel } from '../../components/RedeemPanel';
 import { BuyingConditionChangePanel } from '../../components/BuyingConditionChangePanel';
 import { MaxUint256, ZERO_ADDRESS } from '../../lib/helpers/constants';
+import { TxStatus } from '../../lib/types';
 import Tooltip from '../../components/Tooltip';
 import { TokenIcon } from '@aave/aave-ui-kit';
 
 interface NftState {
   nft?: NFT;
-}
-
-export interface TxStatus {
-  submitted: boolean;
-  confirmed: boolean;
-  txHash?: string;
-  action: string;
 }
 
 function HeadingSeparator({ children }: { children: React.ReactNode }) {

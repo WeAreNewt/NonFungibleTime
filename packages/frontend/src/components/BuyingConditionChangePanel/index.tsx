@@ -2,12 +2,12 @@ import { useWeb3React } from "@web3-react/core";
 import classNames from "classnames";
 import { BigNumber } from "ethers";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PaymentToken } from "../../lib/graphql";
 import { MaxUint256, ZERO_ADDRESS } from "../../lib/helpers/constants";
 import { ChangeBuyingConditionsParamsType } from "../../lib/helpers/NftCollection";
 import { useAppDataProvider } from "../../lib/providers/app-data-provider";
-import { TxStatus } from "../../modules/NFTDetails";
+import { TxStatus } from '../../lib/types';
 import { NFT } from "../../types";
 import { Input, Select } from "../Forms";
 
@@ -42,6 +42,19 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
         },
         reservedBuyer: nft ? nft.allowedBuyer : ZERO_ADDRESS,
     })
+
+    const buyingConditionsChange : boolean = useMemo(() => {
+        if(nft) {
+            const { forSale, price, token, reservedBuyer } = buyingConditions;
+            return (
+                forSale !== nft.forSale ||
+                price !== Number(formatUnits(nft.price.toString(), nft.currency.decimals)) ||
+                token.id !== nft.currency.id ||
+                reservedBuyer !== nft.allowedBuyer
+            )
+        }
+        return false
+    }, [buyingConditions, nft])
 
     // Trigger changeBuyingConditions transaction
     const changeBuyingConditions = async () => {
@@ -158,7 +171,7 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
                             placeholder=""
                             value={buyingConditions.price.toString()}
                             min={0}
-                            className='text-black'
+                            className='text-black w-full'
                             onChange={(e) => {
                                 const price = Number(e.target.value)
                                 let priceRestricted = price > 0 ? price : 0;
@@ -194,8 +207,9 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
 
             <div className="pt-4 w-1/2 mx-auto">
                 <button
-                    className='w-full mx-auto text-center font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 py-4 md:text-md cursor-pointer'
+                    className='w-full mx-auto text-center font-semibold rounded-md text-white bg-indigo-600 hover:bg-gray-500 py-4 md:text-md cursor-pointer disabled:opacity-60 disabled:hover:bg-indigo-600'
                     onClick={() => changeBuyingConditions()}
+                    disabled={!buyingConditionsChange}
                 >
                     <div>Update</div>
                 </button>

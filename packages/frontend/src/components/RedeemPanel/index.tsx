@@ -3,7 +3,7 @@ import { BigNumber } from "ethers";
 import { useState } from "react";
 import { RedeemParamsType } from "../../lib/helpers/NftCollection";
 import { useAppDataProvider } from "../../lib/providers/app-data-provider";
-import { TxStatus } from "../../modules/NFTDetails";
+import { TxStatus } from '../../lib/types';
 import { NFT } from "../../types";
 
 interface RedeemPanelParams {
