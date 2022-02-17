@@ -10,7 +10,7 @@ import { BigNumber } from 'ethers';
 import { Category } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
-import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
+import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/helpers/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
 import { useNavigate } from 'react-router-dom';
 import Tooltip from '../Tooltip';
