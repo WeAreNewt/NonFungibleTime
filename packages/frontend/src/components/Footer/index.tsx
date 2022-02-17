@@ -3,8 +3,10 @@ import discord from '../../images/discord-logo.png';
 import twitter from '../../images/twitter-logo.png';
 import github from '../../images/github-logo.png';
 import etherscan from '../../images/etherscan-logo.png';
+import opensea from '../../images/opensea_logo.svg';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { Link } from 'react-router-dom';
+import { ChainId } from '../../lib/config';
 
 interface FooterLink {
   title: string;
@@ -38,6 +40,7 @@ const textLinks: FooterLink[] = [
 
 export default function Footer() {
   const { networkConfig } = useAppDataProvider();
+  const chainId = networkConfig.chainId;
   const logoLinks: FooterLink[] = [
     {
       title: 'Discord',
@@ -63,6 +66,12 @@ export default function Footer() {
       icon: etherscan,
       alt: 'Etherscan',
     },
+    {
+      title: 'OpenSea',
+      to: Number(chainId) === ChainId.polygon ? 'https://opensea.io/collection/nonfungibletimecollection' : 'https://testnets.opensea.io/collection/non-fungible-time-nmhsylz5yr',
+      icon: opensea,
+      alt: 'OpenSea'
+    }
   ];
 
   return (
