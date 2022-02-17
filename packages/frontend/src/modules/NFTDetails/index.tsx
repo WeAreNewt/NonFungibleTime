@@ -2,13 +2,12 @@ import { useSubscription } from '@apollo/client';
 import { Dialog } from '@headlessui/react';
 import { formatUnits } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
-import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose, FaShareAlt, FaTwitter } from 'react-icons/fa';
 import ClockSpinner from '../../images/clock-loader.webp';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, ButtonVariant } from '../../components/Button';
 import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
-import { TwitterContainer } from '../../components/TwitterContainer';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument } from '../../lib/graphql';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
@@ -318,11 +317,6 @@ export default function NFTDetails() {
                                       className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                                       value={window.location.href}
                                     />
-                                    <div className="pt-2">
-                                      <TwitterContainer
-                                        content={`I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
-                                      />
-                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -339,6 +333,14 @@ export default function NFTDetails() {
                           >
                             Copy URL
                           </button>
+                          <a
+                            target="_blank"
+                            href={`https://twitter.com/intent/tweet?text=I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
+                            className="mt-3 sm:mt-0 w-full inline-flex justify-center items-center gap-2 rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm bg-twitter"
+                          >
+                            <FaTwitter />
+                            Tweet
+                          </a>
                           <button
                             type="button"
                             className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
