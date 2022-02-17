@@ -95,7 +95,13 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
     const formattedPrice = Number(formatUnits(nft.price, nft.currency.decimals));
 
     // Loading wallet balance or transaction data
-    if (!transaction || balance === undefined) {
+    if (!currentAccount) {
+        return (
+            <div className="w-full mx-auto p-4 pb-0">
+                <div className="text-center" >Connect wallet to purchase NFT</div>
+            </div>
+        )
+    } else if (!transaction || balance === undefined) {
         return (
             <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
                 <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
