@@ -7,7 +7,6 @@
     "@ethersproject/providers": "^5.5.2",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
-    "@metamask/detect-provider": "^1.2.0",
     "@tailwindcss/forms": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@testing-library/jest-dom": "^5.14.1",
