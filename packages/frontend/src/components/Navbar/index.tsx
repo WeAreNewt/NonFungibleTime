@@ -87,16 +87,19 @@ export default function Navbar() {
           </div>
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
             {/** Clock Icon */}
-            <div className="flex-shrink-0 flex items-center">
+            <div className="flex-shrink-0 flex items-center gap-4">
               <Link to="/">
                 <img src={icon} alt="clock icon" width="50" height="50" />
+              </Link>
+              <Link className="hidden lg:block" to="/">
+                <span className="text-3xl text-indigo-600 font-extrabold font-inter">Aika</span>
               </Link>
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
             {/** Menu Items */}
             <div className="hidden sm:block sm:ml-6">
-              <div className="flex space-x-5">
+              <div className="flex items-center space-x-5">
                 {navigation.map((link, index) => {
                   return (
                     <div key={index}>

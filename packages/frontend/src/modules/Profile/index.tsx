@@ -68,23 +68,26 @@ export default function Profile() {
   const [nftsShown, setNftsShown] = useState<NFT[]>([]);
 
   useEffect(() => {
-    if (user?.createdNfts && toggleIndex === 0) {
-      const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
-      setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
+    if(user?.createdNfts || user?.ownedNfts) {
+      if (toggleIndex === 0) {
+        const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
+        setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
+      }
+      if (toggleIndex === 1) {
+        const filtered = user.ownedNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
+        setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
+      }
     }
-    if (user?.ownedNfts && toggleIndex === 1) {
-      const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
-      setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
+    else {
+      setNftsShown([])
     }
   }, [user, toggleIndex]);
 
   const onChangeTab = (index: number) => {
     if (index === 0) {
       setToggleIndex(0);
-      setNftsShown(user?.createdNfts ? user?.createdNfts : []);
     } else {
       setToggleIndex(1);
-      setNftsShown(user?.ownedNfts ? user?.ownedNfts : []);
     }
   };
   const renderNFTs = () => {
