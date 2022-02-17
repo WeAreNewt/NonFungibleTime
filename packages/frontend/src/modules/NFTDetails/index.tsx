@@ -335,6 +335,7 @@ export default function NFTDetails() {
                           </button>
                           <a
                             target="_blank"
+                            rel="noreferrer"
                             href={`https://twitter.com/intent/tweet?text=I just put my time on-chain 👀 who wants to be the owner of my time: ${window.location.href}`}
                             className="mt-3 sm:mt-0 w-full inline-flex justify-center items-center gap-2 rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm bg-twitter"
                           >
