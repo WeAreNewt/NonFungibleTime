@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatEthAddress } from '../../lib/helpers/format';
 import { useViewportProvider } from '../../lib/providers/viewport-provider';
-import { useWeb3 } from '../../lib/providers/web3-provider';
+import { useWeb3, isMetamask } from '../../lib/providers/web3-provider';
 import ConnectModal from '../ConnectModal';
 
 export default function AddressInfo() {
@@ -29,8 +29,8 @@ export default function AddressInfo() {
 
   const onClickModalOpen = () => {
     if (account) {
-      if (isCorrectChain) setIsOpen(!isOpen)
-      else requestToSwitchChain()
+      if(isMetamask() && !isCorrectChain) requestToSwitchChain()
+      else setIsOpen(!isOpen)
     }
     else setConnectModalOpen(true)
   }

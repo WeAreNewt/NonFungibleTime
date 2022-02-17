@@ -3,13 +3,18 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector, resetWalletConnector } from '../connectors/WalletConnect';
+import metamaskLogo from '../../images/metamask_logo.svg';
+import walletConnectLogo from '../../images/walletconnect_logo.svg';
+import browserWalletLogo from '../../images/browser_wallet_logo.svg';
+import browserWalletLogoWhite from '../../images/browser_wallet_logo_white.svg'
 import React, { useCallback, useContext, useEffect } from 'react';
+import { isMobile } from '../helpers/userAgent';
 import * as z from 'zod';
 import { addChainParameters, ChainId } from '../config';
 
 const WALLET_TYPE_STORAGE_KEY = 'WALLET_TYPE';
 
-export const WalletType = z.enum(['injected', 'walletConnect']);
+export const WalletType = z.enum(['metamask', 'injected', 'walletConnect']);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type WalletType = z.infer<typeof WalletType>;
 
@@ -31,11 +36,48 @@ export const walletConnect = new WalletConnectConnector({
   supportedChainIds: [PROTOCOL_CHAIN]
 });
 
-export const connectors: Record<WalletType, AbstractConnector> = {
-  injected,
-  walletConnect
-  // Add more supported connectors
-};
+interface WalletInfo {
+  name: string,
+  connector: AbstractConnector,
+  icon: string,
+  darkModeIcon?: string,
+  enabled: () => boolean,
+  type: WalletType
+}
+
+const isInjected = () => !!window.ethereum
+export const isMetamask = () => !!window.ethereum && window.ethereum.isMetaMask
+
+const isWalletConnect = () => !isMobile || (isMobile && !isInjected)
+
+type Wallets = Record<WalletType, WalletInfo>
+
+export const wallets : Wallets = {
+  injected: {
+    type: 'injected',
+    name: 'Browser Wallet',
+    connector: injected,
+    enabled: () => (isInjected() && !isMetamask()),
+    icon: browserWalletLogo,
+    darkModeIcon: browserWalletLogoWhite
+  },
+  metamask: {
+    type: 'metamask',
+    name: 'MetaMask',
+    connector: injected,
+    enabled: isMetamask,
+    icon: metamaskLogo
+  },
+  walletConnect: {
+    type: 'walletConnect',
+    name: 'WalletConnect',
+    connector: walletConnect,
+    icon: walletConnectLogo,
+    enabled: isWalletConnect
+  }
+}
+
+export const getSupportedWallets = () =>  Object.keys(wallets).map<WalletInfo>(elem => wallets[(elem as WalletType)]).filter(elem => elem.enabled())
 
 export interface Web3DataContextType {
   chainId: number;
@@ -57,6 +99,7 @@ export const Web3DataProvider: React.FC = ({ children }) => {
     (walletType: WalletType) => {
       switch (walletType) {
         case WalletType.Values.injected:
+        case WalletType.Values.metamask:
           return activate(injected, undefined, true).then(() => {
             localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
           })
@@ -115,7 +158,7 @@ export const Web3DataProvider: React.FC = ({ children }) => {
     if (
       previouslyConnectedWalletType &&
       WalletType.parse(previouslyConnectedWalletType) &&
-      connectors[previouslyConnectedWalletType]
+      wallets[previouslyConnectedWalletType].connector
     ) {
       try {
         connect(previouslyConnectedWalletType)
