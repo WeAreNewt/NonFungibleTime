@@ -56,7 +56,7 @@ export default function CategoryFilter({ onSelect, selected }: CategoryFilterPro
   // bg-white hover:bg-gray-100 text-gray-700 border border-gray-300
   return (
     <Listbox value={selected} onChange={onSelect}>
-      <div className="relative mt-1">
+      <div className="relative mt-1 z-10">
         <Listbox.Button className="relative border border-gray-300 w-full py-2 px-4  text-left font-medium bg-white rounded-lg  cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
           <span className="block truncate">{selected}</span>
           <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">

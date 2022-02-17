@@ -147,7 +147,7 @@ export default function Navbar() {
       </div>
 
       <div className={menuOpen ? 'sm:hidden' : 'hidden'} id="mobile-menu">
-        <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="px-2 pt-2 pb-3 space-y-3">
           {navigation.map((link, index) => {
             return (
               <div key={index}>
@@ -156,7 +156,7 @@ export default function Navbar() {
                     href={link.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-500 px-3 py-2 rounded-md text-base font-semibold"
+                    className="text-gray-500 px-3 py-2 rounded-md text-lg font-semibold"
                     aria-current={undefined}
                   >
                     {link.title}
@@ -167,8 +167,8 @@ export default function Navbar() {
                     title={link.title}
                     className={
                       activePage === link.title.toLowerCase()
-                        ? 'text-indigo-600 px-3 py-2 rounded-md text-base font-semibold'
-                        : 'text-gray-500 px-3 py-2 rounded-md text-base font-semibold'
+                        ? 'text-indigo-600 px-3 py-2 rounded-md text-lg font-semibold'
+                        : 'text-gray-500 px-3 py-2 rounded-md text-lg font-semibold'
                     }
                     aria-current={activePage === link.title.toLowerCase() ? 'page' : undefined}
                   >
