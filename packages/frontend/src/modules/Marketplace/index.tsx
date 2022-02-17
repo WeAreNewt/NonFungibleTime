@@ -121,13 +121,13 @@ export default function Marketplace() {
                 }} selected={category} />
               </div>
 
-              <div className="w-1/2 p-2" style={{ minWidth: "150px" }}>
+              <div className="w-1/2 p-2" style={{ minWidth: "130px" }}>
                 <FieldLabel>For Sale</FieldLabel>
                 <ToggleFilter onSelect={(forSale) => {
                   setFilters({ ...filters, forSale });
                 }} selected={forSale} />
               </div>
-              <div className="w-1/2 p-2" style={{ minWidth: "150px" }}>
+              <div className="w-1/2 p-2" style={{ minWidth: "130px" }}>
                 <FieldLabel>Redeemed</FieldLabel>
                 <ToggleFilter onSelect={(redeemed) => {
                   setFilters({ ...filters, redeemed });
