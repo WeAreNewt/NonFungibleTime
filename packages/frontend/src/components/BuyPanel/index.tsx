@@ -6,7 +6,7 @@ import { NFT } from "../../types";
 import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import { useAppDataProvider } from "../../lib/providers/app-data-provider";
-import { TxStatus } from '../../modules/NFTDetails/index'
+import { TxStatus } from '../../lib/types';
 import { ZERO_ADDRESS } from "../../lib/helpers/constants";
 import { EthereumTransactionTypeExtended } from "../../lib/helpers/base-service";
 import { ERC20Service } from "../../lib/helpers/ERC20";
