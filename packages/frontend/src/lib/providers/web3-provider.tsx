@@ -19,7 +19,7 @@ export const WalletType = z.enum(['metamask', 'injected', 'walletConnect']);
 export type WalletType = z.infer<typeof WalletType>;
 
 // No network toggle for now
-export const PROTOCOL_CHAIN = ChainId.polygon;
+export const PROTOCOL_CHAIN = process.env.NODE_ENV === 'development' ? ChainId.mumbai : ChainId.polygon;
 
 export const injected = new InjectedConnector({});
 
