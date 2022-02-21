@@ -6,7 +6,7 @@ import { NFT } from "../../types";
 import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import { useAppDataProvider } from "../../lib/providers/app-data-provider";
-import { TxStatus } from '../../modules/NFTDetails/index'
+import { TxStatus } from '../../lib/types';
 import { ZERO_ADDRESS } from "../../lib/helpers/constants";
 import { EthereumTransactionTypeExtended } from "../../lib/helpers/base-service";
 import { ERC20Service } from "../../lib/helpers/ERC20";
@@ -95,7 +95,13 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
     const formattedPrice = Number(formatUnits(nft.price, nft.currency.decimals));
 
     // Loading wallet balance or transaction data
-    if (!transaction || balance === undefined) {
+    if (!currentAccount) {
+        return (
+            <div className="w-full mx-auto p-4 pb-0">
+                <div className="text-center" >Connect wallet to purchase NFT</div>
+            </div>
+        )
+    } else if (!transaction || balance === undefined) {
         return (
             <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
                 <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />

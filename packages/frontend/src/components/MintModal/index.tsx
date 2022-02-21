@@ -10,12 +10,13 @@ import { BigNumber } from 'ethers';
 import { Category } from '../../types';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
-import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/utils/validators'
+import { required, inBetween, validateDate, greaterThanOrEqualTo } from '../../lib/helpers/validators'
 import ClockSpinner from '../../images/clock-loader.webp';
 import { useNavigate } from 'react-router-dom';
 import Tooltip from '../Tooltip';
 import { hexStripZeros } from 'ethers/lib/utils';
 import { BuyingConditionChangePanel } from '../BuyingConditionChangePanel';
+import { TxStatus } from '../../lib/types';
 
 const validateDuration = greaterThanOrEqualTo(0.01)
 const validateRoyalty = inBetween(0, 100)
@@ -23,12 +24,6 @@ const validateRoyalty = inBetween(0, 100)
 interface Props {
   open: boolean,
   onClose: () => void,
-}
-
-export interface TxStatus {
-  submitted: boolean;
-  confirmed: boolean;
-  txHash?: string;
 }
 
 interface MintNftParams {
@@ -63,6 +58,7 @@ export default function MintModal({ open, onClose }: Props) {
   const [txStatus, setTxStatus] = useState<TxStatus>({
     submitted: false,
     confirmed: false,
+    action: ''
   });
   const [lastNft, setLastNft] = useState<number | undefined>(undefined);
   const [displaySaleForm, setDisplaySaleForm] = useState<boolean>(false);
@@ -79,7 +75,7 @@ export default function MintModal({ open, onClose }: Props) {
   }
 
   useEffect(() => {
-    setTxStatus({ submitted: false, confirmed: false, txHash: undefined });
+    setTxStatus({ submitted: false, confirmed: false, txHash: undefined, action: '' });
   }, [])
 
   useEffect(() => {
@@ -205,7 +201,7 @@ export default function MintModal({ open, onClose }: Props) {
                           <button
                             type="button"
                             className="disabled:opacity-50 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white w-auto sm:text-sm"
-                            onClick={() => { setDisplaySaleForm(true); setTxStatus({ submitted: false, confirmed: false, txHash: undefined }) }}
+                            onClick={() => { setDisplaySaleForm(true); setTxStatus({ submitted: false, confirmed: false, txHash: undefined, action: '' }) }}
                           >
                             Sell
                           </button>
