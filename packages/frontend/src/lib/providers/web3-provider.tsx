@@ -48,7 +48,7 @@ interface WalletInfo {
 const isInjected = () => !!window.ethereum
 export const isMetamask = () => !!window.ethereum && window.ethereum.isMetaMask
 
-const isWalletConnect = () => !isMobile || (isMobile && !isInjected)
+const isWalletConnect = () => !isMobile || (isMobile && !isInjected())
 
 type Wallets = Record<WalletType, WalletInfo>
 
