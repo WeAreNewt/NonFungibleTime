@@ -1,0 +1,40 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [development]
+  pull_request:
+    branches: [development]
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./packages/contracts
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.16.1'
+      - name: Install hardhat
+        run: npm install --save-dev hardhat
+        working-directory: ${{env.working-directory}}
+      - name: Install packages
+        run: npm install
+        working-directory: ${{env.working-directory}}
+      - name: Compile code
+        run: npx hardhat compile
+        working-directory: ${{env.working-directory}}
+      - name: Run tests
+        run: npx hardhat test
+        working-directory: ${{env.working-directory}}
+
+  frontend:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./packages/frontend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/build
+        with:
+          WORK_DIR: '${{env.working-directory}}'

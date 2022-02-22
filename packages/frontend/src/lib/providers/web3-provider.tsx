@@ -19,12 +19,12 @@ export const WalletType = z.enum(['metamask', 'injected', 'walletConnect']);
 export type WalletType = z.infer<typeof WalletType>;
 
 // No network toggle for now
-export const PROTOCOL_CHAIN = ChainId.mumbai;
+export const PROTOCOL_CHAIN = process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ?  ChainId.polygon : ChainId.mumbai;
 
 export const injected = new InjectedConnector({});
 
 const chainsRpc = Object.keys(addChainParameters).reduce<Record<number, string>>((acum, current) => {
-  const chainId : number = Number(current)
+  const chainId: number = Number(current)
   if (addChainParameters[chainId].rpcUrls) {
     acum[chainId] = addChainParameters[chainId].rpcUrls![0]
   }
@@ -48,7 +48,7 @@ interface WalletInfo {
 const isInjected = () => !!window.ethereum
 export const isMetamask = () => !!window.ethereum && window.ethereum.isMetaMask
 
-const isWalletConnect = () => !isMobile || (isMobile && !isInjected)
+const isWalletConnect = () => !isMobile || (isMobile && !isInjected())
 
 type Wallets = Record<WalletType, WalletInfo>
 
@@ -118,15 +118,15 @@ export const Web3DataProvider: React.FC = ({ children }) => {
   );
 
   const disconnect = useCallback(
-   async () => {
-     try {
-          await deactivate()
-          localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
-     }
-     catch {
-       //todo: add error msg
-       console.log("error when deactivating wallet")
-     }
+    async () => {
+      try {
+        await deactivate()
+        localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
+      }
+      catch {
+        //todo: add error msg
+        console.log("error when deactivating wallet")
+      }
     },
     [deactivate]
   );
@@ -162,7 +162,7 @@ export const Web3DataProvider: React.FC = ({ children }) => {
     ) {
       try {
         connect(previouslyConnectedWalletType)
-      } catch(error) {
+      } catch (error) {
         console.log(error)
       }
     }
