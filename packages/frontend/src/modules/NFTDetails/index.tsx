@@ -204,7 +204,7 @@ export default function NFTDetails() {
         <div className="flex flex-col sm:flex-row  gap-10 ">
           {/** Column 1: NFT Image + buy/sell/redeem options */}
           <div className="flex w-full sm:w-1/3 md:w-1/4 flex-col gap-5 ">
-            <div className="w-full bg-white rounded-md border border-gray-300">
+            <div className="w-full">
               <img alt="token uri" src={uri} />
             </div>
             {/** If redeemed -> show redeemed message
