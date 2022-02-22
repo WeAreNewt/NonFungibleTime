@@ -19,20 +19,23 @@ inputs:
   AWS_REGION:
     description: AWS region
     required: true
-  WORK_DIR: 
+  WORK_DIR:
     description: Path to source code
     required: true
+  REACT_APP_SELECTED_ENVIRONMENT:
+    description: ReactApp environment
+    required: true
 runs:
-  using: "composite"
-  steps:  
+  using: 'composite'
+  steps:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: "${{ inputs.AWS_ACCESS_KEY_ID }}"
-        aws-secret-access-key: "${{ inputs.AWS_SECRET_ACCESS_KEY }}"
-        aws-region: "${{ inputs.AWS_REGION }}"
+        aws-access-key-id: '${{ inputs.AWS_ACCESS_KEY_ID }}'
+        aws-secret-access-key: '${{ inputs.AWS_SECRET_ACCESS_KEY }}'
+        aws-region: '${{ inputs.AWS_REGION }}'
         role-duration-seconds: 600
-        role-session-name: "nftime-deploy"
+        role-session-name: 'nftime-deploy'
     - name: Upload build to S3
       shell: sh
       working-directory: ${{inputs.WORK_DIR}}

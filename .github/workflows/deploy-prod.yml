@@ -9,18 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: ./packages/frontend
+      react-app-selected-environment: ${{secrets.REACT_APP_SELECTED_ENVIRONMENT}}
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/build
         with:
-          WORK_DIR: "${{env.working-directory}}"
-
+          WORK_DIR: '${{env.working-directory}}'
+          REACT_APP_SELECTED_ENVIRONMENT: '${{env.react-app-selected-environment}}'
       - name: Deploy to AWS S3
         uses: ./.github/actions/deploy
         with:
           S3_BUCKET: ${{secrets.S3_BUCKET}}
-          S3_PREFIX: ""
+          S3_PREFIX: ''
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_REGION: ${{secrets.AWS_REGION}}
-          WORK_DIR: "${{env.working-directory}}"
+          WORK_DIR: '${{env.working-directory}}'
+          REACT_APP_SELECTED_ENVIRONMENT: '${{env.react-app-selected-environment}}'
