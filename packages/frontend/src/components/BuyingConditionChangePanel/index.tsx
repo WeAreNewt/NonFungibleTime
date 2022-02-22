@@ -43,17 +43,23 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
         reservedBuyer: nft ? nft.allowedBuyer : ZERO_ADDRESS,
     })
 
-    const buyingConditionsChange : boolean = useMemo(() => {
-        if(nft) {
-            const { forSale, price, token, reservedBuyer } = buyingConditions;
+    const buyingConditionsChange: boolean = useMemo(() => {
+        const { forSale, price, token, reservedBuyer } = buyingConditions;
+        if (nft) {
             return (
                 forSale !== nft.forSale ||
                 price !== Number(formatUnits(nft.price.toString(), nft.currency.decimals)) ||
                 token.id !== nft.currency.id ||
                 reservedBuyer !== nft.allowedBuyer
             )
+        } else {
+            return (
+                forSale !== false ||
+                price !== 0 ||
+                token.id !== ZERO_ADDRESS ||
+                reservedBuyer !== ZERO_ADDRESS
+            )
         }
-        return false
     }, [buyingConditions, nft])
 
     // Trigger changeBuyingConditions transaction
