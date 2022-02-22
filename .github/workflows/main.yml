@@ -33,8 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: ./packages/frontend
+      react-app-selected-environment: ${{secrets.REACT_APP_SELECTED_ENVIRONMENT}}
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/build
         with:
-          WORK_DIR: "${{env.working-directory}}"
+          WORK_DIR: '${{env.working-directory}}'
+          REACT_APP_SELECTED_ENVIRONMENT: '${{env.react-app-selected-environment}}'

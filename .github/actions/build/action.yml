@@ -1,20 +1,23 @@
 name: Build dist
 description: Build static files for frontend
 inputs:
-  WORK_DIR: 
+  WORK_DIR:
     description: Path to source code
     required: true
+  REACT_APP_SELECTED_ENVIRONMENT:
+    description: ReactApp environment
+    required: true
 runs:
-  using: "composite"
-  steps:  
+  using: 'composite'
+  steps:
     - uses: actions/setup-node@v2
       with:
         node-version: '14.16.1'
     - name: Install NPM packages
       shell: sh
-      working-directory: "${{inputs.WORK_DIR}}"
+      working-directory: '${{inputs.WORK_DIR}}'
       run: npm i
     - name: Build frontend
       shell: sh
-      working-directory: "${{inputs.WORK_DIR}}"
+      working-directory: '${{inputs.WORK_DIR}}'
       run: npm run build
