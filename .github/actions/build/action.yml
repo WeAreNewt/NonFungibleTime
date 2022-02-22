@@ -18,6 +18,8 @@ runs:
       working-directory: '${{inputs.WORK_DIR}}'
       run: npm i
     - name: Build frontend
+      env:
+        REACT_APP_SELECTED_ENVIRONMENT: '${{inputs.REACT_APP_SELECTED_ENVIRONMENT}'
       shell: sh
       working-directory: '${{inputs.WORK_DIR}}'
       run: npm run build
