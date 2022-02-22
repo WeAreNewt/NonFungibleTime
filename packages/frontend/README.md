@@ -1,9 +1,15 @@
 # Development
 
 ```
+cp .env.test .env
 npm install
 npm start
 ```
+
+## Environment
+
+To change the environment you want to work on set the `REACT_APP_SELECTED_ENVIRONMENT` variable defined in the `.env` file to `production`(polygon mainnet)
+or `development`(mumbai)
 
 ## Subgraph Changes
 
