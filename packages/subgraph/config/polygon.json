@@ -1,5 +1,5 @@
 {
-  "network": "polygon",
-  "timeCollectionAddress": "",
-  "timeCollectionStartBlock": 0
+  "network": "matic",
+  "timeCollectionAddress": "0x6A9ab6e747699fB80E53B21b3baB24EE840fD1Ff",
+  "timeCollectionStartBlock": 24793044
 }

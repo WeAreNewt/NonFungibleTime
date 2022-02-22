@@ -39,7 +39,7 @@ export const addChainParameters: Record<number, AddEthereumChainParameter> = {
         rpcUrls: ['https://polygon-mumbai.g.alchemy.com/v2/demo', 'https://matic-mumbai.chainstacklabs.com'],
         chainId: utils.hexValue(ChainId.mumbai),
         blockExplorerUrls: ['https://explorer-mumbai.maticvigil.com'],
-        chainName: 'Polygon Mainnet',
+        chainName: 'Mumbai Testnet',
         nativeCurrency: {
             name: matic.name,
             symbol: matic.symbol,
@@ -70,8 +70,8 @@ export const networkConfigs: Record<number, NetworkConfig> = {
     [ChainId.polygon]: {
         subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
         subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-polygon',
-        collectionAddress: '',
-        blockExplorer: 'https://polygon-rpc.com/',
+        collectionAddress: '0x6A9ab6e747699fB80E53B21b3baB24EE840fD1Ff',
+        blockExplorer: 'https://polygonscan.com',
         ...addChainParameters[ChainId.polygon],
     },
 };
