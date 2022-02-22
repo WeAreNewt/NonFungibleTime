@@ -23,7 +23,7 @@ function getWeb3Library(provider: any): ethers.providers.Web3Provider {
   return new ethers.providers.Web3Provider(provider);
 }
 
-const chainId = process.env.NODE_ENV === 'development' ? ChainId.mumbai : ChainId.polygon
+const chainId = process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ?  ChainId.polygon : ChainId.mumbai;
 
 const apolloClient = createApolloClient({
   httpUri: networkConfigs[chainId].subgraphHttpLink,
