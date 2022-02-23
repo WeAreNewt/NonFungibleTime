@@ -6,7 +6,8 @@ inputs:
     required: true
   REACT_APP_SELECTED_ENVIRONMENT:
     description: ReactApp environment
-    required: true
+    required: false
+    default: development
 runs:
   using: 'composite'
   steps:
@@ -17,9 +18,9 @@ runs:
       shell: sh
       working-directory: '${{inputs.WORK_DIR}}'
       run: npm i
-    - name: Build frontend
-      env:
-        REACT_APP_SELECTED_ENVIRONMENT: '${{inputs.REACT_APP_SELECTED_ENVIRONMENT}}'
+    - name: Build static
       shell: sh
       working-directory: '${{inputs.WORK_DIR}}'
-      run: npm run build
+      run: |
+        echo "REACT_APP_SELECTED_ENVIRONMENT={{ inputs.REACT_APP_SELECTED_ENVIRONMENT }}" > .env
+        npm run build
