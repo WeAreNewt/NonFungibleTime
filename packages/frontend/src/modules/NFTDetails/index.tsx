@@ -415,7 +415,7 @@ export default function NFTDetails() {
                 </div>
                 <div>
                   <div className="flex gap-3 mb-2 align-center">
-                    <FieldLabel className="font-semibold">Royalities</FieldLabel>
+                    <FieldLabel className="font-semibold">Royalties</FieldLabel>
                     <Tooltip content="Your share of secondary sales: every time your time is resold, you receive royalties on the sale. This only applies to sales on our marketplace and any other EIP-2981 compliant marketplace" />
                   </div>
                   <div className="font-semibold">{(nft.royaltyBasisPoints / 100).toString()} %</div>
