@@ -12,7 +12,7 @@ interface Navigation {
 }
 
 export default function Navbar() {
-  const { currentAccount } = useAppDataProvider();
+  const { currentAccount, ensName } = useAppDataProvider();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const activePage = location.pathname.split('/')[1];
@@ -20,7 +20,7 @@ export default function Navbar() {
   // Navbar Links
   const navigation: Navigation[] = [
     {
-      link: '/profile/' + (currentAccount ? currentAccount : ''),
+      link: '/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''),
       title: 'Profile',
     },
     {

@@ -1,60 +1,137 @@
 import React, { useEffect, useState } from 'react';
-import { FaShareAlt } from 'react-icons/fa';
 import ClockSpinner from '../../images/clock-loader.webp';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NFTCard from '../../components/NFTCard';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { NFT, User } from '../../types';
-import { Dialog, Tab } from '@headlessui/react';
+import { Tab } from '@headlessui/react';
 import { NFTGrid } from '../../components/NFTGrid';
 import { ProfileNftsDocument } from '../../lib/graphql';
 import { useSubscription } from '@apollo/client';
-import makeBlockie from 'ethereum-blockies-base64';
 import classnames from 'classnames';
 import ConnectButton from '../../components/ConnectButton';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Button, ButtonVariant } from '../../components/Button';
-import MintModal from '../../components/MintModal';
 import { isAddress } from 'ethers/lib/utils';
 import { ZERO_ADDRESS } from '../../lib/helpers/constants';
-import { formatEthAddress } from '../../lib/helpers/format';
-import { useViewportProvider } from '../../lib/providers/viewport-provider';
+import { ProfileHeader } from '../../components/ProfileHeader';
+
+interface ProfileNameState {
+  loadingAddress: boolean;
+  address: string | undefined;
+  loadingName: boolean;
+  name: string | undefined;
+}
 
 export default function Profile() {
-  const { currentAccount, userData, loadingUserData, } =
+  const { currentAccount, userData, loadingUserData, mainnetProvider, ensName, lookupAddress, ensRegistry } =
     useAppDataProvider();
   const navigate = useNavigate();
-  const { width } = useViewportProvider();
-  const [owner, setOwner] = useState<Boolean>(true);
+  const [owner, setOwner] = useState<boolean>(true);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
-  const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
-  const [shareProfileModalOpen, setShareProfileModalOpen] = useState<boolean>(false);
+  const [nameStatus, setNameStatus] = useState<ProfileNameState>(
+    {
+      loadingAddress: false,
+      loadingName: false,
+      name: undefined,
+      address: undefined,
+    }
+  );
+  const [mintPathSet, setMintPathSet] = useState<boolean>(false);
+  const [resolveError, setResolveError] = useState<string | undefined>(undefined); // If pathname is not an address or valid ens name
   const location = useLocation();
   const path = location.pathname.split('/');
   const accountName = path[2] ? path[2] : '';
 
-  // The width below which the mobile address view
-  const breakpoint = 650;
-
+  // Determine is connected wallet is profile owner
+  // Resolve and set profile ens name and/or address based on pathname
   useEffect(() => {
-    if (accountName.toLowerCase() === currentAccount?.toLowerCase()) {
+    // ensName -> address
+    const resolveName = async (name: string) => {
+      const address = await mainnetProvider.resolveName(name);
+      if (address) {
+        setNameStatus({
+          loadingAddress: false,
+          loadingName: false,
+          name,
+          address,
+        })
+        setResolveError(undefined);
+      } else {
+        setNameStatus({
+          ...nameStatus,
+          loadingName: false,
+          loadingAddress: false,
+        })
+        setResolveError(`Cannot resolve ens name ${name}`)
+      }
+    }
+
+    // address -> ensName
+    const lookup = async (address: string) => {
+      const name = await lookupAddress(address);
+      setNameStatus({
+        ...nameStatus,
+        loadingName: false,
+        name,
+      })
+    }
+
+    // determine if connected wallet is profile owner
+    if (accountName.toLowerCase() === currentAccount?.toLowerCase() || accountName.toLowerCase() === ensName?.toLowerCase()) {
       setOwner(true);
     } else {
       setOwner(false);
     }
-    if (path[3] === 'mint') {
-      navigate('/profile/' + (currentAccount ? currentAccount : ''))
-      setMintModalOpen(true)
+
+    // if user is profile owner and mint is added to pathname, open mint modal
+    if (owner && path[3] === 'mint') {
+      navigate('/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''))
+      setMintPathSet(true)
     }
-  }, [path, currentAccount, navigate, accountName]);
+
+    // set profile address based on pathname or resolve from ens
+    if (!nameStatus.address && !resolveError) {
+      if (isAddress(accountName)) {
+        setResolveError(undefined);
+        const address = accountName.toLowerCase()
+        setNameStatus({
+          ...nameStatus,
+          address,
+          loadingAddress: false,
+        })
+      } else if (!nameStatus.loadingAddress) {
+        // if path is not an address and not already loading, treat path as an ens name and attempt to resolve
+        setNameStatus({
+          ...nameStatus,
+          loadingAddress: true,
+        })
+        resolveName(accountName);
+      }
+    }
+
+    // if ens name is not set and not already loading, lookup address in ensRegistry or lookup if not found
+    if (nameStatus.address && !nameStatus.name) {
+      if (ensRegistry[nameStatus.address]) {
+        setNameStatus({
+          ...nameStatus,
+          name: ensRegistry[nameStatus.address],
+        })
+      } else if (!nameStatus.loadingName) {
+        setNameStatus({
+          ...nameStatus,
+          loadingName: true,
+        })
+        lookup(nameStatus.address);
+      }
+    }
+  }, [accountName, currentAccount, ensName, ensRegistry, lookupAddress, mainnetProvider, nameStatus, navigate, owner, path, resolveError])
 
   // If user is the profile owner, use data from app provider
   // Otherwise fetch data from subgraph
-  let sanitizedUser = ''
-  if (!owner && isAddress(accountName)) {
-    sanitizedUser = accountName.toLowerCase();
+  let sanitizedUser = '';
+  if (!owner && nameStatus.address) {
+    sanitizedUser = nameStatus.address.toLowerCase()
   }
-
   const { data, loading, error } = useSubscription(ProfileNftsDocument, {
     variables: {
       user: sanitizedUser,
@@ -68,7 +145,7 @@ export default function Profile() {
   const [nftsShown, setNftsShown] = useState<NFT[]>([]);
 
   useEffect(() => {
-    if(user?.createdNfts || user?.ownedNfts) {
+    if (user?.createdNfts || user?.ownedNfts) {
       if (toggleIndex === 0) {
         const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
         setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
@@ -121,9 +198,8 @@ export default function Profile() {
       </div>)
   }
 
-  // If there is no user, data is either errored, loading, or no data
-  // If there is no data and the pathname is a valid address, ithis block is skipped and the profile is displayed as empty
-  if (!user) {
+  // Display error or loading screens
+  if (!user || !nameStatus.address) {
     if (error) {
       return <div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
@@ -132,140 +208,35 @@ export default function Profile() {
           </div>
         </div>
       </div>
-    } else if (loadingUserData) {
+    } else if (resolveError) {
+      return <div className="h-screen">
+        <div className="w-1/3 text-center mx-auto align-middle">
+          <div className="text-red font-bold text-xl p-20">
+            An Error occured: {resolveError}
+          </div>
+        </div>
+      </div>
+    } else if (loadingUserData || nameStatus.loadingAddress) {
       return <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
         <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
       </div>;
-    } else if (!accountName || !isAddress(accountName)) {
+    } else if (!accountName || !nameStatus.address || !isAddress(nameStatus.address)) {
       return (<div className="h-screen">
         <div className="w-1/3 text-center mx-auto align-middle">
           <div className="text-black dark:text-white font-bold text-xl p-20">
-            Invalid ETH Address
+            Invalid ETH Address or ENS name
           </div>
         </div>
       </div>)
     }
   }
 
-  // If the path contains a valid ethereum address, display profile data
+  // If the path contains a valid ethereum address or ens name, display profile data
   return (
     <div className="bg-slate-100 dark:bg-gray-800">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="p-4 md:p-10">
-          <div className="flex flex-row flex-wrap lg:flex-nowrap gap-4 justify-between items-center">
-            {/** Profile Header */}
-            <div className="w-full justify-items-center md:justify-items-start">
-              <div className="flex flex-row justify-center items-center gap-4">
-                {/** Avatar/Blockie */}
-                <img
-                  alt="blockie or ens avatar"
-                  src={makeBlockie(accountName)}
-                  className="rounded-full w-40"
-                />
-                {/** ENS Name/Address */}
-                <div className="text-black dark:text-white tracking-widest font-semibold">{width < breakpoint ? formatEthAddress(accountName) : accountName}</div>
-              </div>
-            </div>
-            {/** Share Profile */}
-            <div className="flex md:px-5 w-full py-2 justify-center lg:justify-end ">
-              <div className="flex gap-4 flex-1 py-2 justify-center lg:flex-initial  ">
-                <Button
-                  variant={ButtonVariant.SECONDARY}
-                  onClick={() => setShareProfileModalOpen(true)}
-                >
-                  <FaShareAlt /> Share Profile
-                </Button>
-                {/** Mint */}
-                {owner && (
-                  <Button
-                    onClick={() => {
-                      setMintModalOpen(true);
-                    }}
-                  >
-                    Mint new
-                  </Button>
-                )}
-                {/** Mint Modal */}
-                <MintModal open={mintModalOpen} onClose={() => setMintModalOpen(false)} />
-                {/** Share Profile Modal */}
-                <Dialog
-                  open={shareProfileModalOpen}
-                  onClose={() => setShareProfileModalOpen(false)}
-                  className="fixed z-10 inset-0 overflow-y-auto"
-                  aria-labelledby="modal-title"
-                  role="dialog"
-                  aria-modal="true"
-                >
-                  <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <div
-                      className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                      aria-hidden="true"
-                    ></div>
-
-                    <span
-                      className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                      aria-hidden="true"
-                    >
-                      &#8203;
-                    </span>
-
-                    <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                      <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div className="sm:flex sm:items-start">
-                          <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3
-                              className="text-lg leading-6 font-medium text-gray-900"
-                              id="modal-title"
-                            >
-                              Share Profile
-                            </h3>
-                            <div className="mt-2">
-                              <div>
-                                <label
-                                  htmlFor="profile-link"
-                                  className="block text-sm font-medium text-gray-700"
-                                >
-                                  Profile Link
-                                </label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                  <input
-                                    disabled={true}
-                                    type="text"
-                                    name="profile-link"
-                                    id="price"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder={window.location.href}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                          type="button"
-                          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm"
-                          onClick={() => {
-                            navigator.clipboard.writeText(window.location.href);
-                          }}
-                        >
-                          Copy URL
-                        </button>
-                        <button
-                          type="button"
-                          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                          onClick={() => setShareProfileModalOpen(false)}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Dialog>
-              </div>
-            </div>
-          </div>
+          <ProfileHeader profileAddress={nameStatus.address ? nameStatus.address : ''} profileENS={nameStatus.name !== nameStatus.address ? nameStatus.name : undefined} owner={owner} mintPathSet={mintPathSet} />
           <Tab.Group onChange={(index) => onChangeTab(index)}>
             <Tab.List>
               {categories.map((category) => {
