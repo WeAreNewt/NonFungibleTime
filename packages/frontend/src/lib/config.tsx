@@ -3,6 +3,7 @@ import { utils } from 'ethers';
 export enum ChainId {
     mumbai = 80001,
     polygon = 137,
+    mainnet = 1,
 }
 
 // https://eips.ethereum.org/EIPS/eip-3085
@@ -32,9 +33,27 @@ export class Matic {
     readonly symbol = 'MATIC';
 }
 
+export class ETH {
+    readonly name = 'ETH' as const;
+    readonly decimals = 18 as const;
+    readonly symbol = 'ETH';
+}
+
 export const matic = new Matic();
+export const eth = new ETH();
 
 export const addChainParameters: Record<number, AddEthereumChainParameter> = {
+    [ChainId.mainnet]: {
+        rpcUrls: ['https://cloudflare-eth.com', 'https://rpc.flashbots.net'],
+        chainId: utils.hexValue(ChainId.mainnet),
+        blockExplorerUrls: ['https://etherscan.io'],
+        chainName: 'Ethereum Mainnet',
+        nativeCurrency: {
+            name: eth.name,
+            symbol: eth.symbol,
+            decimals: eth.decimals,
+        },
+    },
     [ChainId.mumbai]: {
         rpcUrls: ['https://polygon-mumbai.g.alchemy.com/v2/demo', 'https://matic-mumbai.chainstacklabs.com'],
         chainId: utils.hexValue(ChainId.mumbai),
@@ -60,6 +79,13 @@ export const addChainParameters: Record<number, AddEthereumChainParameter> = {
 };
 
 export const networkConfigs: Record<number, NetworkConfig> = {
+    [ChainId.mainnet]: {
+        subgraphHttpLink: '',
+        subgraphWsLink: '',
+        collectionAddress: '',
+        blockExplorer: 'https://etherscan.io',
+        ...addChainParameters[ChainId.mainnet],
+    },
     [ChainId.mumbai]: {
         subgraphHttpLink: 'https://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
         subgraphWsLink: 'wss://api.thegraph.com/subgraphs/name/wearenewt/non-fungible-time-mumbai',
