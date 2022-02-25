@@ -45,16 +45,16 @@ export const AppDataProvider: React.FC = ({ children }) => {
   // Setup batch provider for mainnet to reduce rpc calls for batch ENS lookups
   const mainnetConfig = networkConfigs[ChainId.mainnet];
   const mainnetProvider = useMemo<providers.Provider>(() => {
-    const mainnetRpcUrls = mainnetConfig.rpcUrls ? mainnetConfig.rpcUrls : ['']
+    const mainnetRpcUrls = mainnetConfig.rpcUrls ? mainnetConfig.rpcUrls : [''];
     const mainnetBaseProvider = new ethers.providers.JsonRpcBatchProvider(mainnetRpcUrls[0]);
     let mainnetFallbackProvider: providers.Provider | undefined;
     if (mainnetRpcUrls.length > 1) {
       mainnetFallbackProvider = new ethers.providers.StaticJsonRpcProvider(mainnetRpcUrls[1]);
     }
-    return (mainnetFallbackProvider
+    return mainnetFallbackProvider
       ? new providers.FallbackProvider([mainnetBaseProvider, mainnetFallbackProvider])
-      : mainnetBaseProvider)
-  }, [mainnetConfig])
+      : mainnetBaseProvider;
+  }, [mainnetConfig]);
 
   // Set ens name for user's connected wallet
   useEffect(() => {
@@ -63,18 +63,18 @@ export const AppDataProvider: React.FC = ({ children }) => {
       setEnsRegistry({
         ...ensRegistry,
         [address]: name ? name : address,
-      })
-    }
+      });
+    };
 
     if (account) {
       if (!ensRegistry[account]) {
-        lookupAddress(account)
+        lookupAddress(account);
       }
       if (ensRegistry[account] !== account) {
         setEnsName(ensRegistry[account]);
       }
     }
-  }, [account, ensRegistry, mainnetProvider])
+  }, [account, ensRegistry, mainnetProvider]);
 
   // Service for interacting with NFT collection contract
   const nftCollectionService = new NftCollectionService(
@@ -90,12 +90,10 @@ export const AppDataProvider: React.FC = ({ children }) => {
   });
   const userData = data && data.user ? data.user : undefined;
 
-
   // Array of tokens which can be set as payment for time NFTs, Refresh every 5 minutes
   const { data: paymentTokenData } = useQuery(PaymentTokensDocument, {
     pollInterval: 300000,
   });
-
 
   // Hardcoded default
   let availablePaymentTokens: Record<string, PaymentToken> = {
@@ -108,15 +106,16 @@ export const AppDataProvider: React.FC = ({ children }) => {
   };
 
   if (paymentTokenData) {
-    availablePaymentTokens = Object.assign({}, ...paymentTokenData.paymentTokens.map((token) => (
-      { [token.symbol]: token }
-    )))
+    availablePaymentTokens = Object.assign(
+      {},
+      ...paymentTokenData.paymentTokens.map((token) => ({ [token.symbol]: token }))
+    );
   }
 
   const disconnectWallet = () => {
     disconnect();
     setEnsName(undefined);
-  }
+  };
 
   // Lookup ens name for address on mainnet
   const lookupAddress = async (address: string) => {
@@ -124,9 +123,9 @@ export const AppDataProvider: React.FC = ({ children }) => {
     setEnsRegistry({
       ...ensRegistry,
       [address]: name ? name : address,
-    })
+    });
     return ensRegistry[address];
-  }
+  };
 
   return (
     <AppDataContext.Provider

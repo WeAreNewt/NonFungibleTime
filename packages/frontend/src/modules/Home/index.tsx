@@ -15,7 +15,10 @@ export const Home = () => {
               <span className="block text-indigo-600">on your time</span>
             </h1>
             <div>
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">Mint your time as NFTs on the Polygon network. Sell your time to interested parties. Purchase other people’s time.</p>
+              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                Mint your time as NFTs on the Polygon network. Sell your time to interested parties.
+                Purchase other people’s time.
+              </p>
             </div>
             <div className="mt-5 sm:mt-8 sm:flex  sm:justify-center md:justify-start">
               <div className="rounded-md shadow">

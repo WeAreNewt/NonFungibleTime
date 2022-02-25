@@ -67,7 +67,7 @@ export class WalletConnectConnector extends AbstractConnector {
   public async activate(): Promise<ConnectorUpdate> {
     if (!this.walletConnectProvider) {
       this.walletConnectProvider = new Web3WalletConnectProvider(
-        this.config,
+        this.config
       ) as Web3WalletConnectEthereumProvider;
     }
 
@@ -97,7 +97,7 @@ export class WalletConnectConnector extends AbstractConnector {
   public async getAccount(): Promise<null | string> {
     if (this.walletConnectProvider) {
       return Promise.resolve(this.walletConnectProvider.accounts).then(
-        (accounts: string[]): string => accounts[0] as string,
+        (accounts: string[]): string => accounts[0] as string
       );
     }
     return null;
@@ -113,7 +113,7 @@ export class WalletConnectConnector extends AbstractConnector {
       this.walletConnectProvider.removeListener('chainChanged', this.handleChainChanged.bind(this));
       this.walletConnectProvider.removeListener(
         'accountsChanged',
-        this.handleAccountsChanged.bind(this),
+        this.handleAccountsChanged.bind(this)
       );
       void this.walletConnectProvider.disconnect();
     }

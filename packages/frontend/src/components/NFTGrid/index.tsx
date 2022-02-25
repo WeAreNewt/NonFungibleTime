@@ -1,4 +1,4 @@
-import { useViewportProvider } from "../../lib/providers/viewport-provider";
+import { useViewportProvider } from '../../lib/providers/viewport-provider';
 
 type NFTGridProps = {
   children: React.ReactNode;

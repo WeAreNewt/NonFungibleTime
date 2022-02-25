@@ -6,7 +6,7 @@ import { WalletConnectConnector, resetWalletConnector } from '../connectors/Wall
 import metamaskLogo from '../../images/metamask_logo.svg';
 import walletConnectLogo from '../../images/walletconnect_logo.svg';
 import browserWalletLogo from '../../images/browser_wallet_logo.svg';
-import browserWalletLogoWhite from '../../images/browser_wallet_logo_white.svg'
+import browserWalletLogoWhite from '../../images/browser_wallet_logo_white.svg';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { isMobile } from '../helpers/userAgent';
 import * as z from 'zod';
@@ -19,65 +19,72 @@ export const WalletType = z.enum(['metamask', 'injected', 'walletConnect']);
 export type WalletType = z.infer<typeof WalletType>;
 
 // No network toggle for now
-export const PROTOCOL_CHAIN = process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ?  ChainId.polygon : ChainId.mumbai;
+export const PROTOCOL_CHAIN =
+  process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ? ChainId.polygon : ChainId.mumbai;
 
 export const injected = new InjectedConnector({});
 
-const chainsRpc = Object.keys(addChainParameters).reduce<Record<number, string>>((acum, current) => {
-  const chainId: number = Number(current)
-  if (addChainParameters[chainId].rpcUrls) {
-    acum[chainId] = addChainParameters[chainId].rpcUrls![0]
-  }
-  return acum;
-}, {})
+const chainsRpc = Object.keys(addChainParameters).reduce<Record<number, string>>(
+  (acum, current) => {
+    const chainId: number = Number(current);
+    if (addChainParameters[chainId].rpcUrls) {
+      acum[chainId] = addChainParameters[chainId].rpcUrls![0];
+    }
+    return acum;
+  },
+  {}
+);
 
 export const walletConnect = new WalletConnectConnector({
   rpc: chainsRpc,
-  supportedChainIds: [PROTOCOL_CHAIN]
+  supportedChainIds: [PROTOCOL_CHAIN],
 });
 
 interface WalletInfo {
-  name: string,
-  connector: AbstractConnector,
-  icon: string,
-  darkModeIcon?: string,
-  enabled: () => boolean,
-  type: WalletType
+  name: string;
+  connector: AbstractConnector;
+  icon: string;
+  darkModeIcon?: string;
+  enabled: () => boolean;
+  type: WalletType;
 }
 
-const isInjected = () => !!window.ethereum
-export const isMetamask = () => !!window.ethereum && window.ethereum.isMetaMask
+const isInjected = () => !!window.ethereum;
+export const isMetamask = () => !!window.ethereum && window.ethereum.isMetaMask;
 
-const isWalletConnect = () => !isMobile || (isMobile && !isInjected())
+const isWalletConnect = () => !isMobile || (isMobile && !isInjected());
 
-type Wallets = Record<WalletType, WalletInfo>
+type Wallets = Record<WalletType, WalletInfo>;
 
-export const wallets : Wallets = {
+export const wallets: Wallets = {
   injected: {
     type: 'injected',
     name: 'Browser Wallet',
     connector: injected,
-    enabled: () => (isInjected() && !isMetamask()),
+    enabled: () => isInjected() && !isMetamask(),
     icon: browserWalletLogo,
-    darkModeIcon: browserWalletLogoWhite
+    darkModeIcon: browserWalletLogoWhite,
   },
   metamask: {
     type: 'metamask',
     name: 'MetaMask',
     connector: injected,
     enabled: isMetamask,
-    icon: metamaskLogo
+    icon: metamaskLogo,
   },
   walletConnect: {
     type: 'walletConnect',
     name: 'WalletConnect',
     connector: walletConnect,
     icon: walletConnectLogo,
-    enabled: isWalletConnect
-  }
-}
+    enabled: isWalletConnect,
+  },
+};
 
-export const getSupportedWallets = () =>  Object.keys(wallets).map<WalletInfo>(elem => wallets[(elem as WalletType)]).filter(elem => elem.enabled())
+export const getSupportedWallets = () =>
+  Object.keys(wallets)
+    .map<WalletInfo>((elem) => wallets[elem as WalletType])
+    .filter((elem) => elem.enabled());
 
 export interface Web3DataContextType {
   chainId: number;
@@ -92,7 +99,8 @@ export interface Web3DataContextType {
 const Web3DataContext = React.createContext<Web3DataContextType>({} as Web3DataContextType);
 
 export const Web3DataProvider: React.FC = ({ children }) => {
-  const { chainId, account, activate, active, connector, deactivate } = useWeb3React<Web3Provider>();
+  const { chainId, account, activate, active, connector, deactivate } =
+    useWeb3React<Web3Provider>();
   const isCorrectChain = chainId === PROTOCOL_CHAIN;
 
   const connect = useCallback(
@@ -102,14 +110,16 @@ export const Web3DataProvider: React.FC = ({ children }) => {
         case WalletType.Values.metamask:
           return activate(injected, undefined, true).then(() => {
             localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
-          })
-        case WalletType.Values.walletConnect:
-          return activate(walletConnect, undefined, true).then(() => {
-            localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
-          }).catch(error => {
-            resetWalletConnector(walletConnect)
-            throw error;
           });
+        case WalletType.Values.walletConnect:
+          return activate(walletConnect, undefined, true)
+            .then(() => {
+              localStorage.setItem(WALLET_TYPE_STORAGE_KEY, walletType);
+            })
+            .catch((error) => {
+              resetWalletConnector(walletConnect);
+              throw error;
+            });
         default:
           return Promise.reject('Wallet not supported');
       }
@@ -117,21 +127,15 @@ export const Web3DataProvider: React.FC = ({ children }) => {
     [activate]
   );
 
-  const disconnect = useCallback(
-    async () => {
-      try {
-        await deactivate()
-        localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
-      }
-      catch {
-        //todo: add error msg
-        console.log("error when deactivating wallet")
-      }
-    },
-    [deactivate]
-  );
-
-
+  const disconnect = useCallback(async () => {
+    try {
+      await deactivate();
+      localStorage.removeItem(WALLET_TYPE_STORAGE_KEY);
+    } catch {
+      //todo: add error msg
+      console.log('error when deactivating wallet');
+    }
+  }, [deactivate]);
 
   const requestToSwitchChain = useCallback(
     async function () {
@@ -161,9 +165,9 @@ export const Web3DataProvider: React.FC = ({ children }) => {
       wallets[previouslyConnectedWalletType].connector
     ) {
       try {
-        connect(previouslyConnectedWalletType)
+        connect(previouslyConnectedWalletType);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     }
   }, [connect]);

@@ -56,7 +56,7 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "subgraph:codegen": "graphql-codegen",
-    "prettier": "prettier -w \"src/**/*.tsx\""
+    "prettier": "prettier --config ../../.prettierrc  -w \"src/**/*.tsx\""
   },
   "husky": {
     "hooks": {

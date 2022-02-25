@@ -48,18 +48,14 @@ export default function NFTDetails() {
     action: '',
   });
   const [txStatusModalOpen, setTxStatusModalOpen] = useState<boolean>(false);
-  const [creatorEns, setCreatorEns] = useState<EnsState>(
-    {
-      loading: false,
-      name: undefined,
-    }
-  );
-  const [ownerEns, setOwnerEns] = useState<EnsState>(
-    {
-      loading: false,
-      name: undefined,
-    }
-  );
+  const [creatorEns, setCreatorEns] = useState<EnsState>({
+    loading: false,
+    name: undefined,
+  });
+  const [ownerEns, setOwnerEns] = useState<EnsState>({
+    loading: false,
+    name: undefined,
+  });
 
   const path = location.pathname.split('/');
   const tokenId: string | undefined = path[2];
@@ -70,12 +66,13 @@ export default function NFTDetails() {
   }
   const { data, loading, error } = useSubscription(NftDocument, {
     variables: {
-      nft: tokenIdSanitized
+      nft: tokenIdSanitized,
     },
   });
 
   // Use subscription data, or fallback to nft passed through useLocation state, or undefined
-  const nft: NFT | undefined = data && data.nft ? data.nft : (state && state.nft ? state.nft : undefined);
+  const nft: NFT | undefined =
+    data && data.nft ? data.nft : state && state.nft ? state.nft : undefined;
 
   const onClose = () => {
     setTxStatus({
@@ -85,9 +82,9 @@ export default function NFTDetails() {
       action: '',
     });
     setTxStatusModalOpen(false);
-  }
+  };
 
-  // Update nft ownership, svg, and buying conditions 
+  // Update nft ownership, svg, and buying conditions
   useEffect(() => {
     let cancel = false;
     const fetchURI = async (nft: NFT) => {
@@ -105,14 +102,14 @@ export default function NFTDetails() {
     }
     return () => {
       cancel = true;
-    }
+    };
   }, [nft, currentAccount]);
 
   useEffect(() => {
     if (txStatus.submitted) {
       setTxStatusModalOpen(true);
     }
-  }, [txStatus])
+  }, [txStatus]);
 
   // Use creator and owner ens names from ensRegistry hashmap, or call lookupAddress if not found
   useEffect(() => {
@@ -123,8 +120,8 @@ export default function NFTDetails() {
       setCreatorEns({
         loading: false,
         name,
-      })
-    }
+      });
+    };
 
     const lookupOwner = async (address: string) => {
       const name = await lookupAddress(address);
@@ -132,8 +129,8 @@ export default function NFTDetails() {
       setOwnerEns({
         loading: false,
         name,
-      })
-    }
+      });
+    };
     if (nft) {
       // Only fetch if creator name has not been set and is not currently loading
       if (!creatorEns.name) {
@@ -141,12 +138,12 @@ export default function NFTDetails() {
           setCreatorEns({
             loading: false,
             name: ensRegistry[nft.creator.id],
-          })
+          });
         } else if (!creatorEns.loading) {
           setCreatorEns({
             ...creatorEns,
             loading: true,
-          })
+          });
           lookupCreator(nft.creator.id);
         }
       }
@@ -156,20 +153,20 @@ export default function NFTDetails() {
           setOwnerEns({
             loading: false,
             name: ensRegistry[nft.owner.id],
-          })
+          });
         } else if (!ownerEns.loading) {
           setOwnerEns({
             ...ownerEns,
             loading: true,
-          })
+          });
           lookupOwner(nft.owner.id);
         }
       }
       return () => {
         cancel = true;
-      }
+      };
     }
-  }, [creatorEns, ensRegistry, lookupAddress, nft, ownerEns])
+  }, [creatorEns, ensRegistry, lookupAddress, nft, ownerEns]);
 
   // Styling for owner buttons
   const selected =
@@ -179,28 +176,32 @@ export default function NFTDetails() {
 
   if (!nft) {
     if (error) {
-      return <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-red font-bold text-xl p-20">
-            An Error occured: {error}
+      return (
+        <div className="h-screen">
+          <div className="w-1/3 text-center mx-auto align-middle">
+            <div className="text-red font-bold text-xl p-20">An Error occured: {error}</div>
           </div>
         </div>
-      </div>
+      );
     } else if (loading) {
-      return <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
-        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
-      </div>;
+      return (
+        <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
+          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
+        </div>
+      );
     } else {
-      return <div className="h-screen">
-        <div className="w-3/4 text-center mx-auto align-middle">
-          <div className="text-black dark:text-white font-bold text-xl py-4">
-            No NFT found with TokenId {tokenIdSanitized}
-          </div>
-          <div className="text-black dark:text-white font-bold text-xl">
-            If this is a new mint, it may take time to be indexed by the subgraph
+      return (
+        <div className="h-screen">
+          <div className="w-3/4 text-center mx-auto align-middle">
+            <div className="text-black dark:text-white font-bold text-xl py-4">
+              No NFT found with TokenId {tokenIdSanitized}
+            </div>
+            <div className="text-black dark:text-white font-bold text-xl">
+              If this is a new mint, it may take time to be indexed by the subgraph
+            </div>
           </div>
         </div>
-      </div>
+      );
     }
   } else {
     const mintDatetime = new Date(nft.mintTimestamp * 1000);
@@ -230,10 +231,7 @@ export default function NFTDetails() {
               aria-hidden="true"
             ></div>
 
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
-            >
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
               &#8203;
             </span>
 
@@ -257,18 +255,31 @@ export default function NFTDetails() {
                       <div className="text-center flex-col p-4">
                         <div className="font-semibold">Transaction Submitted 👀</div>
                         <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
-                          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
+                          <img
+                            alt="clock spinner"
+                            src={ClockSpinner}
+                            width={50}
+                            height={50}
+                            className="mx-auto"
+                          />
                         </div>
                       </div>
-                    ) : txStatus.confirmed && (
-                      <div className="text-center flex-col">
-                        <div className="font-semibold">Transaction Confirmed 🥳🎉</div>
-                        <div className="pt-4">
-                          <a target="_blank" rel="noopener noreferrer" className="cursor-pointer p-5" href={networkConfig.blockExplorer + '/tx/' + txStatus.txHash}>
-                            View Transaction <FaExternalLinkAlt className="inline-block" />
-                          </a>
+                    ) : (
+                      txStatus.confirmed && (
+                        <div className="text-center flex-col">
+                          <div className="font-semibold">Transaction Confirmed 🥳🎉</div>
+                          <div className="pt-4">
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="cursor-pointer p-5"
+                              href={networkConfig.blockExplorer + '/tx/' + txStatus.txHash}
+                            >
+                              View Transaction <FaExternalLinkAlt className="inline-block" />
+                            </a>
+                          </div>
                         </div>
-                      </div>
+                      )
                     )}
                   </div>
                 </div>
@@ -302,9 +313,7 @@ export default function NFTDetails() {
                     className={ownerSelectedMode === 'update' ? selected : unselected}
                     onClick={() => setOwnerSelectedMode('update')}
                   >
-                    <div>
-                      Update Selling Options
-                    </div>
+                    <div>Update Selling Options</div>
                   </button>
                   <button
                     className={ownerSelectedMode === 'redeem' ? selected : unselected}
@@ -314,9 +323,17 @@ export default function NFTDetails() {
                   </button>
                 </div>
                 {ownerSelectedMode === 'redeem' ? (
-                  (nft.redeemed ? <div className="text-center p-4 font-semibold">This NFT has been redeemed</div> : <RedeemPanel nft={nft} setTxStatus={setTxStatus} />)
+                  nft.redeemed ? (
+                    <div className="text-center p-4 font-semibold">This NFT has been redeemed</div>
+                  ) : (
+                    <RedeemPanel nft={nft} setTxStatus={setTxStatus} />
+                  )
                 ) : (
-                  <BuyingConditionChangePanel nft={nft} setTxStatus={setTxStatus} tokenId={nft.tokenId} />
+                  <BuyingConditionChangePanel
+                    nft={nft}
+                    setTxStatus={setTxStatus}
+                    tokenId={nft.tokenId}
+                  />
                 )}
               </div>
             )}
@@ -437,18 +454,35 @@ export default function NFTDetails() {
                 <FieldLabel className="mb-2">Created By</FieldLabel>
                 <div
                   className="flex cursor-pointer"
-                  onClick={() => navigate('/profile/' + (creatorEns.name !== nft.creator.id ? creatorEns.name : nft.creator.id))}
+                  onClick={() =>
+                    navigate(
+                      '/profile/' +
+                        (creatorEns.name !== nft.creator.id ? creatorEns.name : nft.creator.id)
+                    )
+                  }
                 >
-                  <UserDetail address={nft.creator.id} ensName={creatorEns.name !== nft.creator.id ? creatorEns.name : undefined} caption={mintDateString} />
+                  <UserDetail
+                    address={nft.creator.id}
+                    ensName={creatorEns.name !== nft.creator.id ? creatorEns.name : undefined}
+                    caption={mintDateString}
+                  />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
                 <div
                   className="flex cursor-pointer"
-                  onClick={() => navigate('/profile/' + (ownerEns.name !== nft.owner.id ? ownerEns.name : nft.owner.id))}
+                  onClick={() =>
+                    navigate(
+                      '/profile/' + (ownerEns.name !== nft.owner.id ? ownerEns.name : nft.owner.id)
+                    )
+                  }
                 >
-                  <UserDetail address={nft.owner.id} ensName={ownerEns.name !== nft.owner.id ? ownerEns.name : undefined} caption={lastPurchaseDateString} />
+                  <UserDetail
+                    address={nft.owner.id}
+                    ensName={ownerEns.name !== nft.owner.id ? ownerEns.name : undefined}
+                    caption={lastPurchaseDateString}
+                  />
                 </div>
               </div>
             </div>
@@ -473,8 +507,8 @@ export default function NFTDetails() {
                     <div className="font-semibold">
                       {nft.availabilityFrom > Date.now() / 1000
                         ? new Date(nft.availabilityFrom * 1000).toLocaleString('en-us', {
-                          dateStyle: 'long',
-                        })
+                            dateStyle: 'long',
+                          })
                         : 'Any'}
                     </div>
                   </div>
@@ -483,8 +517,9 @@ export default function NFTDetails() {
                     <div className="font-semibold">
                       {nft.availabilityTo > 0
                         ? new Date(nft.availabilityTo * 1000).toLocaleString('en-us', {
-                          dateStyle: 'long',
-                        }) : 'Any'}
+                            dateStyle: 'long',
+                          })
+                        : 'Any'}
                     </div>
                   </div>
                 </div>
@@ -503,14 +538,31 @@ export default function NFTDetails() {
             </div>
             <div>
               <FieldLabel className="mb-2 font-semibold">Current Listing</FieldLabel>
-              {nft.forSale ? <div>
-                <div className="font-semibold">For Sale</div>
-                <div className="font-semibold">
-                  <div className="inline-block"> {formatUnits(nft.price.toString(), nft.currency.decimals)} {nft.currency.symbol}</div>
-                  <TokenIcon className="inline-block align-middle pl-2 pb-1" tokenSymbol={nft.currency.symbol} width={20} height={20} />
+              {nft.forSale ? (
+                <div>
+                  <div className="font-semibold">For Sale</div>
+                  <div className="font-semibold">
+                    <div className="inline-block">
+                      {' '}
+                      {formatUnits(nft.price.toString(), nft.currency.decimals)}{' '}
+                      {nft.currency.symbol}
+                    </div>
+                    <TokenIcon
+                      className="inline-block align-middle pl-2 pb-1"
+                      tokenSymbol={nft.currency.symbol}
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <div className="font-semibold">
+                    {nft.allowedBuyer === ZERO_ADDRESS
+                      ? 'No Reserved Buyer'
+                      : 'Reserved For ' + nft.allowedBuyer}
+                  </div>
                 </div>
-                <div className="font-semibold">{nft.allowedBuyer === ZERO_ADDRESS ? 'No Reserved Buyer' : 'Reserved For ' + nft.allowedBuyer}</div>
-              </div> : <div className="font-semibold">Not For Sale</div>}
+              ) : (
+                <div className="font-semibold">Not For Sale</div>
+              )}
             </div>
           </div>
         </div>

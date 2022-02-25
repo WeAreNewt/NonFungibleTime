@@ -11,13 +11,11 @@ interface NftCardProps {
 }
 
 export default function NFTCard({ nft }: NftCardProps) {
-  const { lookupAddress, ensRegistry } = useAppDataProvider()
-  const [ensStatus, setEnsStatus] = useState<EnsState>(
-    {
-      loading: false,
-      name: undefined,
-    }
-  );
+  const { lookupAddress, ensRegistry } = useAppDataProvider();
+  const [ensStatus, setEnsStatus] = useState<EnsState>({
+    loading: false,
+    name: undefined,
+  });
   const navigate = useNavigate();
   const mintDatetime = new Date(nft.mintTimestamp * 1000);
   const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
@@ -31,28 +29,27 @@ export default function NFTCard({ nft }: NftCardProps) {
       setEnsStatus({
         loading: false,
         name,
-      })
-    }
+      });
+    };
     // Only fetch if name has not been set and is not currently loading
     if (!ensStatus.name && !ensStatus.loading) {
       if (ensRegistry[nft.creator.id]) {
         setEnsStatus({
           loading: false,
           name: ensRegistry[nft.creator.id],
-        })
+        });
       } else {
         setEnsStatus({
           ...ensStatus,
           loading: true,
-        })
+        });
         lookup(nft.creator.id);
       }
     }
     return () => {
       cancel = true;
-    }
-  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id])
-
+    };
+  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id]);
 
   return (
     <div
@@ -65,7 +62,11 @@ export default function NFTCard({ nft }: NftCardProps) {
         })
       }
     >
-      <UserDetail address={nft.creator.id} ensName={ensStatus.name !== nft.creator.id ? ensStatus.name : undefined} caption={mintDateString} />
+      <UserDetail
+        address={nft.creator.id}
+        ensName={ensStatus.name !== nft.creator.id ? ensStatus.name : undefined}
+        caption={mintDateString}
+      />
       {/** Tag */}
       <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
       {/** NFT Description */}
@@ -77,10 +78,13 @@ export default function NFTCard({ nft }: NftCardProps) {
         {nft.description}
       </div>
       {/** Pricing / Status */}
-      {nft.forSale ?
-        <PriceDisplay amount={nft.price} token={nft.currency} /> : <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
+      {nft.forSale ? (
+        <PriceDisplay amount={nft.price} token={nft.currency} />
+      ) : (
+        <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
           Not for sale
-        </div>}
+        </div>
+      )}
     </div>
   );
 }
