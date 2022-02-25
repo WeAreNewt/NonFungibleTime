@@ -79,6 +79,7 @@ export function BuyingConditionChangePanel({ tokenId, nft, setTxStatus, disableF
                     forSale: buyingConditions.forSale,
                 };
                 setFormError(undefined);
+                setMainTxError(undefined);
                 try {
                     const txs = await nftCollectionService.changeBuyingConditions(input);
                     const tx = txs[0];
