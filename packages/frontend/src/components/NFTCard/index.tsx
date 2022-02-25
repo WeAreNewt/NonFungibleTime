@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NFT } from '../../types';
+import { useAppDataProvider } from '../../lib/providers/app-data-provider';
+import { EnsState, NFT } from '../../types';
 import { CategoryDisplay } from '../Category';
 import { PriceDisplay } from '../PriceDisplay';
 import { UserDetail } from '../UserDetail';
@@ -10,9 +11,48 @@ interface NftCardProps {
 }
 
 export default function NFTCard({ nft }: NftCardProps) {
+  const { lookupAddress, ensRegistry } = useAppDataProvider()
+  const [ensStatus, setEnsStatus] = useState<EnsState>(
+    {
+      loading: false,
+      name: undefined,
+    }
+  );
   const navigate = useNavigate();
   const mintDatetime = new Date(nft.mintTimestamp * 1000);
   const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
+
+  // Use name in ensRegistry hashmap, or lookupAddress if not found
+  useEffect(() => {
+    let cancel = true;
+    const lookup = async (address: string) => {
+      const name = await lookupAddress(address);
+      if (cancel) return;
+      setEnsStatus({
+        loading: false,
+        name,
+      })
+    }
+    // Only fetch if name has not been set and is not currently loading
+    if (!ensStatus.name && !ensStatus.loading) {
+      if (ensRegistry[nft.creator.id]) {
+        setEnsStatus({
+          loading: false,
+          name: ensRegistry[nft.creator.id],
+        })
+      } else {
+        setEnsStatus({
+          ...ensStatus,
+          loading: true,
+        })
+        lookup(nft.creator.id);
+      }
+    }
+    return () => {
+      cancel = true;
+    }
+  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id])
+
 
   return (
     <div
@@ -25,7 +65,7 @@ export default function NFTCard({ nft }: NftCardProps) {
         })
       }
     >
-      <UserDetail address={nft.creator.id} caption={mintDateString} />
+      <UserDetail address={nft.creator.id} ensName={ensStatus.name !== nft.creator.id ? ensStatus.name : undefined} caption={mintDateString} />
       {/** Tag */}
       <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
       {/** NFT Description */}

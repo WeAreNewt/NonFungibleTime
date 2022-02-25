@@ -11,7 +11,7 @@ import { FieldLabel } from '../../components/FieldLabel';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument } from '../../lib/graphql';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
-import { NFT } from '../../types';
+import { EnsState, NFT } from '../../types';
 import { BuyPanel } from '../../components/BuyPanel';
 import { RedeemPanel } from '../../components/RedeemPanel';
 import { BuyingConditionChangePanel } from '../../components/BuyingConditionChangePanel';
@@ -33,7 +33,7 @@ function HeadingSeparator({ children }: { children: React.ReactNode }) {
 }
 
 export default function NFTDetails() {
-  const { currentAccount, networkConfig } = useAppDataProvider();
+  const { currentAccount, networkConfig, lookupAddress, ensRegistry } = useAppDataProvider();
   const [owner, setOwner] = useState<Boolean>(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -48,6 +48,19 @@ export default function NFTDetails() {
     action: '',
   });
   const [txStatusModalOpen, setTxStatusModalOpen] = useState<boolean>(false);
+  const [creatorEns, setCreatorEns] = useState<EnsState>(
+    {
+      loading: false,
+      name: undefined,
+    }
+  );
+  const [ownerEns, setOwnerEns] = useState<EnsState>(
+    {
+      loading: false,
+      name: undefined,
+    }
+  );
+
   const path = location.pathname.split('/');
   const tokenId: string | undefined = path[2];
   let tokenIdSanitized = '';
@@ -64,12 +77,6 @@ export default function NFTDetails() {
   // Use subscription data, or fallback to nft passed through useLocation state, or undefined
   const nft: NFT | undefined = data && data.nft ? data.nft : (state && state.nft ? state.nft : undefined);
 
-  const fetchURI = async (nft: NFT) => {
-    const response = await fetch(nft.tokenURI);
-    const data = await response.json();
-    setURI(data.image);
-  };
-
   const onClose = () => {
     setTxStatus({
       submitted: false,
@@ -82,11 +89,22 @@ export default function NFTDetails() {
 
   // Update nft ownership, svg, and buying conditions 
   useEffect(() => {
+    let cancel = false;
+    const fetchURI = async (nft: NFT) => {
+      const response = await fetch(nft.tokenURI);
+      const data = await response.json();
+      if (cancel) return;
+      setURI(data.image);
+    };
+
     if (nft) {
       nft.owner.id.toLowerCase() === currentAccount?.toLowerCase()
         ? setOwner(true)
         : setOwner(false);
       fetchURI(nft);
+    }
+    return () => {
+      cancel = true;
     }
   }, [nft, currentAccount]);
 
@@ -95,6 +113,63 @@ export default function NFTDetails() {
       setTxStatusModalOpen(true);
     }
   }, [txStatus])
+
+  // Use creator and owner ens names from ensRegistry hashmap, or call lookupAddress if not found
+  useEffect(() => {
+    let cancel = false;
+    const lookupCreator = async (address: string) => {
+      const name = await lookupAddress(address);
+      if (cancel) return;
+      setCreatorEns({
+        loading: false,
+        name,
+      })
+    }
+
+    const lookupOwner = async (address: string) => {
+      const name = await lookupAddress(address);
+      if (cancel) return;
+      setOwnerEns({
+        loading: false,
+        name,
+      })
+    }
+    if (nft) {
+      // Only fetch if creator name has not been set and is not currently loading
+      if (!creatorEns.name) {
+        if (ensRegistry[nft.creator.id]) {
+          setCreatorEns({
+            loading: false,
+            name: ensRegistry[nft.creator.id],
+          })
+        } else if (!creatorEns.loading) {
+          setCreatorEns({
+            ...creatorEns,
+            loading: true,
+          })
+          lookupCreator(nft.creator.id);
+        }
+      }
+      // Only fetch if owner name has not been set and is not currently loading
+      if (!ownerEns.name) {
+        if (ensRegistry[nft.owner.id]) {
+          setOwnerEns({
+            loading: false,
+            name: ensRegistry[nft.owner.id],
+          })
+        } else if (!ownerEns.loading) {
+          setOwnerEns({
+            ...ownerEns,
+            loading: true,
+          })
+          lookupOwner(nft.owner.id);
+        }
+      }
+      return () => {
+        cancel = true;
+      }
+    }
+  }, [creatorEns, ensRegistry, lookupAddress, nft, ownerEns])
 
   // Styling for owner buttons
   const selected =
@@ -362,18 +437,18 @@ export default function NFTDetails() {
                 <FieldLabel className="mb-2">Created By</FieldLabel>
                 <div
                   className="flex cursor-pointer"
-                  onClick={() => navigate('/profile/' + nft.creator.id)}
+                  onClick={() => navigate('/profile/' + (creatorEns.name !== nft.creator.id ? creatorEns.name : nft.creator.id))}
                 >
-                  <UserDetail address={nft.creator.id} caption={mintDateString} />
+                  <UserDetail address={nft.creator.id} ensName={creatorEns.name !== nft.creator.id ? creatorEns.name : undefined} caption={mintDateString} />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
                 <div
                   className="flex cursor-pointer"
-                  onClick={() => navigate('/profile/' + nft.owner.id)}
+                  onClick={() => navigate('/profile/' + (ownerEns.name !== nft.owner.id ? ownerEns.name : nft.owner.id))}
                 >
-                  <UserDetail address={nft.owner.id} caption={lastPurchaseDateString} />
+                  <UserDetail address={nft.owner.id} ensName={ownerEns.name !== nft.owner.id ? ownerEns.name : undefined} caption={lastPurchaseDateString} />
                 </div>
               </div>
             </div>

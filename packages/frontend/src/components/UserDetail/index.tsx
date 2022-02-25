@@ -1,5 +1,5 @@
 import makeBlockie from 'ethereum-blockies-base64';
-import { formatEthAddress } from '../../lib/helpers/format';
+import { formatEns, formatEthAddress } from '../../lib/helpers/format';
 
 export type UserDetailsProps = {
   avatarUrl?: string;
@@ -17,7 +17,7 @@ export function UserDetail({ address, ensName, caption }: UserDetailsProps) {
       <div className="flex flex-col">
         <div className="text-gray-800 dark:text-white leading-5 text-sm">
           {' '}
-          {ensName ? ensName : formatEthAddress(address)}
+          {ensName ? formatEns(ensName, 30) : formatEthAddress(address)}
         </div>
         <div className="text-gray-500 leading-5 text-sm">{caption}</div>
       </div>

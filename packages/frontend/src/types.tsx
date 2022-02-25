@@ -67,3 +67,8 @@ export interface User {
   createdNfts: NFT[];
   ownedNfts: NFT[];
 }
+
+export interface EnsState {
+  loading: boolean;
+  name: string | undefined;
+}
