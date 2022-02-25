@@ -55,6 +55,7 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
 
     // Update wallet balances and transaction data on User or NFT change
     useEffect(() => {
+        let cancel = false;
         const fetchWalletBalance = async () => {
             if (nft && currentAccount) {
                 const erc20Service = new ERC20Service(
@@ -67,6 +68,7 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
                 } else {
                     balance = await erc20Service.balanceOf({ token: nft.currency.id, user: currentAccount });
                 }
+                if (cancel) return;
                 setBalance(balance);
             }
         }
@@ -81,6 +83,7 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
                 }
                 const txs = await nftCollectionService.buyToken(input);
                 const tx = txs[0];
+                if (cancel) return;
                 if (tx.txType === "COLLECTION_ACTION") {
                     setApproved(true);
                 } else {
@@ -91,6 +94,9 @@ export function BuyPanel({ nft, setTxStatus }: BuyPanelParams) {
         }
         fetchWalletBalance();
         fetchTransactionData();
+        return () => {
+            cancel = true;
+        }
     }, [currentAccount, nft, nftCollectionService, approved, jsonRpcProvider])
     const formattedPrice = Number(formatUnits(nft.price, nft.currency.decimals));
 
