@@ -10,7 +10,10 @@ import { CategoryDisplay } from '../../components/Category';
 import { FieldLabel } from '../../components/FieldLabel';
 import { UserDetail } from '../../components/UserDetail';
 import { NftDocument } from '../../lib/graphql';
+import { ProfileNftsDocument } from '../../lib/graphql';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
+import NFTCard from '../../components/NFTCard';
+import { NFTGrid } from '../../components/NFTGrid';
 import { EnsState, NFT } from '../../types';
 import { BuyPanel } from '../../components/BuyPanel';
 import { RedeemPanel } from '../../components/RedeemPanel';
@@ -23,6 +26,36 @@ import { TokenIcon } from '@aave/aave-ui-kit';
 interface NftState {
   nft?: NFT;
 }
+
+const nftSortFunction = (a: NFT, b: NFT) => (a.mintTimestamp < b.mintTimestamp ? 1 : -1);
+
+const OtherNftsComponent = ({ userId, currentNftId }: { userId: string; currentNftId: string }) => {
+  const { data } = useSubscription(ProfileNftsDocument, {
+    variables: {
+      user: userId,
+    },
+  });
+
+  const otherNfts: NFT[] | undefined = data?.user?.createdNfts;
+
+  if (otherNfts?.length! > 0) {
+    const displayedNfts = otherNfts
+      ?.filter((nft) => nft.id !== currentNftId)
+      .sort(nftSortFunction)
+      .slice(0, 3);
+    return (
+      <div className="flex flex-col">
+        <HeadingSeparator>More from this Creator</HeadingSeparator>
+        <NFTGrid>
+          {displayedNfts!.map((nft, index) => {
+            return <NFTCard key={index} nft={nft} />;
+          })}
+        </NFTGrid>
+      </div>
+    );
+  }
+  return null;
+};
 
 function HeadingSeparator({ children }: { children: React.ReactNode }) {
   return (
@@ -564,6 +597,7 @@ export default function NFTDetails() {
                 <div className="font-semibold">Not For Sale</div>
               )}
             </div>
+            <OtherNftsComponent userId={nft.creator.id} currentNftId={nft.id} />
           </div>
         </div>
       </div>
