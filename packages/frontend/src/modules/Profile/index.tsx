@@ -247,7 +247,7 @@ export default function Profile() {
     <div className="bg-slate-100 dark:bg-gray-800">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="p-4 md:p-10">
-          <ProfileHeader profileAddress={nameStatus.address ? nameStatus.address : ''} profileENS={nameStatus.name !== nameStatus.address ? nameStatus.name : undefined} owner={owner} mintPathSet={mintPathSet} />
+          <ProfileHeader profileAddress={nameStatus.address ? nameStatus.address : ''} profileENS={nameStatus.name !== "NA" ? nameStatus.name : undefined} owner={owner} mintPathSet={mintPathSet} />
           <Tab.Group onChange={(index) => onChangeTab(index)}>
             <Tab.List>
               {categories.map((category) => {

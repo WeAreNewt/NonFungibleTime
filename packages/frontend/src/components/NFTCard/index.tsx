@@ -66,7 +66,7 @@ export default function NFTCard({ nft }: NftCardProps) {
         })
       }
     >
-      <UserDetail address={nft.creator.id} ensName={ensStatus.name !== nft.creator.id ? ensStatus.name : undefined} caption={mintDateString} />
+      <UserDetail address={nft.creator.id} ensName={ensStatus.name !== "NA" ? ensStatus.name : undefined} caption={mintDateString} />
       {/** Tag */}
       <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
       {/** NFT Description */}

@@ -131,9 +131,10 @@ export const AppDataProvider: React.FC = ({ children }) => {
 
   // Lookup ens name for address on mainnet
   const lookupAddress = async (address: string) => {
+    console.log(`LOOKING UP ${address}`)
     const name = await mainnetProvider.lookupAddress(address)
     const newRegistry = ensRegistry;
-    newRegistry[address.toLowerCase()] = name ? name : address.toLowerCase();
+    newRegistry[address.toLowerCase()] = name ? name : "NA";
     window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
     setEnsRegistry(newRegistry);
     return ensRegistry[address];
