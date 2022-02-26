@@ -96,6 +96,8 @@ export default function Marketplace() {
       const nextItemsCount = result.data.nfts.length;
       if (nextItemsCount !== PAGE_SIZE) {
         setCanLoadMore(false);
+      } else {
+        setCanLoadMore(true);
       }
 
       observe();
