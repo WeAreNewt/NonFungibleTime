@@ -100,7 +100,8 @@ export interface NftCollectionInterface {
 
 export class NftCollectionService
   extends BaseService<NonFungibleTimeCollection>
-  implements NftCollectionInterface {
+  implements NftCollectionInterface
+{
   readonly collectionAddress: string;
   readonly erc20Service: ERC20ServiceInterface;
 

@@ -13,7 +13,12 @@ export function PriceDisplay({ amount, token }: PriceDisplayProps) {
   return (
     <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
       {`${priceFixed} ${token.symbol}`}
-      <TokenIcon className="inline-block align-middle pl-2 pb-1" tokenSymbol={token.symbol} width={20} height={20} />
+      <TokenIcon
+        className="inline-block align-middle pl-2 pb-1"
+        tokenSymbol={token.symbol}
+        width={20}
+        height={20}
+      />
     </div>
   );
 }

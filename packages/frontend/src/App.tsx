@@ -23,11 +23,12 @@ function getWeb3Library(provider: any): ethers.providers.Web3Provider {
   return new ethers.providers.Web3Provider(provider);
 }
 
-const chainId = process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ?  ChainId.polygon : ChainId.mumbai;
+const chainId =
+  process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ? ChainId.polygon : ChainId.mumbai;
 
 const apolloClient = createApolloClient({
   httpUri: networkConfigs[chainId].subgraphHttpLink,
-  wsUri: networkConfigs[chainId].subgraphWsLink
+  wsUri: networkConfigs[chainId].subgraphWsLink,
 });
 
 function App() {
@@ -46,8 +47,16 @@ function App() {
                         <Route path="/profile/*" element={<Profile />} key="profile" />
                         <Route path="/marketplace" element={<Marketplace />} key="marketplace" />
                         <Route path="/nft/*" element={<Details />} key="details" />
-                        <Route path="/terms-and-conditions" element={<TermsAndConditions />} key="terms-and-conditions" />
-                        <Route path="/privacy-policy" element={<PrivacyPolicy />} key="privacy-policy" />
+                        <Route
+                          path="/terms-and-conditions"
+                          element={<TermsAndConditions />}
+                          key="terms-and-conditions"
+                        />
+                        <Route
+                          path="/privacy-policy"
+                          element={<PrivacyPolicy />}
+                          key="privacy-policy"
+                        />
                       </Routes>
                     </ScreenWrapper>
                   </ViewportProvider>

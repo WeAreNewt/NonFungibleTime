@@ -114,4 +114,3 @@ export class ERC20Service extends BaseService<ERC20> implements ERC20ServiceInte
 function MAX_ALLOWANCE(MAX_ALLOWANCE: any): BigNumber {
   throw new Error('Function not implemented.');
 }
-
