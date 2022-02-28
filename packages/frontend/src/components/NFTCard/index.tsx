@@ -46,7 +46,7 @@ export default function NFTCard({ nft }: NftCardProps) {
         setEnsStatus({
           ...ensStatus,
           loading: true,
-        })
+        });
         lookup(nft.creator.id);
       }
     }
@@ -78,10 +78,13 @@ export default function NFTCard({ nft }: NftCardProps) {
         {nft.description}
       </div>
       {/** Pricing / Status */}
-      {nft.forSale ?
-        <PriceDisplay amount={nft.price} token={nft.currency} /> : <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
+      {nft.forSale ? (
+        <PriceDisplay amount={nft.price} token={nft.currency} />
+      ) : (
+        <div className=" dark:text-white text-lg leading-7 font-semibold text-gray-900">
           Not for sale
-        </div>}
+        </div>
+      )}
     </div>
   );
 }

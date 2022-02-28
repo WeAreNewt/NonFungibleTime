@@ -44,9 +44,12 @@ export default function Footer() {
   const logoLinks: FooterLink[] = [
     {
       title: 'OpenSea',
-      to: Number(chainId) === ChainId.polygon ? 'https://opensea.io/collection/nonfungibletimecollection' : 'https://testnets.opensea.io/collection/non-fungible-time-nmhsylz5yr',
+      to:
+        Number(chainId) === ChainId.polygon
+          ? 'https://opensea.io/collection/nonfungibletimecollection'
+          : 'https://testnets.opensea.io/collection/non-fungible-time-nmhsylz5yr',
       icon: opensea,
-      alt: 'OpenSea'
+      alt: 'OpenSea',
     },
     {
       title: 'Discord',
@@ -71,7 +74,7 @@ export default function Footer() {
       to: networkConfig.blockExplorer + '/address/' + networkConfig.collectionAddress,
       icon: etherscan,
       alt: 'Etherscan',
-    }
+    },
   ];
 
   return (
@@ -80,9 +83,8 @@ export default function Footer() {
         <section className="flex items-center justify-center lg:justify-start w-full lg:w-3/4 h-full">
           <ul className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-10 items-center">
             {textLinks.map((link) => {
-              const outerLink = link.to.substring(0, 5) === 'https'
-              return outerLink ? 
-              (
+              const outerLink = link.to.substring(0, 5) === 'https';
+              return outerLink ? (
                 <li key={link.title}>
                   <a
                     className="hover:text-slate-300"
@@ -93,18 +95,13 @@ export default function Footer() {
                     {link.title}
                   </a>
                 </li>
-              ) :
-              (
+              ) : (
                 <li key={link.title}>
-                  <Link 
-                    to={link.to}
-                    title={link.title}
-                    className="hover:text-slate-300"
-                  >
+                  <Link to={link.to} title={link.title} className="hover:text-slate-300">
                     {link.title}
                   </Link>
                 </li>
-              )
+              );
             })}
           </ul>
         </section>

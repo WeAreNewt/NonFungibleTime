@@ -26,19 +26,24 @@ interface FormFilter {
   active: string;
 }
 
-const defaultFilter: FormFilter = { category: 'Show All', forSale: ToggleState.Yes, redeemed: ToggleState.All, searchType: Search.Owner, active: "" }
-
+const defaultFilter: FormFilter = {
+  category: 'Show All',
+  forSale: ToggleState.Yes,
+  redeemed: ToggleState.All,
+  searchType: Search.Owner,
+  active: '',
+};
 
 export default function Marketplace() {
   const { currentAccount } = useAppDataProvider();
   const allowedBuyers = [ZERO_ADDRESS];
   if (currentAccount) {
-    allowedBuyers.push(currentAccount.toLowerCase())
+    allowedBuyers.push(currentAccount.toLowerCase());
   }
   const [canLoadMore, setCanLoadMore] = useState(true);
   const [filters, setFilters] = useState<FormFilter>(defaultFilter);
-  const [searchValue, setSearchValue] = useState<string>('')
-  const [searchError, setSearchError] = useState<string | undefined>(undefined)
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchError, setSearchError] = useState<string | undefined>(undefined);
 
   const { category, forSale, redeemed } = filters;
 
@@ -46,13 +51,23 @@ export default function Marketplace() {
   const whereArg = useMemo<Nft_Filter>(() => {
     const newFilter: Nft_Filter = {
       category: filters.category !== 'Show All' ? filters.category : undefined,
-      forSale: filters.forSale === ToggleState.Yes ? true : filters.forSale === ToggleState.No ? false : undefined,
-      redeemed: filters.redeemed === ToggleState.Yes ? true : filters.redeemed === ToggleState.No ? false : undefined,
+      forSale:
+        filters.forSale === ToggleState.Yes
+          ? true
+          : filters.forSale === ToggleState.No
+          ? false
+          : undefined,
+      redeemed:
+        filters.redeemed === ToggleState.Yes
+          ? true
+          : filters.redeemed === ToggleState.No
+          ? false
+          : undefined,
       owner: filters.searchType === Search.Owner && filters.active ? filters.active : undefined,
       creator: filters.searchType === Search.Creator && filters.active ? filters.active : undefined,
-    }
-    return (newFilter);
-  }, [filters])
+    };
+    return newFilter;
+  }, [filters]);
 
   const { data, loading, fetchMore, refetch } = useQuery(NftsDocument, {
     variables: {
@@ -67,14 +82,14 @@ export default function Marketplace() {
   // so it can recalculate if should paginate or not
   useEffect(() => {
     setCanLoadMore(true);
-    refetch()
+    refetch();
   }, [whereArg, refetch]);
 
   const nfts: NFT[] = data && data.nfts ? data.nfts : [];
   const [nftsShown, setNftsShown] = useState<NFT[]>(nfts);
 
   useEffect(() => {
-    data && data.nfts ? setNftsShown(data.nfts) : setNftsShown([])
+    data && data.nfts ? setNftsShown(data.nfts) : setNftsShown([]);
   }, [data]);
 
   const { observe } = useInView({
@@ -116,46 +131,62 @@ export default function Marketplace() {
           </div>
           <div className="w-full lg:w-2/3 lg:justify-items-end">
             <div className="flex flex-row w-full justify-around flex-wrap lg:flex-nowrap">
-              <div className="w-full p-2" style={{ minWidth: "220px" }}>
+              <div className="w-full p-2" style={{ minWidth: '220px' }}>
                 <FieldLabel>Category</FieldLabel>
-                <CategoryFilter onSelect={(category) => {
-                  setFilters({ ...filters, category });
-                }} selected={category} />
+                <CategoryFilter
+                  onSelect={(category) => {
+                    setFilters({ ...filters, category });
+                  }}
+                  selected={category}
+                />
               </div>
 
-              <div className="w-1/2 p-2" style={{ minWidth: "130px" }}>
+              <div className="w-1/2 p-2" style={{ minWidth: '130px' }}>
                 <FieldLabel>For Sale</FieldLabel>
-                <ToggleFilter onSelect={(forSale) => {
-                  setFilters({ ...filters, forSale });
-                }} selected={forSale} />
+                <ToggleFilter
+                  onSelect={(forSale) => {
+                    setFilters({ ...filters, forSale });
+                  }}
+                  selected={forSale}
+                />
               </div>
-              <div className="w-1/2 p-2" style={{ minWidth: "130px" }}>
+              <div className="w-1/2 p-2" style={{ minWidth: '130px' }}>
                 <FieldLabel>Redeemed</FieldLabel>
-                <ToggleFilter onSelect={(redeemed) => {
-                  setFilters({ ...filters, redeemed });
-                }} selected={redeemed} />
+                <ToggleFilter
+                  onSelect={(redeemed) => {
+                    setFilters({ ...filters, redeemed });
+                  }}
+                  selected={redeemed}
+                />
               </div>
-              <div className="w-full p-2" style={{ minWidth: "200px" }}>
+              <div className="w-full p-2" style={{ minWidth: '200px' }}>
                 <FieldLabel>Search</FieldLabel>
                 <SearchFilter
                   onChange={(searchValue) => {
-                    setSearchValue(searchValue)
+                    setSearchValue(searchValue);
                     if (isAddress(searchValue)) {
-                      setFilters({ ...filters, active: searchValue.toLowerCase() })
-                      setSearchError(undefined)
+                      setFilters({ ...filters, active: searchValue.toLowerCase() });
+                      setSearchError(undefined);
                     } else {
-                      searchValue.length > 0 ? setSearchError('Not a valid ethereum address') : setSearchError(undefined)
-                      setFilters({ ...filters, active: '' })
+                      searchValue.length > 0
+                        ? setSearchError('Not a valid ethereum address')
+                        : setSearchError(undefined);
+                      setFilters({ ...filters, active: '' });
                     }
-                  }} selected={searchValue} searchType={filters.searchType}
+                  }}
+                  selected={searchValue}
+                  searchType={filters.searchType}
                   error={searchError ? searchError : undefined}
                 />
               </div>
-              <div className="w-1/2 p-2 mx-auto" style={{ minWidth: "150px" }}>
+              <div className="w-1/2 p-2 mx-auto" style={{ minWidth: '150px' }}>
                 <FieldLabel>Search For</FieldLabel>
-                <Listbox value={filters.searchType} onChange={(searchType) => {
-                  setFilters({ ...filters, searchType });
-                }}>
+                <Listbox
+                  value={filters.searchType}
+                  onChange={(searchType) => {
+                    setFilters({ ...filters, searchType });
+                  }}
+                >
                   <div className="relative mt-1">
                     <Listbox.Button className="relative border border-gray-300 w-full py-2 px-4  text-left font-medium bg-white rounded-lg  cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
                       <span className="block truncate">{filters.searchType}</span>
@@ -170,12 +201,9 @@ export default function Marketplace() {
                       leaveTo="opacity-0"
                     >
                       <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                        {
-                          Object.keys(Search).map((search, index) => {
-                            return (
-                              <ListOption key={index} value={search} label={search} />
-                            )
-                          })}
+                        {Object.keys(Search).map((search, index) => {
+                          return <ListOption key={index} value={search} label={search} />;
+                        })}
                       </Listbox.Options>
                     </Transition>
                   </div>
@@ -183,38 +211,47 @@ export default function Marketplace() {
               </div>
             </div>
           </div>
-
         </div>
         <div className="flex-auto h-10 text-sm lg:text-xl text-slate-500">
           A quick way to find the right talent for any project
         </div>
         {loading || !nfts ? (
           <div className="w-full lg:w-1/5 mx-auto p-4 pb-0">
-            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
+            <img
+              alt="clock spinner"
+              src={ClockSpinner}
+              width={50}
+              height={50}
+              className="mx-auto"
+            />
           </div>
-
-        ) :
-          nftsShown.length === 0 ? <div className="w-full mx-auto text-center text-red-500 font-semibold text-xl pt-4">No results found</div> :
-            (
-              <>
-                <NFTGrid>
-                  {nftsShown.map((nft, index) => {
-                    return <NFTCard key={index} nft={nft} />;
-                  })}
-                </NFTGrid>
-                {canLoadMore && (
-                  <div
-                    style={{ marginTop: 20, width: '100%', padding: 20 }}
-                    ref={observe}
-                  >
-                    <div className="w-full lg:w-1/5 mx-auto p-4 pb-0">
-                      <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
-                    </div>
-                  </div>
-                )}
-              </>
+        ) : nftsShown.length === 0 ? (
+          <div className="w-full mx-auto text-center text-red-500 font-semibold text-xl pt-4">
+            No results found
+          </div>
+        ) : (
+          <>
+            <NFTGrid>
+              {nftsShown.map((nft, index) => {
+                return <NFTCard key={index} nft={nft} />;
+              })}
+            </NFTGrid>
+            {canLoadMore && (
+              <div style={{ marginTop: 20, width: '100%', padding: 20 }} ref={observe}>
+                <div className="w-full lg:w-1/5 mx-auto p-4 pb-0">
+                  <img
+                    alt="clock spinner"
+                    src={ClockSpinner}
+                    width={50}
+                    height={50}
+                    className="mx-auto"
+                  />
+                </div>
+              </div>
             )}
+          </>
+        )}
       </div>
-    </div >
+    </div>
   );
 }

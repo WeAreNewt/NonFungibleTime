@@ -23,19 +23,24 @@ interface ProfileNameState {
 }
 
 export default function Profile() {
-  const { currentAccount, userData, loadingUserData, mainnetProvider, ensName, lookupAddress, ensRegistry } =
-    useAppDataProvider();
+  const {
+    currentAccount,
+    userData,
+    loadingUserData,
+    mainnetProvider,
+    ensName,
+    lookupAddress,
+    ensRegistry,
+  } = useAppDataProvider();
   const navigate = useNavigate();
   const [owner, setOwner] = useState<boolean>(true);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
-  const [nameStatus, setNameStatus] = useState<ProfileNameState>(
-    {
-      loadingAddress: false,
-      loadingName: false,
-      name: undefined,
-      address: undefined,
-    }
-  );
+  const [nameStatus, setNameStatus] = useState<ProfileNameState>({
+    loadingAddress: false,
+    loadingName: false,
+    name: undefined,
+    address: undefined,
+  });
   const [mintPathSet, setMintPathSet] = useState<boolean>(false);
   const [resolveError, setResolveError] = useState<string | undefined>(undefined); // If pathname is not an address or valid ens name
   const location = useLocation();
@@ -54,17 +59,17 @@ export default function Profile() {
           loadingName: false,
           name,
           address,
-        })
+        });
         setResolveError(undefined);
       } else {
         setNameStatus({
           ...nameStatus,
           loadingName: false,
           loadingAddress: false,
-        })
-        setResolveError(`Cannot resolve ens name ${name}`)
+        });
+        setResolveError(`Cannot resolve ens name ${name}`);
       }
-    }
+    };
 
     // address -> ensName
     const lookup = async (address: string) => {
@@ -73,11 +78,14 @@ export default function Profile() {
         ...nameStatus,
         loadingName: false,
         name,
-      })
-    }
+      });
+    };
 
     // determine if connected wallet is profile owner
-    if (accountName.toLowerCase() === currentAccount?.toLowerCase() || accountName.toLowerCase() === ensName?.toLowerCase()) {
+    if (
+      accountName.toLowerCase() === currentAccount?.toLowerCase() ||
+      accountName.toLowerCase() === ensName?.toLowerCase()
+    ) {
       setOwner(true);
     } else {
       setOwner(false);
@@ -104,18 +112,18 @@ export default function Profile() {
     if (!nameStatus.address && !resolveError) {
       if (isAddress(accountName)) {
         setResolveError(undefined);
-        const address = accountName.toLowerCase()
+        const address = accountName.toLowerCase();
         setNameStatus({
           ...nameStatus,
           address,
           loadingAddress: false,
-        })
+        });
       } else if (!nameStatus.loadingAddress) {
         // if path is not an address and not already loading, treat path as an ens name and attempt to resolve
         setNameStatus({
           ...nameStatus,
           loadingAddress: true,
-        })
+        });
         resolveName(accountName);
       }
     }
@@ -126,22 +134,34 @@ export default function Profile() {
         setNameStatus({
           ...nameStatus,
           name: ensRegistry[nameStatus.address],
-        })
+        });
       } else if (!nameStatus.loadingName) {
         setNameStatus({
           ...nameStatus,
           loadingName: true,
-        })
+        });
         lookup(nameStatus.address);
       }
     }
-  }, [accountName, currentAccount, ensName, ensRegistry, lookupAddress, mainnetProvider, nameStatus, navigate, owner, path, resolveError])
+  }, [
+    accountName,
+    currentAccount,
+    ensName,
+    ensRegistry,
+    lookupAddress,
+    mainnetProvider,
+    nameStatus,
+    navigate,
+    owner,
+    path,
+    resolveError,
+  ]);
 
   // If user is the profile owner, use data from app provider
   // Otherwise fetch data from subgraph
   let sanitizedUser = '';
   if (!owner && nameStatus.address) {
-    sanitizedUser = nameStatus.address.toLowerCase()
+    sanitizedUser = nameStatus.address.toLowerCase();
   }
   const { data, loading, error } = useSubscription(ProfileNftsDocument, {
     variables: {
@@ -151,23 +171,26 @@ export default function Profile() {
 
   const categories = ['Created', 'Collected'];
   // Use app-data-provider for pre-loaded data if user if profile owner, otherwise use separate subscription
-  const user: User | undefined = owner ? userData : (data && data.user ? data.user : undefined);
+  const user: User | undefined = owner ? userData : data && data.user ? data.user : undefined;
   const userLoading: boolean = owner ? loadingUserData : loading;
   const [nftsShown, setNftsShown] = useState<NFT[]>([]);
 
   useEffect(() => {
     if (user?.createdNfts || user?.ownedNfts) {
       if (toggleIndex === 0) {
-        const filtered = user.createdNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
-        setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
+        const filtered = user.createdNfts.filter((nft) => nft.owner.id !== ZERO_ADDRESS);
+        setNftsShown(
+          filtered.sort((nftA, nftB) => (nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1))
+        );
       }
       if (toggleIndex === 1) {
-        const filtered = user.ownedNfts.filter(nft => nft.owner.id !== ZERO_ADDRESS);
-        setNftsShown(filtered.sort((nftA, nftB) => nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1));
+        const filtered = user.ownedNfts.filter((nft) => nft.owner.id !== ZERO_ADDRESS);
+        setNftsShown(
+          filtered.sort((nftA, nftB) => (nftA.mintTimestamp > nftB.mintTimestamp ? -1 : 1))
+        );
       }
-    }
-    else {
-      setNftsShown([])
+    } else {
+      setNftsShown([]);
     }
   }, [user, toggleIndex]);
 
@@ -180,16 +203,14 @@ export default function Profile() {
   };
   const renderNFTs = () => {
     const copy = `No ${categories[toggleIndex].toLowerCase()} NFTs for this address.`;
-    return (
-      !nftsShown.length ? (
-        <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
-      ) : (
-        <NFTGrid>
-          {nftsShown.map((nft, index) => {
-            return <NFTCard key={index} nft={nft} />;
-          })}
-        </NFTGrid>
-      )
+    return !nftsShown.length ? (
+      <div className="text-xl text-center font-medium text-blue-700 ">{copy}</div>
+    ) : (
+      <NFTGrid>
+        {nftsShown.map((nft, index) => {
+          return <NFTCard key={index} nft={nft} />;
+        })}
+      </NFTGrid>
     );
   };
 
@@ -206,39 +227,46 @@ export default function Profile() {
             <ConnectButton />
           </div>
         </div>
-      </div>)
+      </div>
+    );
   }
 
   // Display error or loading screens
   if (!user || !nameStatus.address) {
     if (error) {
-      return <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-red font-bold text-xl p-20">
-            An Error occured: {error.toString()}
+      return (
+        <div className="h-screen">
+          <div className="w-1/3 text-center mx-auto align-middle">
+            <div className="text-red font-bold text-xl p-20">
+              An Error occured: {error.toString()}
+            </div>
           </div>
         </div>
-      </div>
+      );
     } else if (resolveError) {
-      return <div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-red font-bold text-xl p-20">
-            An Error occured: {resolveError}
+      return (
+        <div className="h-screen">
+          <div className="w-1/3 text-center mx-auto align-middle">
+            <div className="text-red font-bold text-xl p-20">An Error occured: {resolveError}</div>
           </div>
         </div>
-      </div>
+      );
     } else if (loadingUserData || nameStatus.loadingAddress) {
-      return <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
-        <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
-      </div>;
+      return (
+        <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
+          <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
+        </div>
+      );
     } else if (!accountName || !nameStatus.address || !isAddress(nameStatus.address)) {
-      return (<div className="h-screen">
-        <div className="w-1/3 text-center mx-auto align-middle">
-          <div className="text-black dark:text-white font-bold text-xl p-20">
-            Invalid ETH Address or ENS name
+      return (
+        <div className="h-screen">
+          <div className="w-1/3 text-center mx-auto align-middle">
+            <div className="text-black dark:text-white font-bold text-xl p-20">
+              Invalid ETH Address or ENS name
+            </div>
           </div>
         </div>
-      </div>)
+      );
     }
   }
 
@@ -269,11 +297,21 @@ export default function Profile() {
               })}
             </Tab.List>
           </Tab.Group>
-          {userLoading ? <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
-            <img alt="clock spinner" src={ClockSpinner} width={50} height={50} className="mx-auto" />
-          </div> : renderNFTs()}
+          {userLoading ? (
+            <div className="w-full md:w-1/5 mx-auto p-4 pb-0">
+              <img
+                alt="clock spinner"
+                src={ClockSpinner}
+                width={50}
+                height={50}
+                className="mx-auto"
+              />
+            </div>
+          ) : (
+            renderNFTs()
+          )}
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
