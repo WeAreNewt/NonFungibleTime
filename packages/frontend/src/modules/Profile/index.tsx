@@ -98,13 +98,13 @@ export default function Profile() {
           ...nameStatus,
           loadingAddress: false,
           address: currentAccount?.toLowerCase(),
-        })
+        });
         setResolveError(undefined);
       }
       // if mint flag is added to pathname, open mint modal
       if (path[3] === '/mint') {
-        navigate('/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''))
-        setMintPathSet(true)
+        navigate('/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''));
+        setMintPathSet(true);
       }
     }
 
@@ -275,7 +275,12 @@ export default function Profile() {
     <div className="bg-slate-100 dark:bg-gray-800">
       <div className="flex flex-col max-w-7xl m-auto">
         <div className="p-4 md:p-10">
-          <ProfileHeader profileAddress={nameStatus.address ? nameStatus.address : ''} profileENS={nameStatus.name !== "NA" ? nameStatus.name : undefined} owner={owner} mintPathSet={mintPathSet} />
+          <ProfileHeader
+            profileAddress={nameStatus.address ? nameStatus.address : ''}
+            profileENS={nameStatus.name !== 'NA' ? nameStatus.name : undefined}
+            owner={owner}
+            mintPathSet={mintPathSet}
+          />
           <Tab.Group onChange={(index) => onChangeTab(index)}>
             <Tab.List>
               {categories.map((category) => {

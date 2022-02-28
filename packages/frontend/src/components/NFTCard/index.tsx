@@ -11,13 +11,11 @@ interface NftCardProps {
 }
 
 export default function NFTCard({ nft }: NftCardProps) {
-  const { lookupAddress, ensRegistry } = useAppDataProvider()
-  const [ensStatus, setEnsStatus] = useState<EnsState>(
-    {
-      loading: false,
-      name: ensRegistry[nft.creator.id],
-    }
-  );
+  const { lookupAddress, ensRegistry } = useAppDataProvider();
+  const [ensStatus, setEnsStatus] = useState<EnsState>({
+    loading: false,
+    name: ensRegistry[nft.creator.id],
+  });
   const navigate = useNavigate();
   const mintDatetime = new Date(nft.mintTimestamp * 1000);
   const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
@@ -32,8 +30,8 @@ export default function NFTCard({ nft }: NftCardProps) {
       setEnsStatus({
         loading: false,
         name,
-      })
-    }
+      });
+    };
     // If name is not set, fetch from cache
     // If address is not in cache and not currently loading, lookup with mainnet providr
     if (!ensStatus.name) {
@@ -41,7 +39,7 @@ export default function NFTCard({ nft }: NftCardProps) {
         setEnsStatus({
           loading: false,
           name: ensRegistry[nft.creator.id],
-        })
+        });
       } else if (!ensStatus.loading) {
         setEnsStatus({
           ...ensStatus,
@@ -52,8 +50,8 @@ export default function NFTCard({ nft }: NftCardProps) {
     }
     return () => {
       cancel = true;
-    }
-  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id])
+    };
+  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id]);
 
   return (
     <div
@@ -66,7 +64,11 @@ export default function NFTCard({ nft }: NftCardProps) {
         })
       }
     >
-      <UserDetail address={nft.creator.id} ensName={ensStatus.name !== "NA" ? ensStatus.name : undefined} caption={mintDateString} />
+      <UserDetail
+        address={nft.creator.id}
+        ensName={ensStatus.name !== 'NA' ? ensStatus.name : undefined}
+        caption={mintDateString}
+      />
       {/** Tag */}
       <CategoryDisplay>{nft.category ? nft.category : 'Other'}</CategoryDisplay>
       {/** NFT Description */}

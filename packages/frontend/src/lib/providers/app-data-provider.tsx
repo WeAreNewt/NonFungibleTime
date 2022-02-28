@@ -63,7 +63,7 @@ export const AppDataProvider: React.FC = ({ children }) => {
     if (registry) {
       setEnsRegistry(JSON.parse(registry ? registry : ''));
     }
-  }, [])
+  }, []);
 
   // Set ens name for user's connected wallet
   useEffect(() => {
@@ -74,18 +74,18 @@ export const AppDataProvider: React.FC = ({ children }) => {
       newRegistry[address.toLowerCase()] = name ? name : address.toLowerCase();
       window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
       setEnsRegistry(newRegistry);
-    }
+    };
 
     if (account) {
       if (!ensRegistry[account.toLowerCase()] && !ensLoading) {
         setEnsLoading(true);
-        lookupAddress(account)
+        lookupAddress(account);
       }
       if (ensRegistry[account.toLowerCase()] !== account.toLowerCase()) {
         setEnsName(ensRegistry[account.toLowerCase()]);
       }
     }
-  }, [account, ensLoading, ensRegistry, mainnetProvider])
+  }, [account, ensLoading, ensRegistry, mainnetProvider]);
 
   // Service for interacting with NFT collection contract
   const nftCollectionService = new NftCollectionService(
@@ -130,9 +130,9 @@ export const AppDataProvider: React.FC = ({ children }) => {
 
   // Lookup ens name for address on mainnet
   const lookupAddress = async (address: string) => {
-    const name = await mainnetProvider.lookupAddress(address)
+    const name = await mainnetProvider.lookupAddress(address);
     const newRegistry = ensRegistry;
-    newRegistry[address.toLowerCase()] = name ? name : "NA";
+    newRegistry[address.toLowerCase()] = name ? name : 'NA';
     window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
     setEnsRegistry(newRegistry);
     return ensRegistry[address];

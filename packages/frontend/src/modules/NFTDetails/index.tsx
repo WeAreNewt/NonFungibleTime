@@ -487,18 +487,32 @@ export default function NFTDetails() {
                 <FieldLabel className="mb-2">Created By</FieldLabel>
                 <div
                   className="flex cursor-pointer"
-                  onClick={() => navigate('/profile/' + (creatorEns.name !== "NA" ? creatorEns.name : nft.creator.id))}
+                  onClick={() =>
+                    navigate(
+                      '/profile/' + (creatorEns.name !== 'NA' ? creatorEns.name : nft.creator.id)
+                    )
+                  }
                 >
-                  <UserDetail address={nft.creator.id} ensName={creatorEns.name !== "NA" ? creatorEns.name : undefined} caption={mintDateString} />
+                  <UserDetail
+                    address={nft.creator.id}
+                    ensName={creatorEns.name !== 'NA' ? creatorEns.name : undefined}
+                    caption={mintDateString}
+                  />
                 </div>
               </div>
               <div className="w-1/2">
                 <FieldLabel className="mb-2">Owned By</FieldLabel>
                 <div
                   className="flex cursor-pointer"
-                  onClick={() => navigate('/profile/' + (ownerEns.name !== "NA" ? ownerEns.name : nft.owner.id))}
+                  onClick={() =>
+                    navigate('/profile/' + (ownerEns.name !== 'NA' ? ownerEns.name : nft.owner.id))
+                  }
                 >
-                  <UserDetail address={nft.owner.id} ensName={ownerEns.name !== "NA" ? ownerEns.name : undefined} caption={lastPurchaseDateString} />
+                  <UserDetail
+                    address={nft.owner.id}
+                    ensName={ownerEns.name !== 'NA' ? ownerEns.name : undefined}
+                    caption={lastPurchaseDateString}
+                  />
                 </div>
               </div>
             </div>
@@ -523,8 +537,8 @@ export default function NFTDetails() {
                     <div className="font-semibold">
                       {nft.availabilityFrom > Date.now() / 1000
                         ? new Date(nft.availabilityFrom * 1000).toLocaleString('en-us', {
-                          dateStyle: 'long',
-                        })
+                            dateStyle: 'long',
+                          })
                         : 'Any'}
                     </div>
                   </div>
@@ -533,8 +547,8 @@ export default function NFTDetails() {
                     <div className="font-semibold">
                       {nft.availabilityTo > 0
                         ? new Date(nft.availabilityTo * 1000).toLocaleString('en-us', {
-                          dateStyle: 'long',
-                        })
+                            dateStyle: 'long',
+                          })
                         : 'Any'}
                     </div>
                   </div>
