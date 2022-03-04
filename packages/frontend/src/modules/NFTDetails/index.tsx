@@ -43,16 +43,18 @@ const OtherNftsComponent = ({ userId, currentNftId }: { userId: string; currentN
       ?.filter((nft) => nft.id !== currentNftId)
       .sort(nftSortFunction)
       .slice(0, 3);
-    return (
-      <div className="flex flex-col">
-        <HeadingSeparator>More from this Creator</HeadingSeparator>
-        <NFTGrid>
-          {displayedNfts!.map((nft, index) => {
-            return <NFTCard key={index} nft={nft} />;
-          })}
-        </NFTGrid>
-      </div>
-    );
+    if (displayedNfts && displayedNfts.length > 0) {
+      return (
+        <div className="flex flex-col">
+          <HeadingSeparator>More from this Creator</HeadingSeparator>
+          <NFTGrid>
+            {displayedNfts!.map((nft, index) => {
+              return <NFTCard key={index} nft={nft} />;
+            })}
+          </NFTGrid>
+        </div>
+      );
+    }
   }
   return null;
 };

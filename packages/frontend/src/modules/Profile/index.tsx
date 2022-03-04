@@ -92,6 +92,14 @@ export default function Profile() {
     }
 
     if (owner) {
+      if (nameStatus.address !== currentAccount?.toLowerCase()) {
+        setNameStatus({
+          loadingAddress: false,
+          loadingName: false,
+          address: currentAccount?.toLowerCase(),
+          name: undefined,
+        });
+      }
       // if connected wallet is profile owner, no need to resolve an ens name, just use the connected wallet address
       if (!nameStatus.address) {
         setNameStatus({

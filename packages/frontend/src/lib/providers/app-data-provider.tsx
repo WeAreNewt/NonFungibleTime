@@ -71,7 +71,7 @@ export const AppDataProvider: React.FC = ({ children }) => {
       const name = await mainnetProvider.lookupAddress(address);
       setEnsLoading(false);
       const newRegistry = ensRegistry;
-      newRegistry[address.toLowerCase()] = name ? name : address.toLowerCase();
+      newRegistry[address.toLowerCase()] = name ? name : 'NA';
       window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
       setEnsRegistry(newRegistry);
     };
@@ -81,8 +81,10 @@ export const AppDataProvider: React.FC = ({ children }) => {
         setEnsLoading(true);
         lookupAddress(account);
       }
-      if (ensRegistry[account.toLowerCase()] !== account.toLowerCase()) {
+      if (ensRegistry[account.toLowerCase()] !== 'NA') {
         setEnsName(ensRegistry[account.toLowerCase()]);
+      } else {
+        setEnsName(undefined);
       }
     }
   }, [account, ensLoading, ensRegistry, mainnetProvider]);
