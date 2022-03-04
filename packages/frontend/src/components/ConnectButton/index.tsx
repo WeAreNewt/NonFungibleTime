@@ -11,21 +11,28 @@ export default function AddressInfo() {
   const { account, isCorrectChain, requestToSwitchChain } = useWeb3();
   const { ensName, disconnectWallet } = useAppDataProvider();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeProfile, setActiveProfile] = useState<string>('');
   const [connectModalOpen, setConnectModalOpen] = useState(false);
   const navigate = useNavigate();
   const { width } = useViewportProvider();
   const location = useLocation();
 
-  // If user connects wallet while on disconnected profile screen, redirect to their profile
   useEffect(() => {
     if (account) {
+      // If account changes while viewing your own profile, change to the new accounts profile
+      if (account !== activeProfile) {
+        setActiveProfile(account);
+        navigate('/profile/' + account);
+      }
       if (location.pathname === '/profile/mint/') {
+        // Bring user directly to mint modal if /mint flag is added to url
         navigate('/profile/' + (ensName && ensName !== 'NA' ? ensName : account) + '/mint/');
       } else if (location.pathname === '/profile/' + account || location.pathname === '/profile/') {
+        // Switch profile url to include ensName if applicable
         navigate('/profile/' + (ensName && ensName !== 'NA' ? ensName : account));
       }
     }
-  }, [account, ensName, location.pathname, navigate]);
+  }, [account, activeProfile, ensName, location.pathname, navigate]);
 
   // Cutoff for mobile abbreviated text
   const threshold = 620;
