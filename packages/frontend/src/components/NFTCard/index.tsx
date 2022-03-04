@@ -38,7 +38,7 @@ export default function NFTCard({ nft }: NftCardProps) {
       setEnsStatus({
         loading: false,
         name: undefined,
-      })
+      });
     }
     // If name is not set, fetch from cache
     // If address is not in cache and not currently loading, lookup with mainnet providr

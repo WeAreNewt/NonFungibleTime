@@ -20,9 +20,9 @@ export default function AddressInfo() {
   useEffect(() => {
     if (account) {
       if (location.pathname === '/profile/mint/') {
-        navigate('/profile/' + (ensName ? ensName : account) + '/mint/');
+        navigate('/profile/' + (ensName && ensName !== 'NA' ? ensName : account) + '/mint/');
       } else if (location.pathname === '/profile/' + account || location.pathname === '/profile/') {
-        navigate('/profile/' + (ensName ? ensName : account));
+        navigate('/profile/' + (ensName && ensName !== 'NA' ? ensName : account));
       }
     }
   }, [account, ensName, location.pathname, navigate]);
@@ -47,8 +47,12 @@ export default function AddressInfo() {
         {account ? (
           isCorrectChain ? (
             <div className="flex items-center space-x-2">
-              <Davatar address={account.toLowerCase()} size={25} generatedAvatarType='blockies' />
-              <div>{ensName ? formatEns(ensName, 15) : formatEthAddress(account)}</div>
+              <Davatar address={account.toLowerCase()} size={25} generatedAvatarType="blockies" />
+              <div>
+                {ensName && ensName !== 'NA'
+                  ? formatEns(ensName, 15)
+                  : formatEthAddress(account.toLowerCase())}
+              </div>
             </div>
           ) : (
             'Wrong Network'
