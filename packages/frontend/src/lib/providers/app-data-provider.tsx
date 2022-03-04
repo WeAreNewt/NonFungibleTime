@@ -28,6 +28,7 @@ const AppDataContext = React.createContext<AppDataContextType>({} as AppDataCont
 export const AppDataProvider: React.FC = ({ children }) => {
   const { account, chainId, disconnect } = useWeb3();
   const [ensName, setEnsName] = useState<string | undefined>(undefined);
+  const [ensLoading, setEnsLoading] = useState<boolean>(false);
   const [ensRegistry, setEnsRegistry] = useState<Record<string, string>>({});
 
   // Provider setup for active network
@@ -45,36 +46,48 @@ export const AppDataProvider: React.FC = ({ children }) => {
   // Setup batch provider for mainnet to reduce rpc calls for batch ENS lookups
   const mainnetConfig = networkConfigs[ChainId.mainnet];
   const mainnetProvider = useMemo<providers.Provider>(() => {
-    const mainnetRpcUrls = mainnetConfig.rpcUrls ? mainnetConfig.rpcUrls : ['']
+    const mainnetRpcUrls = mainnetConfig.rpcUrls ? mainnetConfig.rpcUrls : [''];
     const mainnetBaseProvider = new ethers.providers.JsonRpcBatchProvider(mainnetRpcUrls[0]);
     let mainnetFallbackProvider: providers.Provider | undefined;
     if (mainnetRpcUrls.length > 1) {
       mainnetFallbackProvider = new ethers.providers.StaticJsonRpcProvider(mainnetRpcUrls[1]);
     }
-    return (mainnetFallbackProvider
+    return mainnetFallbackProvider
       ? new providers.FallbackProvider([mainnetBaseProvider, mainnetFallbackProvider])
-      : mainnetBaseProvider)
-  }, [mainnetConfig])
+      : mainnetBaseProvider;
+  }, [mainnetConfig]);
+
+  // load cache from localStorage on first page load
+  useEffect(() => {
+    const registry = window.localStorage.getItem('ensRegistry');
+    if (registry) {
+      setEnsRegistry(JSON.parse(registry ? registry : ''));
+    }
+  }, []);
 
   // Set ens name for user's connected wallet
   useEffect(() => {
     const lookupAddress = async (address: string) => {
       const name = await mainnetProvider.lookupAddress(address);
-      setEnsRegistry({
-        ...ensRegistry,
-        [address]: name ? name : address,
-      })
-    }
+      setEnsLoading(false);
+      const newRegistry = ensRegistry;
+      newRegistry[address.toLowerCase()] = name ? name : 'NA';
+      window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
+      setEnsRegistry(newRegistry);
+    };
 
     if (account) {
-      if (!ensRegistry[account]) {
-        lookupAddress(account)
+      if (!ensRegistry[account.toLowerCase()] && !ensLoading) {
+        setEnsLoading(true);
+        lookupAddress(account);
       }
-      if (ensRegistry[account] !== account) {
-        setEnsName(ensRegistry[account]);
+      if (ensRegistry[account.toLowerCase()] !== 'NA') {
+        setEnsName(ensRegistry[account.toLowerCase()]);
+      } else {
+        setEnsName(undefined);
       }
     }
-  }, [account, ensRegistry, mainnetProvider])
+  }, [account, ensLoading, ensRegistry, mainnetProvider]);
 
   // Service for interacting with NFT collection contract
   const nftCollectionService = new NftCollectionService(
@@ -90,12 +103,10 @@ export const AppDataProvider: React.FC = ({ children }) => {
   });
   const userData = data && data.user ? data.user : undefined;
 
-
   // Array of tokens which can be set as payment for time NFTs, Refresh every 5 minutes
   const { data: paymentTokenData } = useQuery(PaymentTokensDocument, {
     pollInterval: 300000,
   });
-
 
   // Hardcoded default
   let availablePaymentTokens: Record<string, PaymentToken> = {
@@ -108,25 +119,26 @@ export const AppDataProvider: React.FC = ({ children }) => {
   };
 
   if (paymentTokenData) {
-    availablePaymentTokens = Object.assign({}, ...paymentTokenData.paymentTokens.map((token) => (
-      { [token.symbol]: token }
-    )))
+    availablePaymentTokens = Object.assign(
+      {},
+      ...paymentTokenData.paymentTokens.map((token) => ({ [token.symbol]: token }))
+    );
   }
 
   const disconnectWallet = () => {
     disconnect();
     setEnsName(undefined);
-  }
+  };
 
   // Lookup ens name for address on mainnet
   const lookupAddress = async (address: string) => {
     const name = await mainnetProvider.lookupAddress(address);
-    setEnsRegistry({
-      ...ensRegistry,
-      [address]: name ? name : address,
-    })
+    const newRegistry = ensRegistry;
+    newRegistry[address.toLowerCase()] = name ? name : 'NA';
+    window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
+    setEnsRegistry(newRegistry);
     return ensRegistry[address];
-  }
+  };
 
   return (
     <AppDataContext.Provider
