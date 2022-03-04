@@ -16,6 +16,7 @@ export default function NFTCard({ nft }: NftCardProps) {
     loading: false,
     name: ensRegistry[nft.creator.id],
   });
+  const [cardId, setCardId] = useState<string>('');
   const navigate = useNavigate();
   const mintDatetime = new Date(nft.mintTimestamp * 1000);
   const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
@@ -32,6 +33,13 @@ export default function NFTCard({ nft }: NftCardProps) {
         name,
       });
     };
+    if (cardId !== nft.creator.id) {
+      setCardId(nft.creator.id);
+      setEnsStatus({
+        loading: false,
+        name: undefined,
+      })
+    }
     // If name is not set, fetch from cache
     // If address is not in cache and not currently loading, lookup with mainnet providr
     if (!ensStatus.name) {
@@ -51,7 +59,7 @@ export default function NFTCard({ nft }: NftCardProps) {
     return () => {
       cancel = true;
     };
-  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id]);
+  }, [cardId, ensRegistry, ensStatus, lookupAddress, nft.creator.id]);
 
   return (
     <div
