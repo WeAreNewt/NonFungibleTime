@@ -5,6 +5,7 @@ import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { useViewportProvider } from '../../lib/providers/viewport-provider';
 import { useWeb3, isMetamask } from '../../lib/providers/web3-provider';
 import ConnectModal from '../ConnectModal';
+import Davatar from '@davatar/react';
 
 export default function AddressInfo() {
   const { account, isCorrectChain, requestToSwitchChain } = useWeb3();
@@ -43,15 +44,20 @@ export default function AddressInfo() {
         onClick={onClickModalOpen}
         className="w-full flex items-center justify-center px-6 py-1 border border-transparent text-base font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-2 md:text-lg md:px-8 cursor-pointer"
       >
-        {account
-          ? isCorrectChain
-            ? ensName
-              ? formatEns(ensName, 15)
-              : formatEthAddress(account)
-            : 'Wrong Network'
-          : width < threshold
-          ? 'Connect'
-          : 'Connect Wallet'}
+        {account ? (
+          isCorrectChain ? (
+            <div className="flex items-center space-x-2">
+              <Davatar address={account} size={25} />
+              <div>{ensName ? formatEns(ensName, 15) : formatEthAddress(account)}</div>
+            </div>
+          ) : (
+            'Wrong Network'
+          )
+        ) : width < threshold ? (
+          'Connect'
+        ) : (
+          'Connect Wallet'
+        )}
       </button>
       {isOpen && (
         <button

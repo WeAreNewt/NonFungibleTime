@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@aave/aave-ui-kit": "^0.1.22",
+    "@davatar/react": "^1.9.0",
     "@ethersproject/providers": "^5.5.2",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
