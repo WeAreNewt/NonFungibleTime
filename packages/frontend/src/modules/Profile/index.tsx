@@ -91,10 +91,21 @@ export default function Profile() {
       setOwner(false);
     }
 
-    // if user is profile owner and mint is added to pathname, open mint modal
-    if (owner && path[3] === 'mint') {
-      navigate('/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''));
-      setMintPathSet(true);
+    if (owner) {
+      // if connected wallet is profile owner, no need to resolve an ens name, just use the connected wallet address
+      if (!nameStatus.address) {
+        setNameStatus({
+          ...nameStatus,
+          loadingAddress: false,
+          address: currentAccount?.toLowerCase(),
+        });
+        setResolveError(undefined);
+      }
+      // if mint flag is added to pathname, open mint modal
+      if (path[3] === '/mint') {
+        navigate('/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''));
+        setMintPathSet(true);
+      }
     }
 
     // set profile address based on pathname or resolve from ens
@@ -266,7 +277,7 @@ export default function Profile() {
         <div className="p-4 md:p-10">
           <ProfileHeader
             profileAddress={nameStatus.address ? nameStatus.address : ''}
-            profileENS={nameStatus.name !== nameStatus.address ? nameStatus.name : undefined}
+            profileENS={nameStatus.name !== 'NA' ? nameStatus.name : undefined}
             owner={owner}
             mintPathSet={mintPathSet}
           />

@@ -14,31 +14,41 @@ export default function NFTCard({ nft }: NftCardProps) {
   const { lookupAddress, ensRegistry } = useAppDataProvider();
   const [ensStatus, setEnsStatus] = useState<EnsState>({
     loading: false,
-    name: undefined,
+    name: ensRegistry[nft.creator.id],
   });
+  const [cardId, setCardId] = useState<string>('');
   const navigate = useNavigate();
   const mintDatetime = new Date(nft.mintTimestamp * 1000);
   const mintDateString = mintDatetime.toLocaleString('en-us', { dateStyle: 'medium' });
 
-  // Use name in ensRegistry hashmap, or lookupAddress if not found
+  // If user has no ens name in cache, set loading to true and lookup with mainnet provider
   useEffect(() => {
-    let cancel = true;
+    let cancel = false;
     const lookup = async (address: string) => {
-      const name = await lookupAddress(address);
+      // Prevent memory leak if component beocomes unmounted whlie fetching
       if (cancel) return;
+      const name = await lookupAddress(address);
       setEnsStatus({
         loading: false,
         name,
       });
     };
-    // Only fetch if name has not been set and is not currently loading
-    if (!ensStatus.name && !ensStatus.loading) {
+    if (cardId !== nft.creator.id) {
+      setCardId(nft.creator.id);
+      setEnsStatus({
+        loading: false,
+        name: undefined,
+      })
+    }
+    // If name is not set, fetch from cache
+    // If address is not in cache and not currently loading, lookup with mainnet providr
+    if (!ensStatus.name) {
       if (ensRegistry[nft.creator.id]) {
         setEnsStatus({
           loading: false,
           name: ensRegistry[nft.creator.id],
         });
-      } else {
+      } else if (!ensStatus.loading) {
         setEnsStatus({
           ...ensStatus,
           loading: true,
@@ -49,7 +59,7 @@ export default function NFTCard({ nft }: NftCardProps) {
     return () => {
       cancel = true;
     };
-  }, [ensRegistry, ensStatus, lookupAddress, nft.creator.id]);
+  }, [cardId, ensRegistry, ensStatus, lookupAddress, nft.creator.id]);
 
   return (
     <div
@@ -64,7 +74,7 @@ export default function NFTCard({ nft }: NftCardProps) {
     >
       <UserDetail
         address={nft.creator.id}
-        ensName={ensStatus.name !== nft.creator.id ? ensStatus.name : undefined}
+        ensName={ensStatus.name !== 'NA' ? ensStatus.name : undefined}
         caption={mintDateString}
       />
       {/** Tag */}

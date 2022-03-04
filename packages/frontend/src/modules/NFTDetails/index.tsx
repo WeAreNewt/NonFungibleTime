@@ -489,14 +489,13 @@ export default function NFTDetails() {
                   className="flex cursor-pointer"
                   onClick={() =>
                     navigate(
-                      '/profile/' +
-                        (creatorEns.name !== nft.creator.id ? creatorEns.name : nft.creator.id)
+                      '/profile/' + (creatorEns.name !== 'NA' ? creatorEns.name : nft.creator.id)
                     )
                   }
                 >
                   <UserDetail
                     address={nft.creator.id}
-                    ensName={creatorEns.name !== nft.creator.id ? creatorEns.name : undefined}
+                    ensName={creatorEns.name !== 'NA' ? creatorEns.name : undefined}
                     caption={mintDateString}
                   />
                 </div>
@@ -506,14 +505,12 @@ export default function NFTDetails() {
                 <div
                   className="flex cursor-pointer"
                   onClick={() =>
-                    navigate(
-                      '/profile/' + (ownerEns.name !== nft.owner.id ? ownerEns.name : nft.owner.id)
-                    )
+                    navigate('/profile/' + (ownerEns.name !== 'NA' ? ownerEns.name : nft.owner.id))
                   }
                 >
                   <UserDetail
                     address={nft.owner.id}
-                    ensName={ownerEns.name !== nft.owner.id ? ownerEns.name : undefined}
+                    ensName={ownerEns.name !== 'NA' ? ownerEns.name : undefined}
                     caption={lastPurchaseDateString}
                   />
                 </div>

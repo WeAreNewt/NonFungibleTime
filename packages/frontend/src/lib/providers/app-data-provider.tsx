@@ -28,6 +28,7 @@ const AppDataContext = React.createContext<AppDataContextType>({} as AppDataCont
 export const AppDataProvider: React.FC = ({ children }) => {
   const { account, chainId, disconnect } = useWeb3();
   const [ensName, setEnsName] = useState<string | undefined>(undefined);
+  const [ensLoading, setEnsLoading] = useState<boolean>(false);
   const [ensRegistry, setEnsRegistry] = useState<Record<string, string>>({});
 
   // Provider setup for active network
@@ -56,25 +57,35 @@ export const AppDataProvider: React.FC = ({ children }) => {
       : mainnetBaseProvider;
   }, [mainnetConfig]);
 
+  // load cache from localStorage on first page load
+  useEffect(() => {
+    const registry = window.localStorage.getItem('ensRegistry');
+    if (registry) {
+      setEnsRegistry(JSON.parse(registry ? registry : ''));
+    }
+  }, []);
+
   // Set ens name for user's connected wallet
   useEffect(() => {
     const lookupAddress = async (address: string) => {
       const name = await mainnetProvider.lookupAddress(address);
-      setEnsRegistry({
-        ...ensRegistry,
-        [address]: name ? name : address,
-      });
+      setEnsLoading(false);
+      const newRegistry = ensRegistry;
+      newRegistry[address.toLowerCase()] = name ? name : address.toLowerCase();
+      window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
+      setEnsRegistry(newRegistry);
     };
 
     if (account) {
-      if (!ensRegistry[account]) {
+      if (!ensRegistry[account.toLowerCase()] && !ensLoading) {
+        setEnsLoading(true);
         lookupAddress(account);
       }
-      if (ensRegistry[account] !== account) {
-        setEnsName(ensRegistry[account]);
+      if (ensRegistry[account.toLowerCase()] !== account.toLowerCase()) {
+        setEnsName(ensRegistry[account.toLowerCase()]);
       }
     }
-  }, [account, ensRegistry, mainnetProvider]);
+  }, [account, ensLoading, ensRegistry, mainnetProvider]);
 
   // Service for interacting with NFT collection contract
   const nftCollectionService = new NftCollectionService(
@@ -120,10 +131,10 @@ export const AppDataProvider: React.FC = ({ children }) => {
   // Lookup ens name for address on mainnet
   const lookupAddress = async (address: string) => {
     const name = await mainnetProvider.lookupAddress(address);
-    setEnsRegistry({
-      ...ensRegistry,
-      [address]: name ? name : address,
-    });
+    const newRegistry = ensRegistry;
+    newRegistry[address.toLowerCase()] = name ? name : 'NA';
+    window.localStorage.setItem('ensRegistry', JSON.stringify(newRegistry));
+    setEnsRegistry(newRegistry);
     return ensRegistry[address];
   };
 
