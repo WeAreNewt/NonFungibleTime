@@ -6,12 +6,13 @@ import { useViewportProvider } from '../../lib/providers/viewport-provider';
 import { useWeb3, isMetamask } from '../../lib/providers/web3-provider';
 import ConnectModal from '../ConnectModal';
 import Davatar from '@davatar/react';
+import { isOwner } from '../../lib/helpers/validators';
 
 export default function AddressInfo() {
   const { account, isCorrectChain, requestToSwitchChain } = useWeb3();
   const { ensName, disconnectWallet } = useAppDataProvider();
   const [isOpen, setIsOpen] = useState(false);
-  const [activeProfile, setActiveProfile] = useState<string>('');
+  const [activeAccount, setActiveAccount] = useState<string | undefined>(undefined);
   const [connectModalOpen, setConnectModalOpen] = useState(false);
   const navigate = useNavigate();
   const { width } = useViewportProvider();
@@ -19,11 +20,14 @@ export default function AddressInfo() {
 
   useEffect(() => {
     if (account) {
-      // If account changes while viewing your own profile, change to the new accounts profile
-      if (account !== activeProfile) {
-        setActiveProfile(account);
+      // Reload profile if wallet is changed, but only reload if we are on our current profile
+      // This way you can connect or change a wallet without losing the page you're currently on
+      if (activeAccount && account !== activeAccount) {
+        setActiveAccount(account);
         navigate('/profile/' + account);
       }
+      const path = location.pathname.split('/');
+      setActiveAccount(isOwner(path[2] ? path[2] : '', account, ensName) ? account : undefined);
       if (location.pathname === '/profile/mint/') {
         // Bring user directly to mint modal if /mint flag is added to url
         navigate('/profile/' + (ensName && ensName !== 'NA' ? ensName : account) + '/mint/');
@@ -32,7 +36,7 @@ export default function AddressInfo() {
         navigate('/profile/' + (ensName && ensName !== 'NA' ? ensName : account));
       }
     }
-  }, [account, activeProfile, ensName, location.pathname, navigate]);
+  }, [account, activeAccount, ensName, location.pathname, navigate]);
 
   // Cutoff for mobile abbreviated text
   const threshold = 620;

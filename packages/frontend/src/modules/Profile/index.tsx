@@ -14,6 +14,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { isAddress } from 'ethers/lib/utils';
 import { ZERO_ADDRESS } from '../../lib/helpers/constants';
 import { ProfileHeader } from '../../components/ProfileHeader';
+import { isOwner } from '../../lib/helpers/validators';
 
 interface ProfileNameState {
   loadingAddress: boolean;
@@ -33,7 +34,7 @@ export default function Profile() {
     ensRegistry,
   } = useAppDataProvider();
   const navigate = useNavigate();
-  const [owner, setOwner] = useState<boolean>(true);
+  const [owner, setOwner] = useState<boolean>(false);
   const [toggleIndex, setToggleIndex] = useState<number>(0);
   const [nameStatus, setNameStatus] = useState<ProfileNameState>({
     loadingAddress: false,
@@ -58,7 +59,7 @@ export default function Profile() {
           loadingAddress: false,
           loadingName: false,
           name,
-          address,
+          address: address.toLowerCase(),
         });
         setResolveError(undefined);
       } else {
@@ -82,42 +83,31 @@ export default function Profile() {
     };
 
     // determine if connected wallet is profile owner
-    if (
-      accountName.toLowerCase() === currentAccount?.toLowerCase() ||
-      accountName.toLowerCase() === ensName?.toLowerCase()
-    ) {
-      setOwner(true);
-    } else {
-      setOwner(false);
-    }
+    setOwner(isOwner(accountName, currentAccount, ensName));
 
     if (owner) {
-      if (nameStatus.address !== currentAccount?.toLowerCase()) {
+      // Set currently active address to connected wallet
+      if (
+        !nameStatus.address ||
+        nameStatus.address.toLowerCase() !== currentAccount?.toLowerCase()
+      ) {
         setNameStatus({
           loadingAddress: false,
           loadingName: false,
           address: currentAccount?.toLowerCase(),
           name: undefined,
         });
-      }
-      // if connected wallet is profile owner, no need to resolve an ens name, just use the connected wallet address
-      if (!nameStatus.address) {
-        setNameStatus({
-          ...nameStatus,
-          loadingAddress: false,
-          address: currentAccount?.toLowerCase(),
-        });
         setResolveError(undefined);
       }
-      // if mint flag is added to pathname, open mint modal
+      // if mint flag is added to pathname, open mint modal and reset pathname
       if (path[3] === '/mint') {
         navigate('/profile/' + (ensName ? ensName : currentAccount ? currentAccount : ''));
         setMintPathSet(true);
       }
     }
 
-    // set profile address based on pathname or resolve from ens
-    if (!nameStatus.address && !resolveError) {
+    // If we are on someones else's profile, set profile address based on adress or .eth from pathname
+    if (!owner && !nameStatus.address && !resolveError) {
       if (isAddress(accountName)) {
         setResolveError(undefined);
         const address = accountName.toLowerCase();
