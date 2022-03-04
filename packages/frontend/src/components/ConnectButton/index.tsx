@@ -47,7 +47,7 @@ export default function AddressInfo() {
         {account ? (
           isCorrectChain ? (
             <div className="flex items-center space-x-2">
-              <Davatar address={account} size={25} />
+              <Davatar address={account.toLowerCase()} size={25} generatedAvatarType='blockies' />
               <div>{ensName ? formatEns(ensName, 15) : formatEthAddress(account)}</div>
             </div>
           ) : (
