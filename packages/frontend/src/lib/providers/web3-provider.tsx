@@ -20,7 +20,7 @@ export type WalletType = z.infer<typeof WalletType>;
 
 // No network toggle for now
 export const PROTOCOL_CHAIN =
-  process.env.REACT_APP_SELECTED_ENVIRONMENT === 'production' ? ChainId.polygon : ChainId.mumbai;
+  process.env.REACT_APP_SELECTED_ENVIRONMENT === 'development' ? ChainId.mumbai : ChainId.polygon;
 
 export const injected = new InjectedConnector({});
 
