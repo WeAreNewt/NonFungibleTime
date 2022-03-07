@@ -6,21 +6,23 @@ inputs:
     required: true
   REACT_APP_SELECTED_ENVIRONMENT:
     description: ReactApp environment
-    required: false
-    default: development
+    required: true
 runs:
   using: 'composite'
   steps:
     - uses: actions/setup-node@v2
       with:
         node-version: '14.16.1'
+        cache: 'npm'
+        cache-dependency-path: '${{inputs.WORK_DIR}}/package-lock.json'
     - name: Install NPM packages
       shell: sh
       working-directory: '${{inputs.WORK_DIR}}'
-      run: npm i
+      run: npm ci
     - name: Build static
       shell: sh
       working-directory: '${{inputs.WORK_DIR}}'
       run: |
-        echo "REACT_APP_SELECTED_ENVIRONMENT={{ inputs.REACT_APP_SELECTED_ENVIRONMENT }}" > .env
+        echo "REACT_APP_SELECTED_ENVIRONMENT=${{ inputs.REACT_APP_SELECTED_ENVIRONMENT }}" > .env
+        cat .env
         npm run build

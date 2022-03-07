@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14.16.1'
+          cache: 'npm'
+          cache-dependency-path: '${{env.working-directory}}/package-lock.json'
       - name: Install hardhat
         run: npm install --save-dev hardhat
         working-directory: ${{env.working-directory}}
