@@ -13,9 +13,6 @@ inputs:
   AWS_SECRET_ACCESS_KEY:
     description: AWS secret access key
     required: true
-  AWS_ROLE_TO_ASSUME:
-    description: AWS IAM role to assume
-    required: true
   AWS_REGION:
     description: AWS region
     required: true
@@ -38,8 +35,8 @@ runs:
       working-directory: ${{inputs.WORK_DIR}}
       run: |
         aws s3 sync --quiet --only-show-errors --delete \
-        ./build 's3://${{inputs.S3_BUCKET}}/${{inputs.S3_PREFIX}}'
+        ./build 's3://${{inputs.S3_BUCKET}}${{inputs.S3_PREFIX}}'
     - name: Invalidate Cloudfront cache
       shell: sh
       working-directory: ./
-      run: ./scripts/cache_invalidation.sh '${{inputs.S3_BUCKET}}' '/${{inputs.S3_PREFIX}}/*'
+      run: ./scripts/cache_invalidation.sh '${{inputs.S3_BUCKET}}' '${{inputs.S3_PREFIX}}*'
