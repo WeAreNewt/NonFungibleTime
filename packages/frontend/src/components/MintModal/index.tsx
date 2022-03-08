@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { FaExternalLinkAlt, FaRegWindowClose } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegWindowClose, FaTwitter } from 'react-icons/fa';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 import { MintParamsType } from '../../lib/helpers/NftCollection';
 import { Input, Label, Select, baseInputClassNames } from '../../components/Forms';
@@ -216,6 +216,15 @@ export default function MintModal({ open, onClose }: Props) {
                         >
                           View
                         </button>
+                        <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href={`https://twitter.com/intent/tweet?text=I just minted a time NFT on-chain: ${window.location.origin}/nft/${lastNft}`}
+                            className="mt-3 sm:mt-0 w-full inline-flex justify-center items-center gap-2 rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm bg-twitter"
+                          >
+                            <FaTwitter />
+                            Tweet
+                          </a>
                         <button
                           type="button"
                           className="disabled:opacity-50 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white w-auto sm:text-sm"
