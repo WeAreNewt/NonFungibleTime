@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import Toggle from '../../ThemeToggle';
 import { Button } from '../Button';
 import MintModal from '../MintModal';
+import { useWeb3 } from '../../lib/providers/web3-provider';
 import { useAppDataProvider } from '../../lib/providers/app-data-provider';
 
 interface Navigation {
@@ -17,6 +18,7 @@ export default function Navbar() {
   const { currentAccount, ensName } = useAppDataProvider();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mintModalOpen, setMintModalOpen] = useState<boolean>(false);
+  const { isCorrectChain } = useWeb3();
   const location = useLocation();
   const activePage = location.pathname.split('/')[1];
 
@@ -139,7 +141,7 @@ export default function Navbar() {
                 })}
 
                 {/** Mint */}
-                {currentAccount && (
+                {currentAccount && isCorrectChain && (
                   <Button
                     onClick={() => {
                       setMintModalOpen(true);
