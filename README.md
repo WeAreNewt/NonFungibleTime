@@ -54,6 +54,10 @@ Given the modular nature of smart contracts, Time NFTs can be integrated, enhanc
 ## Smart Contracts
 
 The smart contracts store the NFT collection (ERC-721) on the blockchain - with the reference implementation being deployed to the Polygon network. This package uses the hardhat framework for contract development and deployment.
+
+Contract address on Polygon: [0x6A9ab6e747699fB80E53B21b3baB24EE840fD1Ff](https://polygonscan.com/address/0x6A9ab6e747699fB80E53B21b3baB24EE840fD1Ff#code)
+
+See the time NFTs on Opensea in the [NFTime Collection](https://opensea.io/collection/nonfungibletimecollection).
     
 ### NonFungibleTimeCollection
 
@@ -181,6 +185,8 @@ npx hardhat compile
 <br />
 
 ## Frontend
+
+See canonical frontend at [aika.market](https://aika.market)
 
 Main features of the frontend are creating, discovering, purchasing, and redeeming time NFTs
 
